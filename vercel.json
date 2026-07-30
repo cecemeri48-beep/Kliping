@@ -1,0 +1,6 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/klip/:id", "destination": "/api/share?id=:id" }
+  ]
+}
