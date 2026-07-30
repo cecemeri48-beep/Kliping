@@ -360,6 +360,11 @@ body{background:#f6f3ed;background-image:radial-gradient(circle at 10% 8%,#fff 0
   .foot{padding:36px 0 calc(30px + env(safe-area-inset-bottom))}
   .toast{left:16px;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));transform:none;text-align:center}
 }
+.btabs{display:none}
+@media(max-width:640px){.btabs{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;background:#fff;border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(16,42,67,.10);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}.btabs button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:#7a828c;font-size:11px;font-weight:700;border-radius:10px;cursor:pointer}.btabs button .bi{font-size:19px;line-height:1}.btabs button.on{color:var(--violet)}body{padding-bottom:68px}}
+[data-tema="gelap"] .btabs{background:#12161d;border-top-color:#2b313b;box-shadow:0 -4px 16px rgba(0,0,0,.45)}
+[data-tema="gelap"] .btabs button{color:#c7ccd4}
+[data-tema="gelap"] .btabs button.on{color:#b6a8ff}
 </style>
 </head>
 <body>
@@ -473,7 +478,7 @@ S={mode:"public",pv:{n:"board"},av:"dasbor",filter:"Semua",me:null,draft:null,er
 
 const PERM={
  "Super-Admin":["dasbor","kliping","tinjauan","materi","pengguna","taksonomi","pedoman","audit","pengaturan"],
- "Admin":["dasbor","kliping","tinjauan","materi","pedoman"],
+ "Admin":["dasbor","kliping","tinjauan","materi","pengguna","pedoman"],
  "Kurator":["dasbor","kliping"]
 };
 const ICON={dasbor:"\u25F1",kliping:"\u2702",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",audit:"\u2261",pengaturan:"\u2699"};
@@ -677,17 +682,19 @@ function suntingMateri(id){openModal("materi",id)}
 function hapusMateri(id){const m=mat(id);if(!m)return;const used=db.kliping.filter(k=>k.materi.includes(id)).length;if(!confirm("Hapus materi \""+m.judul+"\"?"+(used?" Materi ini ditaut oleh "+used+" kliping; tautannya akan dilepas.":"")))return;const affected=db.kliping.filter(k=>k.materi.includes(id));db.materi=db.materi.filter(x=>x.id!==id);db.kliping.forEach(k=>{k.materi=k.materi.filter(x=>x!==id)});log("Menghapus materi",m.judul);supa.from("materi").delete().eq("id",id).then(({error})=>pErr(error,"materi"));affected.forEach(k=>{supa.from("kliping").update({materi:k.materi}).eq("id",k.id).then(({error})=>{if(error)console.warn("kliping",error.message)})});render();toast("Materi dihapus")}
 
 function pPengguna(){
+  const sa=me().peran==="Super-Admin";
   const rows=db.pengguna.map(u=>"<tr><td><b>"+esc(u.nama)+'</b></td><td>'+esc(u.divisi)+'</td><td><select onchange="ubahPeran(\''+u.id+'\',this.value)" style="padding:6px 8px;border:1px solid var(--line);border-radius:6px">'+
     ["Super-Admin","Admin","Kurator"].map(p=>'<option '+(u.peran===p?"selected":"")+">"+p+"</option>").join("")+'</select></td><td>'+(u.aktif?'<span class="tag tag-g">Aktif</span>':'<span class="tag tag-r">Nonaktif</span>')+
     '</td><td><button class="btn btn-sm" onclick="toggleAktif(\''+u.id+'\')">'+(u.aktif?"Nonaktifkan":"Aktifkan")+'</button> <button class="btn btn-sm btn-d" onclick="hapusPengguna(\''+u.id+'\')">Hapus</button></td></tr>').join("");
-  return ph("Pengguna & Peran","Hanya Super-Admin dapat mengubah peran. Setiap perubahan tercatat di jurnal audit.",'<button class="btn btn-p" onclick="tambahUser()">+ Pengguna</button>')+
+  return ph("Pengguna & Peran",sa?"Hanya Super-Admin dapat mengubah peran. Setiap perubahan tercatat di jurnal audit.":"Sebagai Admin kamu dapat menambahkan akun Kurator. Perubahan peran & penghapusan hanya oleh Super-Admin.",'<button class="btn btn-p" onclick="tambahUser()">+ '+(sa?"Pengguna":"Kurator")+'</button>')+
    '<div class="note" style="margin-bottom:16px"><b>Super-Admin</b> mengelola pengguna, rubrik, pedoman, audit, dan pengaturan. <b>Admin</b> menyunting, meninjau, dan menerbitkan. <b>Kurator</b> menggunting lalu mengajukan tinjauan.</div>'+
    '<div class="tbl tbl-scroll"><table><thead><tr><th>Nama</th><th>Divisi</th><th>Peran</th><th>Status</th><th></th></tr></thead><tbody>'+rows+"</tbody></table></div>";
 }
-function ubahPeran(id,p){const u=user(id);u.peran=p;log("Mengubah peran pengguna",u.nama+" menjadi "+p);supa.from("profiles").update({peran:p}).eq("id",id).then(({error})=>pErr(error,"peran"));render();toast(u.nama+" kini "+p)}
-function toggleAktif(id){const u=user(id);u.aktif=!u.aktif;log(u.aktif?"Mengaktifkan akun":"Menonaktifkan akun",u.nama);supa.from("profiles").update({aktif:u.aktif}).eq("id",id).then(({error})=>pErr(error,"status akun"));render();toast(u.nama+(u.aktif?" diaktifkan":" dinonaktifkan"))}
+function ubahPeran(id,p){if(me().peran!=="Super-Admin"){toast("Hanya Super-Admin dapat mengubah peran");render();return}const u=user(id);u.peran=p;log("Mengubah peran pengguna",u.nama+" menjadi "+p);supa.from("profiles").update({peran:p}).eq("id",id).then(({error})=>pErr(error,"peran"));render();toast(u.nama+" kini "+p)}
+function toggleAktif(id){if(me().peran!=="Super-Admin"){toast("Hanya Super-Admin dapat mengubah status akun");return}const u=user(id);u.aktif=!u.aktif;log(u.aktif?"Mengaktifkan akun":"Menonaktifkan akun",u.nama);supa.from("profiles").update({aktif:u.aktif}).eq("id",id).then(({error})=>pErr(error,"status akun"));render();toast(u.nama+(u.aktif?" diaktifkan":" dinonaktifkan"))}
 function hapusPengguna(id){
   const u=user(id);if(!u)return;
+  if(me().peran!=="Super-Admin"){toast("Hanya Super-Admin dapat menghapus pengguna");return}
   if(id===S.me){toast("Tidak bisa menghapus akun sendiri");return}
   if(u.peran==="Super-Admin"&&db.pengguna.filter(x=>x.peran==="Super-Admin").length<=1){toast("Minimal harus ada satu Super-Admin");return}
   if(!confirm("Hapus pengguna \""+u.nama+"\"? Tindakan ini permanen."))return;
@@ -701,14 +708,16 @@ function tambahUser(){openModal("pengguna")}
 function pTaksonomi(){
   return ph("Rubrik & Sumber","Daftar tertutup agar penamaan tetap rapi selama bertahun-tahun.","")+
    '<div class="grid g2"><div class="card"><b style="font-size:14px">Rubrik</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Rubrik bertanda wajib tinjau tidak boleh terbit tanpa peninjau.</p>'+
-   db.rubrik.map(r=>'<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px"><span>'+esc(r)+'</span>'+(db.sensitif.includes(r)?' <span class="tag tag-r">wajib tinjau</span>':"")+'<button class="btn btn-sm" style="margin-left:auto" onclick="toggleSensitif(\''+r+'\')">'+(db.sensitif.includes(r)?"Jadikan biasa":"Jadikan sensitif")+"</button></div>").join("")+
+   db.rubrik.map((r,ri)=>'<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px"><span>'+esc(r)+'</span>'+(db.sensitif.includes(r)?' <span class="tag tag-r">wajib tinjau</span>':"")+'<button class="btn btn-sm" style="margin-left:auto" onclick="toggleSensitif(\''+r+'\')">'+(db.sensitif.includes(r)?"Jadikan biasa":"Jadikan sensitif")+'</button><button class="btn btn-sm btn-d" style="margin-left:6px" onclick="hapusRubrik('+ri+')">Hapus</button></div>').join("")+
    '<button class="btn btn-sm" style="margin-top:12px" onclick="tambahRubrik()">+ Rubrik</button></div>'+
    '<div class="card"><b style="font-size:14px">Sumber media</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Dipakai sebagai pilihan pada formulir kliping.</p><div style="display:flex;gap:6px;flex-wrap:wrap">'+
-   db.media.map(x=>'<span class="tag">'+esc(x)+"</span>").join("")+'</div><button class="btn btn-sm" style="margin-top:14px" onclick="tambahMedia()">+ Sumber</button></div></div>';
+   db.media.map((x,xi)=>'<span class="tag" style="display:inline-flex;align-items:center;gap:6px">'+esc(x)+'<button onclick="hapusMedia('+xi+')" title="Hapus" style="border:0;background:none;cursor:pointer;color:#c0392b;font-weight:700;font-size:15px;line-height:1;padding:0">&times;</button></span>').join("")+'</div><button class="btn btn-sm" style="margin-top:14px" onclick="tambahMedia()">+ Sumber</button></div></div>';
 }
 function toggleSensitif(r){const i=db.sensitif.indexOf(r);if(i<0)db.sensitif.push(r);else db.sensitif.splice(i,1);const sens=db.sensitif.includes(r);log("Mengubah status rubrik",r);supa.from("rubrik").update({sensitif:sens}).eq("nama",r).then(({error})=>pErr(error,"rubrik"));render()}
 function tambahRubrik(){openModal("rubrik")}
 function tambahMedia(){openModal("media")}
+function hapusRubrik(ri){var r=db.rubrik[ri];if(!r)return;if(db.rubrik.length<=1){toast("Minimal harus ada satu rubrik");return}var used=db.kliping.filter(k=>k.rubrik===r).length;if(!confirm("Hapus rubrik: "+r+(used?" ("+used+" kliping memakainya)":"")+"?"))return;db.rubrik=db.rubrik.filter(x=>x!==r);db.sensitif=db.sensitif.filter(x=>x!==r);log("Menghapus rubrik",r);supa.from("rubrik").delete().eq("nama",r).then(({error})=>pErr(error,"rubrik"));render();toast("Rubrik dihapus")}
+function hapusMedia(xi){var x=db.media[xi];if(!x)return;if(db.media.length<=1){toast("Minimal harus ada satu sumber");return}var used=db.kliping.filter(k=>k.media===x).length;if(!confirm("Hapus sumber: "+x+(used?" ("+used+" kliping memakainya)":"")+"?"))return;db.media=db.media.filter(m=>m!==x);log("Menghapus sumber media",x);supa.from("media").delete().eq("nama",x).then(({error})=>pErr(error,"media"));render();toast("Sumber dihapus")}
 
 function pPedoman(){
   const sa=me().peran==="Super-Admin";
@@ -918,8 +927,8 @@ function simpanMedia(){
 }
 
 function mFormPengguna(){
-  const PERAN=["Super-Admin","Admin","Kurator"],DIV=["Komunikasi & Publikasi","Pendidikan & Edukasi","Lingkungan & Ekologis","Tim Master Mind"];
-  return mHead("Pengguna baru","Hanya Super-Admin dapat menambah pengguna. Setiap perubahan tercatat di jurnal audit.")+
+  const sa=me().peran==="Super-Admin";const PERAN=sa?["Super-Admin","Admin","Kurator"]:["Kurator"],DIV=["Komunikasi & Publikasi","Pendidikan & Edukasi","Lingkungan & Ekologis","Tim Master Mind"];
+  return mHead(sa?"Pengguna baru":"Kurator baru",sa?"Hanya Super-Admin dapat menambah pengguna. Setiap perubahan tercatat di jurnal audit.":"Admin dapat menambahkan akun Kurator. Peran otomatis terkunci sebagai Kurator.")+
    '<div class="f"><label class="req">Nama</label><input type="text" id="uNama" placeholder="Nama lengkap" /></div>'+
    '<div class="f"><label class="req">Email Google <span class="hint">dipakai untuk login</span></label><input type="email" id="uEmail" placeholder="nama@gmail.com" /></div>'+
    '<div class="row2"><div class="f"><label>Peran</label>'+mSel("uPeran","Kurator",PERAN)+'</div><div class="f"><label>Divisi</label>'+mSel("uDivisi","Komunikasi & Publikasi",DIV)+'</div></div>'+
@@ -928,12 +937,14 @@ function mFormPengguna(){
 function simpanPengguna(){
   const nama=document.getElementById("uNama").value.trim();if(!nama){toast("Nama belum diisi");return}
   const email=document.getElementById("uEmail").value.trim().toLowerCase();if(!email){toast("Email Google wajib diisi");return}
-  const rec={id:"u"+Date.now(),nama:nama,email:email,peran:document.getElementById("uPeran").value,divisi:document.getElementById("uDivisi").value,aktif:true};
+  var _pr=document.getElementById("uPeran").value;if(me().peran!=="Super-Admin")_pr="Kurator";const rec={id:"u"+Date.now(),nama:nama,email:email,peran:_pr,divisi:document.getElementById("uDivisi").value,aktif:true};
   db.pengguna.push(rec);
   log("Menambah pengguna",nama);supa.from("profiles").insert(rec).then(({error})=>pErr(error,"pengguna"));S.modal=null;render();toast("Pengguna ditambahkan");
 }
 
 /* ================= render ================= */
+function goTab(i){var n=["board","materi","arsip","pedoman"][i];if(n)go({pv:{n:n}})}
+function bottomNav(){if(S.mode!=="public")return "";var t=[["board","📰","Papan"],["materi","📚","Materi"],["arsip","📁","Arsip"],["pedoman","📖","Pedoman"]];return '<nav class="btabs">'+t.map(function(p,i){var on=(S.pv.n===p[0]||(p[0]==="board"&&S.pv.n==="clip")||(p[0]==="materi"&&S.pv.n==="materiDetail"))?"on":"";return '<button class="'+on+'" onclick="goTab('+i+')"><span class="bi">'+p[1]+'</span><span class="bl">'+p[2]+'</span></button>'}).join("")+'</nav>'}
 function render(){
   document.body.className=db.settings.sinyalTipis?"thin":"";
   let body;
@@ -943,7 +954,7 @@ function render(){
     const n=S.pv.n;
     body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():viewBoard();
   }
-  document.getElementById("app").innerHTML=header()+body+modalView();
+  document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
   save();
 }
 bootstrap();
