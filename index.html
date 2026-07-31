@@ -563,15 +563,17 @@ function setMeFromSession(session){
   const email=session&&session.user&&session.user.email;
   if(!email){S.me=null;return null}
   const u=db.pengguna.find(p=>p.email&&p.email.toLowerCase()===email.toLowerCase());
-  S.me=u?u.id:null;
-  return u?null:email;
+  if(!u){S.me=null;return {email:email,sebab:"asing"}}
+  if(u.aktif===false||u.aktif===0||u.aktif==="false"){S.me=null;return {email:email,sebab:"nonaktif"}}
+  S.me=u.id;
+  return null;
 }
 async function bootstrap(){
   try{
     const {data:{session}}=await supa.auth.getSession();
     await fetchAll();
-    const unreg=setMeFromSession(session);
-    if(session&&unreg){toast("Email "+unreg+" belum terdaftar sebagai pengelola")}
+    const tolak=setMeFromSession(session);
+    if(session&&tolak){toast(tolak.sebab==="nonaktif"?"Akun "+tolak.email+" dinonaktifkan. Hubungi Super-Admin.":"Email "+tolak.email+" belum terdaftar sebagai pengelola")}
     const _h=(location.hash.match(/klip=([A-Za-z0-9_-]+)/)||[])[1];
     if(_h&&db.kliping.some(k=>k.id===_h)){S.mode="public";S.pv={n:"clip",id:_h}}
   }catch(e){console.error(e);toast("Gagal memuat data: "+(e.message||e));if(!db)db=seed()}
@@ -596,7 +598,7 @@ function can(k){const m=me();return m?PERM[m.peran].includes(k):false}
 function user(id){return db.pengguna.find(u=>u.id===id)}
 function nm(id){const u=user(id);return u?u.nama:"—"}
 function mat(id){return db.materi.find(m=>m.id===id)}
-function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function terbit(){return db.kliping.filter(k=>k.status==="Terbit")}
 function tglID(s){if(!s)return "—";const b=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];const p=s.split("-");return p[2]*1+" "+b[p[1]*1-1]+" "+p[0]}
 function jilid(s){return s?s.slice(0,7):""}
