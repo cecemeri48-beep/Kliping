@@ -621,6 +621,21 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
 .ik-aju small{display:block;margin-top:6px;font-size:12px;color:var(--ink2)}
 .ik-aju-b{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .ik-tunggu{font-size:12.5px;color:var(--ink2);font-style:italic}
+.rks{margin:22px 0 4px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--soft)}
+.rks-h{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px}
+.rks-row{display:flex;gap:10px;flex-wrap:wrap}
+.rks-b{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-size:14px;cursor:pointer;transition:transform .12s ease,border-color .12s ease,background .12s ease}
+.rks-b:hover{border-color:var(--ink2);transform:translateY(-1px)}
+.rks-b:active{transform:scale(.96)}
+.rks-b .rks-e{font-size:18px;line-height:1}
+.rks-b .rks-n{min-width:20px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink2)}
+.rks-b.on{background:rgba(213,128,59,.10);border-color:var(--orange)}
+.rks-b.on .rks-n{color:var(--orange)}
+.rks-k{margin:10px 0 0;font-size:12.5px;color:var(--ink2)}
+.rks-mini{font-variant-numeric:tabular-nums;color:var(--ink2)}
+[data-tema="gelap"] .rks{background:rgba(255,255,255,.03)}
+[data-tema="gelap"] .rks-b{background:rgba(255,255,255,.05);color:var(--ink)}
+@media(max-width:380px){.rks-b{flex:1 1 auto;justify-content:center}}
 [data-tema="gelap"] .ik-aju{background:rgba(255,255,255,.03)}
 .sh-lain:hover{background:var(--line)}
 [data-tema="gelap"] .sh-lain{background:#22303f;color:#eef3f8;border-color:#2b313b}
@@ -1784,6 +1799,7 @@ function afiliasiBox(k){
     }).join("")+'</div>'+
     '<p class="afl-note">Tautan afiliasi. Pembelian lewat tautan ini memberi komisi kecil untuk kas REICHAS tanpa menambah harga, dan tidak memengaruhi isi penilaian alat.</p></div>';
 }
+function _kKlip(id){return (typeof db!=="undefined"&&db&&db.kliping)?db.kliping.find(function(x){return x.id===id}):null}
 function _sisipSebelumFooter(html,tambah){
   if(!tambah)return html;
   var i=html.lastIndexOf('<footer class="foot"');
@@ -1797,7 +1813,7 @@ function _sisipSebelumFooter(html,tambah){
   viewRak=function(){return _sisipSebelumFooter(_rak.apply(this,arguments),sponsorBox("rak")+adsBox("rak")+dukunganBox())};
   viewMateri=function(){return _sisipSebelumFooter(_mat.apply(this,arguments),sponsorBox("materi")+adsBox("materi")+dukunganBox())};
   viewMateriDetail=function(){return _sisipSebelumFooter(_matD.apply(this,arguments),sponsorBox("materi"))};
-  viewClip=function(){return _sisipSebelumFooter(_clip.apply(this,arguments),afiliasiBox(klip(S.pv.id)))};
+  viewClip=function(){return _sisipSebelumFooter(_clip.apply(this,arguments),afiliasiBox(_kKlip(S.pv&&S.pv.id)))};
   render=function(){_render.apply(this,arguments);try{pasangIklan()}catch(e){}};
 })();
 
@@ -2052,6 +2068,111 @@ function pIklan(){
     (baris||'<p style="font-size:13px;color:var(--ink2);margin-top:10px">Belum ada slot sponsor.</p>')+"</div>"+
     pratinjau+kartuIklan();
 }
+
+
+/* ============ tanggapan pembaca: \ud83d\udd25 api & \u2615 kopi ============ */
+var RKS_EMO={api:"\ud83d\udd25",kopi:"\u2615"};
+var RKS_LBL={api:"Nyalakan",kopi:"Bahan ngopi"};
+var RKS_KET={api:"Kliping ini penting dan mendesak dibaca",kopi:"Layak dibahas pelan-pelan sambil ngopi"};
+var RKS_HITUNG={};
+var RKS_LURING=false;
+
+function _rksSidik(){
+  var s="";
+  try{s=localStorage.getItem("rcs_sidik")||""}catch(e){}
+  if(!s){
+    s="d"+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+    try{localStorage.setItem("rcs_sidik",s)}catch(e){}
+  }
+  return s;
+}
+function _rksSaya(){
+  try{return JSON.parse(localStorage.getItem("rcs_reaksi")||"{}")||{}}catch(e){return {}}
+}
+function _rksSimpanSaya(m){try{localStorage.setItem("rcs_reaksi",JSON.stringify(m))}catch(e){}}
+function rksSayaPunya(id,emo){var m=_rksSaya();return !!(m[id]&&m[id][emo])}
+function rksJumlah(id,emo){var h=RKS_HITUNG[id];return (h&&h[emo])||0}
+function _rksUbah(id,emo,d){
+  if(!RKS_HITUNG[id])RKS_HITUNG[id]={api:0,kopi:0};
+  RKS_HITUNG[id][emo]=Math.max(0,(RKS_HITUNG[id][emo]||0)+d);
+}
+function muatReaksi(){
+  try{
+    return Promise.resolve(supa.from("reaksi").select("klip,emo")).then(function(r){
+      if(r&&r.error){RKS_LURING=true;console.warn("reaksi",r.error.message);return}
+      var h={};
+      (r&&r.data||[]).forEach(function(x){
+        if(!x||!x.klip||!RKS_EMO[x.emo])return;
+        if(!h[x.klip])h[x.klip]={api:0,kopi:0};
+        h[x.klip][x.emo]++;
+      });
+      RKS_HITUNG=h;RKS_LURING=false;
+    }).catch(function(e){RKS_LURING=true;console.warn("reaksi",e&&e.message)});
+  }catch(e){RKS_LURING=true;return Promise.resolve()}
+}
+function reaksiToggle(id,emo){
+  if(!RKS_EMO[emo])return;
+  var mine=_rksSaya(),punya=!!(mine[id]&&mine[id][emo]),sidik=_rksSidik();
+  if(punya){delete mine[id][emo];if(!Object.keys(mine[id]).length)delete mine[id]}
+  else{mine[id]=mine[id]||{};mine[id][emo]=1}
+  _rksSimpanSaya(mine);
+  _rksUbah(id,emo,punya?-1:1);
+  render();
+  var balik=function(pesan){
+    var m=_rksSaya();
+    if(punya){m[id]=m[id]||{};m[id][emo]=1}else if(m[id]){delete m[id][emo];if(!Object.keys(m[id]).length)delete m[id]}
+    _rksSimpanSaya(m);_rksUbah(id,emo,punya?1:-1);render();
+    if(pesan)toast(pesan);
+  };
+  try{
+    var q=punya
+      ? supa.from("reaksi").delete().eq("klip",id).eq("emo",emo).eq("sidik",sidik)
+      : supa.from("reaksi").insert({klip:id,emo:emo,sidik:sidik});
+    Promise.resolve(q).then(function(r){
+      if(r&&r.error)balik("Tanggapan gagal terkirim: "+r.error.message);
+    }).catch(function(e){balik("Tanggapan gagal terkirim")});
+  }catch(e){balik("Tanggapan gagal terkirim")}
+}
+function reaksiBar(k){
+  if(!k||k.status!=="Terbit")return "";
+  var tomb=Object.keys(RKS_EMO).map(function(emo){
+    var on=rksSayaPunya(k.id,emo),n=rksJumlah(k.id,emo);
+    return '<button class="rks-b'+(on?" on":"")+'" onclick=\'reaksiToggle("'+k.id+'","'+emo+'")\' '+
+      'aria-pressed="'+(on?"true":"false")+'" title="'+esc(RKS_KET[emo])+'">'+
+      '<span class="rks-e">'+RKS_EMO[emo]+'</span><span class="rks-t">'+esc(RKS_LBL[emo])+'</span>'+
+      '<span class="rks-n">'+n+'</span></button>';
+  }).join("");
+  return '<div class="rks"><span class="rks-h">Tanggapan pembaca</span><div class="rks-row">'+tomb+'</div>'+
+    '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p></div>';
+}
+function rksMini(k){
+  var a=rksJumlah(k.id,"api"),b=rksJumlah(k.id,"kopi");
+  if(!a&&!b)return "";
+  return '<span class="rks-mini">'+(a?RKS_EMO.api+" "+a:"")+(a&&b?" \u00b7 ":"")+(b?RKS_EMO.kopi+" "+b:"")+"</span>";
+}
+(function(){
+  var _clip=viewClip,_kartu=kartuKlip,_boot=bootstrap;
+  viewClip=function(){
+    var h=_clip.apply(this,arguments);
+    var k=_kKlip(S.pv&&S.pv.id);
+    var bar=reaksiBar(k);
+    if(!bar)return h;
+    var i=h.indexOf('<div class="sec afl');
+    if(i<0)return _sisipSebelumFooter(h,bar);
+    return h.slice(0,i)+bar+h.slice(i);
+  };
+  kartuKlip=function(k){
+    var h=_kartu.apply(this,arguments);
+    var m=rksMini(k);
+    return m?h.replace('<div class="clip-meta">','<div class="clip-meta">'+m):h;
+  };
+  bootstrap=function(){
+    var p=Promise.resolve(_boot.apply(this,arguments));
+    var jalan=function(){muatReaksi().then(function(){try{render()}catch(e){}})};
+    p.then(jalan,jalan);
+    return p;
+  };
+})();
 
 bootstrap();
 </script>
