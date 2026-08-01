@@ -246,6 +246,31 @@ body{background:#f6f3ed;background-image:radial-gradient(circle at 10% 8%,#fff 0
 .side button:hover{background:#ecf7e2;color:var(--navy)}
 .side button.on{background:linear-gradient(135deg,rgba(115,87,255,.15),rgba(66,103,231,.10));color:#4f3bb4}
 .side button.on i.ic{color:var(--violet)}
+/* --- Menu admin mobile: satu tombol --- */
+.smenu{display:none}
+@media (max-width:900px){
+  .side{display:none!important}
+  .smenu{display:block;position:relative;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px;z-index:40}
+  .smenu-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:11px 14px;font-size:15px;font-weight:600;color:var(--ink);min-height:44px}
+  .smenu-caret{color:var(--ink2)}
+  .smenu-pop{display:none;position:absolute;left:16px;right:16px;top:calc(100% - 6px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 34px rgba(16,42,67,.16);padding:6px;max-height:70vh;overflow-y:auto}
+  .smenu.open .smenu-pop{display:block}
+  .smi{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:0;background:none;padding:11px 12px;border-radius:8px;color:var(--ink2);min-height:44px;font-size:15px}
+  .smi:hover{background:var(--soft)}
+  .smi.on{background:var(--blue-s);color:#1a5f9e;font-weight:600}
+  .smi i.ic{font-style:normal;width:18px;text-align:center;flex:none}
+}
+[data-tema="gelap"] .smenu{background:#12161d;border-bottom-color:#2b313b}
+[data-tema="gelap"] .smenu-btn{background:#1b212b;color:var(--ink);border-color:var(--line)}
+[data-tema="gelap"] .smenu-pop{background:#161b24;border-color:#2b313b}
+[data-tema="gelap"] .smi{color:#c7ccd4}
+[data-tema="gelap"] .smi:hover{background:#22303f;color:#eef3f8}
+[data-tema="gelap"] .smi.on{background:linear-gradient(135deg,rgba(115,87,255,.30),rgba(66,103,231,.22));color:#c3b7ff}
+.grp-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:20px 0 8px;font-weight:700}
+.grp-lbl:first-of-type{margin-top:6px}
+.grp-n{display:inline-block;background:var(--soft2);border-radius:999px;padding:2px 9px;font-size:11px;letter-spacing:0;text-transform:none;color:var(--ink)}
+[data-tema="gelap"] .grp-lbl{color:#8b9099}
+[data-tema="gelap"] .grp-n{background:#22303f;color:#eef3f8}
 .ph h2{color:var(--navy)}
 
 /* Admin cards + tables: softer, floaty, rounded to match the public cards */
@@ -589,6 +614,8 @@ function simpanDrafLokal(){try{if(S.draft)sessionStorage.setItem(DRAFT_KEY,JSON.
 function hapusDrafLokal(){try{sessionStorage.removeItem(DRAFT_KEY)}catch(e){}}
 function pulihkanDraf(){try{const t=sessionStorage.getItem(DRAFT_KEY);return t?JSON.parse(t):null}catch(e){return null}}
 document.addEventListener("input",function(e){if(S&&S.draft&&e.target&&e.target.closest&&e.target.closest(".f")){try{ambil()}catch(err){}}});
+function toggleSideMenu(e){try{e.stopPropagation()}catch(_){}var w=document.getElementById("sideMenu");if(w)w.classList.toggle("open")}
+document.addEventListener("click",function(e){var w=document.getElementById("sideMenu");if(w&&w.classList.contains("open")&&!(e.target&&w.contains(e.target)))w.classList.remove("open")});
 
 const PERM={
  "Super-Admin":["dasbor","kliping","tinjauan","materi","pengguna","taksonomi","pedoman","audit","pengaturan"],
@@ -835,8 +862,9 @@ async function masukGoogle(){
 function viewAdmin(){
   const m=me();if(!m)return viewLogin();
   const keys=PERM[m.peran];
-  const side='<aside class="side"><div class="lbl">Panel '+esc(m.peran)+"</div>"+
-    keys.map(k=>'<button class="'+(S.av===k?"on":"")+'" onclick=\'go({av:"'+k+'",draft:null,err:[]})\'><i class="ic">'+ICON[k]+"</i>"+LBL[k]+(k==="tinjauan"&&db.kliping.filter(x=>x.status==="Ditinjau").length?' <span class="tag tag-b" style="margin-left:auto">'+db.kliping.filter(x=>x.split===undefined&&x.status==="Ditinjau").length+"</span>":"")+"</button>").join("")+"</aside>";
+  const tabBtn=(k,cls)=>'<button class="'+cls+(S.av===k?" on":"")+'" onclick=\'go({av:"'+k+'",draft:null,err:[]})\'><i class="ic">'+ICON[k]+"</i>"+LBL[k]+(k==="tinjauan"&&db.kliping.filter(x=>x.status==="Ditinjau").length?' <span class="tag tag-b" style="margin-left:auto">'+db.kliping.filter(x=>x.split===undefined&&x.status==="Ditinjau").length+"</span>":"")+"</button>";
+  const side='<aside class="side"><div class="lbl">Panel '+esc(m.peran)+"</div>"+keys.map(k=>tabBtn(k,"")).join("")+"</aside>";
+  const smenu='<div class="smenu" id="sideMenu"><button type="button" class="smenu-btn" onclick="toggleSideMenu(event)"><span>'+(ICON[S.av]||"")+" "+esc(LBL[S.av]||"Menu")+'</span><span class="smenu-caret">\u25BE</span></button><div class="smenu-pop">'+keys.map(k=>tabBtn(k,"smi")).join("")+"</div></div>";
   let body;
   if(S.draft)body=formKliping();
   else if(S.av==="dasbor")body=pDasbor();
@@ -849,7 +877,7 @@ function viewAdmin(){
   else if(S.av==="audit")body=pAudit();
   else if(S.av==="pengaturan")body=pPengaturan();
   else body='<div class="panel"><p class="empty">Tidak tersedia untuk peran ini.</p></div>';
-  return '<div class="shell">'+side+'<div class="panel">'+body+"</div></div>";
+  return '<div class="shell">'+smenu+side+'<div class="panel">'+body+"</div></div>";
 }
 function ph(t,s,act){return '<div class="ph"><div><h2>'+esc(t)+"</h2><p>"+esc(s)+'</p></div><div class="act">'+(act||"")+"</div></div>"}
 
@@ -910,11 +938,18 @@ function hapusMateri(id){const m=mat(id);if(!m)return;const used=db.kliping.filt
 
 function pPengguna(){
   const sa=me().peran==="Super-Admin";
-  const rows=db.pengguna.filter(u=>sa||u.peran!=="Super-Admin").map(u=>"<tr><td><b>"+esc(u.nama)+'</b></td><td>'+esc(u.divisi)+'</td><td><select onchange="ubahPeran(\''+u.id+'\',this.value)" style="padding:6px 8px;border:1px solid var(--line);border-radius:6px">'+
+  const list=db.pengguna.filter(u=>sa||u.peran!=="Super-Admin");
+  const rowU=u=>"<tr><td><b>"+esc(u.nama)+'</b></td><td>'+esc(u.divisi)+'</td><td><select onchange="ubahPeran(\''+u.id+'\',this.value)" style="padding:6px 8px;border:1px solid var(--line);border-radius:6px">'+
     ["Super-Admin","Admin","Kurator"].map(p=>'<option '+(u.peran===p?"selected":"")+">"+p+"</option>").join("")+'</select></td><td>'+(u.aktif?'<span class="tag tag-g">Aktif</span>':'<span class="tag tag-r">Nonaktif</span>')+
-    '</td><td>'+(sa?'<button class="btn btn-sm" onclick="toggleAktif(\''+u.id+'\')">'+(u.aktif?"Nonaktifkan":"Aktifkan")+'</button> ':"")+((sa||u.peran==="Kurator")?'<button class="btn btn-sm btn-d" onclick="hapusPengguna(\''+u.id+'\')">Hapus</button>':"")+'</td></tr>').join("");
+    '</td><td>'+(sa?'<button class="btn btn-sm" onclick="toggleAktif(\''+u.id+'\')">'+(u.aktif?"Nonaktifkan":"Aktifkan")+'</button> ':"")+((sa||u.peran==="Kurator")?'<button class="btn btn-sm btn-d" onclick="hapusPengguna(\''+u.id+'\')">Hapus</button>':"")+'</td></tr>';
+  const tbl=us=>'<div class="tbl tbl-scroll" style="margin-bottom:22px"><table><thead><tr><th>Nama</th><th>Divisi</th><th>Peran</th><th>Status</th><th></th></tr></thead><tbody>'+us.map(rowU).join("")+"</tbody></table></div>";
+  const grup=peran=>{
+    const us=list.filter(u=>u.peran===peran);
+    if(!us.length)return "";
+    return '<div class="grp-lbl">'+peran+' <span class="grp-n">'+us.length+'</span></div>'+tbl(us);
+  };
   return ph("Pengguna & Peran",sa?"Hanya Super-Admin dapat mengubah peran. Setiap perubahan tercatat di jurnal audit.":"Sebagai Admin kamu dapat menambahkan akun Kurator.",'<button class="btn btn-p" onclick="tambahUser()">+ '+(sa?"Pengguna":"Kurator")+'</button>')+
-   '<div class="tbl tbl-scroll"><table><thead><tr><th>Nama</th><th>Divisi</th><th>Peran</th><th>Status</th><th></th></tr></thead><tbody>'+rows+"</tbody></table></div>";
+   grup("Super-Admin")+grup("Admin")+grup("Kurator");
 }
 function ubahPeran(id,p){if(me().peran!=="Super-Admin"){toast("Hanya Super-Admin dapat mengubah peran");render();return}const u=user(id);u.peran=p;log("Mengubah peran pengguna",u.nama+" menjadi "+p);supa.from("profiles").update({peran:p}).eq("id",id).then(({error})=>pErr(error,"peran"));render();toast(u.nama+" kini "+p)}
 function toggleAktif(id){if(me().peran!=="Super-Admin"){toast("Hanya Super-Admin dapat mengubah status akun");return}const u=user(id);u.aktif=!u.aktif;log(u.aktif?"Mengaktifkan akun":"Menonaktifkan akun",u.nama);supa.from("profiles").update({aktif:u.aktif}).eq("id",id).then(({error})=>pErr(error,"status akun"));render();toast(u.nama+(u.aktif?" diaktifkan":" dinonaktifkan"))}
