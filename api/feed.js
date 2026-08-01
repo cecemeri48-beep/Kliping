@@ -107,10 +107,13 @@ async function sitemap(res){
        '<changefreq>monthly</changefreq><priority>0.8</priority></url>\n';
   });
   x+='</urlset>\n';
-  // Tembolok pendek: kliping baru harus cepat muncul, dan kalau ada yang
-  // keliru kamu tidak perlu menunggu sejam untuk melihat hasil perbaikan.
+  // Jangan pernah menembolok hasil kosong. Kalau Supabase sedang tersendat,
+  // sitemap berisi beranda saja bisa membeku di tepi jaringan dan terlihat
+  // seperti situs satu halaman padahal kliping ada.
   res.setHeader('Content-Type','application/xml; charset=utf-8');
-  res.setHeader('Cache-Control','public, max-age=300, s-maxage=300, stale-while-revalidate=600');
+  res.setHeader('Cache-Control', kl.length
+    ? 'public, max-age=300, s-maxage=300, stale-while-revalidate=600'
+    : 'no-store');
   res.status(200).send(x);
 }
 
@@ -144,7 +147,9 @@ async function rss(res){
   });
   x+='</channel>\n</rss>\n';
   res.setHeader('Content-Type','application/rss+xml; charset=utf-8');
-  res.setHeader('Cache-Control','public, max-age=300, s-maxage=300, stale-while-revalidate=600');
+  res.setHeader('Cache-Control', kl.length
+    ? 'public, max-age=300, s-maxage=300, stale-while-revalidate=600'
+    : 'no-store');
   res.status(200).send(x);
 }
 
