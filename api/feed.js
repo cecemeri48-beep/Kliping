@@ -35,6 +35,14 @@ function ambilNilai(o,nama){
   return undefined;
 }
 function tglKlip(k){return ambilNilai(k,'tglKliping')||ambilNilai(k,'tglBerita')||'';}
+function daftar(x){
+  if(typeof x==='string'){
+    const t=x.trim();
+    if(t.charAt(0)==='['){try{x=JSON.parse(t);}catch(e){x=t.split(/\n|\|/);}}
+    else x=t?t.split(/\n|\|/):[];
+  }
+  return Array.isArray(x)?x.filter(function(v){return v&&String(v).trim();}).map(function(v){return String(v).trim();}):[];
+}
 async function ambilKliping(){
   const h=await ambilTabel('kliping');
   return h.baris
@@ -93,13 +101,15 @@ async function sitemap(res){
     x+='<url><loc>'+esc(SITE+t[0])+'</loc><lastmod>'+now+'</lastmod><changefreq>'+t[2]+'</changefreq><priority>'+t[1].toFixed(1)+'</priority></url>\n';
   });
   kl.forEach(function(k){
-    x+='<url><loc>'+esc(SITE+'/klip/'+encodeURIComponent(k.id))+'</loc>'+
+    x+='<url><loc>'+esc(SITE+'/klip/'+encodeURIComponent(ambilNilai(k,'id')))+'</loc>'+
        (tglKlip(k)?'<lastmod>'+esc(String(tglKlip(k)).slice(0,10))+'</lastmod>':'')+
        '<changefreq>monthly</changefreq><priority>0.8</priority></url>\n';
   });
   x+='</urlset>\n';
+  // Tembolok pendek: kliping baru harus cepat muncul, dan kalau ada yang
+  // keliru kamu tidak perlu menunggu sejam untuk melihat hasil perbaikan.
   res.setHeader('Content-Type','application/xml; charset=utf-8');
-  res.setHeader('Cache-Control','public, max-age=1800, s-maxage=3600');
+  res.setHeader('Cache-Control','public, max-age=300, s-maxage=300, stale-while-revalidate=600');
   res.status(200).send(x);
 }
 
@@ -125,15 +135,15 @@ async function rss(res){
        '<link>'+esc(tautan)+'</link>\n'+
        '<guid isPermaLink="true">'+esc(tautan)+'</guid>\n'+
        '<pubDate>'+hariRFC(String(tglKlip(k)).slice(0,10))+'</pubDate>'+'\n'+
-       (k.rubrik?'<category>'+cdata(k.rubrik)+'</category>\n':'')+
-       (Array.isArray(k.topik)?k.topik.map(function(t){return '<category>'+cdata(t)+'</category>\n';}).join(''):'')+
+       (ambilNilai(k,'rubrik')?'<category>'+cdata(ambilNilai(k,'rubrik'))+'</category>\n':'')+
+       daftar(ambilNilai(k,'topik')).map(function(t){return '<category>'+cdata(t)+'</category>\n';}).join('')+
        '<description>'+cdata(isi)+'</description>\n'+
-       (k.gambar&&/^https?:\/\//.test(k.gambar)?'<enclosure url="'+esc(k.gambar)+'" type="image/jpeg" />\n':'')+
+       (/^https?:\/\//.test(String(ambilNilai(k,'gambar')||''))?'<enclosure url="'+esc(ambilNilai(k,'gambar'))+'" type="image/jpeg" />\n':'')+
        '</item>\n';
   });
   x+='</channel>\n</rss>\n';
   res.setHeader('Content-Type','application/rss+xml; charset=utf-8');
-  res.setHeader('Cache-Control','public, max-age=900, s-maxage=1800');
+  res.setHeader('Cache-Control','public, max-age=300, s-maxage=300, stale-while-revalidate=600');
   res.status(200).send(x);
 }
 

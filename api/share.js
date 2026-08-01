@@ -4,7 +4,29 @@ const SITE='https://kliping-reichas.my.id';
 const SUREL_REDAKSI='kliping.rcscbs@gmail.com';
 
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function arr(x){return Array.isArray(x)?x.filter(function(v){return v&&String(v).trim();}):[];}
+function arr(x){
+  if(typeof x==='string'){
+    var t=x.trim();
+    if(t.charAt(0)==='['){try{x=JSON.parse(t);}catch(e){x=t.split(/\n|\|/);}}
+    else x=t?t.split(/\n|\|/):[];
+  }
+  return Array.isArray(x)?x.filter(function(v){return v&&String(v).trim();}).map(function(v){return String(v).trim();}):[];
+}
+// Kolom di Supabase memakai snake_case (tgl_kliping, keterangan_gambar),
+// sedangkan aplikasi memakai camelCase. Samakan dulu supaya tanggal dan
+// keterangan gambar tidak hilang diam-diam dari halaman kliping.
+function keCamel(s){return String(s).replace(/_([a-z0-9])/g,function(m,c){return c.toUpperCase();});}
+function rapikan(row){
+  var o={};
+  for(var k in row){
+    o[k]=row[k];
+    var c=keCamel(k);
+    if(o[c]===undefined)o[c]=row[k];
+  }
+  if(o.gbrKet===undefined&&o.keteranganGambar!==undefined)o.gbrKet=o.keteranganGambar;
+  if(o.gbrKet===undefined&&o.gambarKet!==undefined)o.gbrKet=o.gambarKet;
+  return o;
+}
 function tglID(s){
   if(!s)return '';
   var B=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -53,7 +75,7 @@ module.exports = async function (req, res) {
     if (id) {
       const r = await fetch(SUPA+'/rest/v1/kliping?id=eq.'+encodeURIComponent(id)+'&select=*',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});
       const rows = await r.json();
-      if (Array.isArray(rows) && rows.length && String(rows[0].status||'').trim().toLowerCase() === 'terbit') k = rows[0];
+      if (Array.isArray(rows) && rows.length && String(rows[0].status||'').trim().toLowerCase() === 'terbit') k = rapikan(rows[0]);
     }
   } catch (e) {}
   if (!k) return halamanKosong(res,id);
