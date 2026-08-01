@@ -125,7 +125,7 @@ module.exports = async function (req, res) {
      (k.rubrik?'<span class="tag">'+esc(k.rubrik)+'</span>':'')+
      topik.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('')+
      '<div style="margin-top:8px">Digunting '+esc(tglID(k.tglKliping))+
-     (kurator?' oleh '+esc(kurator):'')+
+     ' oleh '+esc(kurator||'Redaksi Kliping REICHAS')+
      (peninjau?' \u00b7 ditinjau '+esc(peninjau):'')+
      (lokasi.length?' \u00b7 '+esc(lokasi.join(', ')):'')+
      (k.wilayah?' \u00b7 '+esc(k.wilayah):'')+'</div></div>'+

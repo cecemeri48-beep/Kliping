@@ -59,7 +59,7 @@ async function ambilMateri(){
 }
 async function cek(res){
   const out=[];
-  for(const t of ['kliping','materi']){
+  for(const t of ['kliping','materi','profiles']){
     let h;
     try{h=await ambilTabel(t);}catch(e){h={ok:false,kode:0,baris:[],pesan:String(e&&e.message||e)};}
     const satu=h.baris[0]||null;
@@ -77,6 +77,7 @@ async function cek(res){
       namaKolom:satu?Object.keys(satu):[],
       contohId:satu?ambilNilai(satu,'id'):null,
       contohTanggal:satu?tglKlip(satu):null,
+      contohKurator:satu?(ambilNilai(satu,'kurator')||null):null,
       pesanGalat:h.pesan||null
     });
   }
