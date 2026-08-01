@@ -583,7 +583,7 @@ mark{background:#fff2a8;color:inherit;padding:0 2px;border-radius:3px}
 
 /* --- sponsor, iklan, dukungan, afiliasi --- */
 .spon-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:26px 0 6px}
-.spon{position:relative;display:block;border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px;text-decoration:none;color:inherit;transition:box-shadow .18s ease,transform .18s ease}
+.spon{position:relative;display:block;border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px 14px 12px;text-decoration:none;color:inherit;transition:box-shadow .18s ease,transform .18s ease}
 a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px)}
 .spon img{width:100%;border-radius:10px;border:1px solid var(--line);margin:8px 0 10px;display:block}
 .spon-lbl{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
@@ -615,6 +615,13 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
   .dukung .btn{margin-left:0;width:100%;text-align:center}
 }
 .sh-lain{background:var(--soft2);color:var(--ink);border:1px solid var(--line)}
+.ik-aju{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px;background:var(--soft)}
+.ik-aju-t{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ik-aju p{margin:6px 0 0;font-size:13px;color:var(--ink2)}
+.ik-aju small{display:block;margin-top:6px;font-size:12px;color:var(--ink2)}
+.ik-aju-b{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.ik-tunggu{font-size:12.5px;color:var(--ink2);font-style:italic}
+[data-tema="gelap"] .ik-aju{background:rgba(255,255,255,.03)}
 .sh-lain:hover{background:var(--line)}
 [data-tema="gelap"] .sh-lain{background:#22303f;color:#eef3f8;border-color:#2b313b}
 .rubrik-row{display:flex;gap:10px;flex-wrap:wrap;padding:16px 0 6px;margin:0}
@@ -812,12 +819,12 @@ function toggleSideMenu(e){try{e.stopPropagation()}catch(_){}var w=document.getE
 document.addEventListener("click",function(e){var w=document.getElementById("sideMenu");if(w&&w.classList.contains("open")&&!(e.target&&w.contains(e.target)))w.classList.remove("open")});
 
 const PERM={
- "Super-Admin":["dasbor","kliping","tinjauan","materi","pengguna","taksonomi","pedoman","audit","pengaturan"],
- "Admin":["dasbor","kliping","tinjauan","materi","pengguna","pedoman"],
+ "Super-Admin":["dasbor","kliping","tinjauan","materi","pengguna","taksonomi","pedoman","iklan","audit","pengaturan"],
+ "Admin":["dasbor","kliping","tinjauan","materi","pengguna","pedoman","iklan"],
  "Kurator":["dasbor","kliping"]
 };
-const ICON={dasbor:"\u25F1",kliping:"\u2702",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",audit:"\u2261",pengaturan:"\u2699"};
-const LBL={dasbor:"Dasbor",kliping:"Kliping",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",audit:"Jurnal Audit",pengaturan:"Pengaturan Situs"};
+const ICON={dasbor:"\u25F1",kliping:"\u2702",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",audit:"\u2261",iklan:"\u25B1",pengaturan:"\u2699"};
+const LBL={dasbor:"Dasbor",kliping:"Kliping",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs"};
 const STAG={"Calon":"tag","Ditulis":"tag tag-o","Ditinjau":"tag tag-b","Terbit":"tag tag-g","Diarsipkan":"tag"};
 
 function me(){return db.pengguna.find(u=>u.id===S.me)||null}
@@ -1069,6 +1076,7 @@ function viewAdmin(){
   else if(S.av==="taksonomi")body=pTaksonomi();
   else if(S.av==="pedoman")body=pPedoman();
   else if(S.av==="audit")body=pAudit();
+  else if(S.av==="iklan")body=pIklan();
   else if(S.av==="pengaturan")body=pPengaturan();
   else body='<div class="panel"><p class="empty">Tidak tersedia untuk peran ini.</p></div>';
   return '<div class="shell">'+smenu+side+'<div class="panel">'+body+"</div></div>";
@@ -1736,16 +1744,16 @@ function sponsorBox(tempat){
   }).join("")+'</div>';
 }
 function adsBox(tempat){
-  var c=iklanCfg(),a=c.adsense;
-  if(!c.aktif||!a.aktif||!a.client)return "";
+  var a=iklanCfg().adsense;
+  if(!iklanCfg().aktif||!a.aktif||!a.client)return "";
   var slot=tempat==="rak"?a.slotRak:a.slotMateri;
   if(!slot)return "";
   return '<div class="ads-wrap"><span class="spon-lbl">Iklan</span>'+
     '<ins class="adsbygoogle" style="display:block" data-ad-client="'+esc(a.client)+'" data-ad-slot="'+esc(slot)+'" data-ad-format="auto" data-full-width-responsive="true"></ins></div>';
 }
 function pasangIklan(){
-  var c=iklanCfg(),a=c.adsense;
-  if(!c.aktif||!a.aktif||!a.client)return;
+  var a=iklanCfg().adsense;
+  if(!iklanCfg().aktif||!a.aktif||!a.client)return;
   if(!document.getElementById("adsenseLib")){
     var sc=document.createElement("script");
     sc.id="adsenseLib";sc.async=true;sc.crossOrigin="anonymous";
@@ -1760,8 +1768,8 @@ function pasangIklan(){
   }
 }
 function dukunganBox(){
-  var c=iklanCfg(),d=c.dukungan;
-  if(!c.aktif||!d.aktif||!d.url)return "";
+  var d=iklanCfg().dukungan;
+  if(!iklanCfg().aktif||!d.aktif||!d.url)return "";
   return '<div class="dukung"><div><b>'+esc(d.judul)+'</b><p>'+esc(d.teks)+'</p></div>'+
     '<a class="btn btn-p" href="'+esc(d.url)+'" target="_blank" rel="noopener">'+esc(d.tombol)+'</a></div>';
 }
@@ -1814,14 +1822,14 @@ function iklanBaca(){
 }
 function iklanTambahSlot(){iklanBaca();db.settings.iklan.slot.push({nama:"",teks:"",gambar:"",tautan:"",sampai:"",aktif:true,tempat:["rak","materi"]});render()}
 function iklanHapusSlot(i){iklanBaca();db.settings.iklan.slot.splice(i,1);render()}
-function iklanTambahAfl(){iklanBaca();db.settings.iklan.afiliasi.push({nama:"",tautan:"",catatan:""});render()}
+function iklanTambahAfl(nama,ket){iklanBaca();db.settings.iklan.afiliasi.push({nama:typeof nama==="string"?nama:"",tautan:"",catatan:typeof ket==="string"?ket:""});render()}
 function iklanHapusAfl(i){iklanBaca();db.settings.iklan.afiliasi.splice(i,1);render()}
 function iklanMerekUmum(){
   iklanBaca();
   var mer=[["Petzl","Headlamp, helm, dan alat vertikal"],["KONG","Karabiner dan konektor"],["CAMP","Alat panjat dan alpine"],["Black Diamond","Headlamp dan trekking pole"],["Deuter","Carrier dan daypack"],["Eiger","Perlengkapan harian pendakian"]];
   var ada=db.settings.iklan.afiliasi.map(function(a){return (a.nama||"").toLowerCase()});
   mer.forEach(function(m){if(ada.indexOf(m[0].toLowerCase())<0)db.settings.iklan.afiliasi.push({nama:m[0],tautan:"",catatan:m[1]})});
-  render();toast("Daftar merek ditambahkan \u2014 tinggal isi tautan afiliasinya");
+  render();toast("Daftar merek ditambahkan \u2014 isi tautan afiliasinya");
 }
 function iklanSimpan(){
   iklanBaca();
@@ -1837,9 +1845,9 @@ function kartuIklan(){
     var t=s.tempat||[];
     return '<div class="ik-slot"><div class="ik-slot-h"><b>Slot '+(i+1)+'</b>'+
       '<label class="ik-cek"><input type="checkbox" id="ikS'+i+'aktif" '+(s.aktif===false?"":"checked")+' /> aktif</label>'+
-      '<button class="btn btn-sm btn-d" style="margin-left:auto" onclick="iklanHapusSlot('+i+')">Hapus</button></div>'+
+      '<button class="btn btn-sm btn-d" onclick="iklanHapusSlot('+i+')">Hapus</button></div>'+
       f("Nama sponsor",txt("ikS"+i+"nama",s.nama,"Toko Rimba Makassar"))+
-      f("Kalimat singkat",txt("ikS"+i+"teks",s.teks,"Sewa carrier dan servis kompor"))+
+      f("Kalimat singkat",txt("ikS"+i+"teks",s.teks,"Sewa dan servis alat naik gunung"))+
       f("URL gambar (opsional)",txt("ikS"+i+"gbr",s.gambar,"https://\u2026/banner.jpg"))+
       f("Tautan tujuan",txt("ikS"+i+"url",s.tautan,"https://\u2026"))+
       f("Tayang sampai (opsional)",'<input type="date" id="ikS'+i+'sampai" value="'+esc(s.sampai||"")+'" />')+
@@ -1856,7 +1864,7 @@ function kartuIklan(){
     '<p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Semua iklan hanya tayang di Rak Baca dan halaman Materi. Halaman kliping dibiarkan bersih, kecuali blok afiliasi pada rubrik Lemari Gear.</p>'+
     '<div class="f"><label class="ik-cek"><input type="checkbox" id="ikAktif" '+(c.aktif?"checked":"")+' /> Tampilkan sponsor, iklan, dan dukungan di situs</label></div>'+
     '<div class="grp-lbl">Google AdSense</div>'+
-    '<p style="font-size:12.5px;color:var(--ink2);margin:0 0 10px">Isi setelah situs disetujui AdSense. Pengiklan ditentukan lelang Google, jadi merek tertentu tidak bisa dipesan dari sini.</p>'+
+    '<p style="font-size:12.5px;color:var(--ink2);margin:0 0 10px">Isi setelah situs disetujui AdSense. Pengiklan dipilih lelang Google, jadi merek tertentu tidak bisa dipesan dari sini.</p>'+
     '<div class="f"><label class="ik-cek"><input type="checkbox" id="ikAdsAktif" '+(c.adsense.aktif?"checked":"")+' /> Aktifkan AdSense</label></div>'+
     f("ID penerbit",txt("ikAdsClient",c.adsense.client,"ca-pub-0000000000000000"))+
     f("Slot Rak Baca",txt("ikAdsRak",c.adsense.slotRak,"1234567890"))+
@@ -1883,6 +1891,167 @@ function kartuIklan(){
     return i<0?h+kartuIklan():h.slice(0,i)+kartuIklan()+h.slice(i);
   };
 })();
+
+
+/* ============ persetujuan pemasangan iklan + halaman panel "Sponsor & Iklan" ============ */
+function _ikPeran(){var m=(typeof me==="function")?me():null;return m?m.peran:""}
+function _ikSA(){return _ikPeran()==="Super-Admin"}
+function _ikNama(){var m=(typeof me==="function")?me():null;return m?(m.nama||m.email||"\u2014"):"\u2014"}
+function _ikHari(){return new Date().toISOString().slice(0,10)}
+function _ikSimpanDiam(){supa.from("app_settings").upsert({id:"situs",data:db.settings}).then(function(r){pErr(r&&r.error,"sponsor")})}
+
+(function(){
+  var _cfg=iklanCfg;
+  iklanCfg=function(){
+    var c=_cfg.apply(this,arguments);
+    var raw=((typeof db!=="undefined"&&db&&db.settings&&db.settings.iklan)||{});
+    var ra=raw.adsense||{};
+    c.slot=(c.slot||[]).map(function(s){
+      s=s||{};
+      if(!s.status)s.status="Disetujui";
+      s.pengaju=s.pengaju||"";s.tglAju=s.tglAju||"";s.penyetuju=s.penyetuju||"";s.catatan=s.catatan||"";
+      return s;
+    });
+    c.adsense.status=ra.status||(c.adsense.aktif?"Disetujui":"Belum diajukan");
+    c.adsense.pengaju=ra.pengaju||"";c.adsense.tglAju=ra.tglAju||"";c.adsense.penyetuju=ra.penyetuju||"";c.adsense.catatan=ra.catatan||"";
+    return c;
+  };
+  var _hidup=_slotHidup;
+  _slotHidup=function(sl,tempat){
+    if(!sl)return false;
+    if((sl.status||"Disetujui")!=="Disetujui")return false;
+    return _hidup.apply(this,arguments);
+  };
+  var _ads=adsBox,_pasang=pasangIklan;
+  adsBox=function(){return iklanCfg().adsense.status==="Disetujui"?_ads.apply(this,arguments):""};
+  pasangIklan=function(){if(iklanCfg().adsense.status==="Disetujui")_pasang.apply(this,arguments)};
+
+  var _baca=iklanBaca;
+  iklanBaca=function(){
+    var prev=iklanCfg();
+    var out=_baca.apply(this,arguments);
+    var sa=_ikSA();
+    out.slot=out.slot.map(function(s,i){
+      var p=prev.slot[i]||{};
+      s.status=p.status||"Diajukan";s.pengaju=p.pengaju||"";s.tglAju=p.tglAju||"";s.penyetuju=p.penyetuju||"";s.catatan=p.catatan||"";
+      if(!sa){
+        var beda=(p.nama||"")!==(s.nama||"")||(p.teks||"")!==(s.teks||"")||(p.tautan||"")!==(s.tautan||"")||(p.gambar||"")!==(s.gambar||"");
+        if(beda||!p.status){s.status="Diajukan";s.pengaju=_ikNama();s.tglAju=_ikHari();s.penyetuju="";s.catatan=""}
+      }
+      return s;
+    });
+    var pa=prev.adsense,na=out.adsense;
+    na.status=pa.status||"Belum diajukan";na.pengaju=pa.pengaju||"";na.tglAju=pa.tglAju||"";na.penyetuju=pa.penyetuju||"";na.catatan=pa.catatan||"";
+    if(na.aktif&&na.status!=="Disetujui"){
+      if(sa){na.status="Disetujui";na.penyetuju=_ikNama()}
+      else{na.aktif=false;na.status="Diajukan";na.pengaju=_ikNama();na.tglAju=_ikHari();na.catatan=""}
+    }
+    db.settings.iklan=out;
+    return out;
+  };
+})();
+
+function iklanAjukan(i){
+  iklanBaca();var s=db.settings.iklan.slot[i];if(!s)return;
+  if(!s.nama&&!s.teks){toast("Isi dulu nama atau kalimat sponsornya");return}
+  s.status="Diajukan";s.pengaju=_ikNama();s.tglAju=_ikHari();s.penyetuju="";s.catatan="";
+  log("Mengajukan pemasangan iklan",s.nama||"Slot "+(i+1));_ikSimpanDiam();render();
+  toast("Ajuan dikirim. Menunggu persetujuan Super-Admin.");
+}
+function iklanSetujui(i){
+  if(!_ikSA()){toast("Hanya Super-Admin dapat menyetujui pemasangan iklan");return}
+  iklanBaca();var s=db.settings.iklan.slot[i];if(!s)return;
+  s.status="Disetujui";s.penyetuju=_ikNama();s.catatan="";
+  log("Menyetujui pemasangan iklan",s.nama||"Slot "+(i+1));_ikSimpanDiam();render();
+  toast("Disetujui \u2014 sponsor mulai tayang");
+}
+function iklanTolak(i){
+  if(!_ikSA()){toast("Hanya Super-Admin dapat menolak ajuan iklan");return}
+  var alasan=prompt("Alasan penolakan (dibaca pengaju):","");
+  if(alasan===null)return;
+  iklanBaca();var s=db.settings.iklan.slot[i];if(!s)return;
+  s.status="Ditolak";s.penyetuju=_ikNama();s.catatan=alasan.trim();
+  log("Menolak ajuan iklan",(s.nama||"Slot "+(i+1))+(alasan.trim()?" \u2014 "+alasan.trim():""));
+  _ikSimpanDiam();render();toast("Ajuan ditolak");
+}
+function iklanAdsAjukan(){
+  iklanBaca();var a=db.settings.iklan.adsense;
+  if(!a.client){toast("Isi dulu ID penerbit AdSense");return}
+  a.aktif=false;a.status="Diajukan";a.pengaju=_ikNama();a.tglAju=_ikHari();a.catatan="";
+  log("Mengajukan pemasangan AdSense",a.client);_ikSimpanDiam();render();
+  toast("Ajuan AdSense dikirim ke Super-Admin");
+}
+function iklanAdsSetujui(){
+  if(!_ikSA()){toast("Hanya Super-Admin dapat menyetujui AdSense");return}
+  iklanBaca();var a=db.settings.iklan.adsense;
+  a.status="Disetujui";a.aktif=true;a.penyetuju=_ikNama();a.catatan="";
+  log("Menyetujui pemasangan AdSense",a.client||"\u2014");_ikSimpanDiam();render();
+  toast("AdSense disetujui dan mulai tayang");
+}
+function iklanAdsTolak(){
+  if(!_ikSA()){toast("Hanya Super-Admin dapat menolak ajuan AdSense");return}
+  var alasan=prompt("Alasan penolakan:","");if(alasan===null)return;
+  iklanBaca();var a=db.settings.iklan.adsense;
+  a.status="Ditolak";a.aktif=false;a.penyetuju=_ikNama();a.catatan=alasan.trim();
+  log("Menolak ajuan AdSense",alasan.trim()||"\u2014");_ikSimpanDiam();render();toast("Ajuan AdSense ditolak");
+}
+
+function _ikTag(st){
+  var c=st==="Disetujui"?"tag tag-g":st==="Diajukan"?"tag tag-b":st==="Ditolak"?"tag tag-o":"tag";
+  return '<span class="'+c+'">'+esc(st||"\u2014")+"</span>";
+}
+function _ikBarisAjuan(judul,ket,st,jejak,tomb){
+  return '<div class="ik-aju"><div class="ik-aju-t"><b>'+esc(judul)+"</b>"+_ikTag(st)+"</div>"+
+    (ket?"<p>"+esc(ket)+"</p>":"")+
+    (jejak?"<small>"+esc(jejak)+"</small>":"")+
+    (tomb?'<div class="ik-aju-b">'+tomb+"</div>":"")+"</div>";
+}
+function pIklan(){
+  var c=iklanCfg(),sa=_ikSA(),baris="";
+  c.slot.forEach(function(s,i){
+    var jejak=(s.pengaju?"Diajukan "+s.pengaju+(s.tglAju?" \u00b7 "+s.tglAju:""):"")+
+      (s.penyetuju?(s.pengaju?" \u00b7 ":"")+(s.status==="Ditolak"?"Ditolak ":"Disetujui ")+s.penyetuju:"")+
+      (s.catatan?" \u00b7 \u201c"+s.catatan+"\u201d":"");
+    var t="";
+    if(sa){
+      if(s.status!=="Disetujui")t+='<button class="btn btn-sm btn-p" onclick="iklanSetujui('+i+')">Setujui</button> ';
+      if(s.status!=="Ditolak")t+='<button class="btn btn-sm btn-d" onclick="iklanTolak('+i+')">Tolak</button>';
+    }else if(s.status==="Diajukan"){
+      t+='<span class="ik-tunggu">Menunggu persetujuan Super-Admin</span>';
+    }else if(s.status==="Disetujui"){
+      t+='<span class="ik-tunggu">Sedang tayang</span>';
+    }else{
+      t+='<button class="btn btn-sm" onclick="iklanAjukan('+i+')">Ajukan pemasangan</button>';
+    }
+    baris+=_ikBarisAjuan(s.nama||"Slot "+(i+1),s.teks||"",s.status,jejak,t);
+  });
+  var a=c.adsense,at="";
+  if(sa){
+    if(a.status!=="Disetujui")at+='<button class="btn btn-sm btn-p" onclick="iklanAdsSetujui()">Setujui</button> ';
+    if(a.status!=="Ditolak")at+='<button class="btn btn-sm btn-d" onclick="iklanAdsTolak()">Tolak</button>';
+  }else if(a.status==="Diajukan"){at+='<span class="ik-tunggu">Menunggu persetujuan Super-Admin</span>'}
+  else{at+='<button class="btn btn-sm" onclick="iklanAdsAjukan()">Ajukan pemasangan</button>'}
+  baris+=_ikBarisAjuan("Google AdSense",a.client?"ID penerbit "+a.client:"ID penerbit belum diisi",a.status,
+    (a.pengaju?"Diajukan "+a.pengaju+(a.tglAju?" \u00b7 "+a.tglAju:""):"")+
+    (a.penyetuju?" \u00b7 "+(a.status==="Ditolak"?"Ditolak ":"Disetujui ")+a.penyetuju:"")+
+    (a.catatan?" \u00b7 \u201c"+a.catatan+"\u201d":""),at);
+
+  var tunggu=c.slot.filter(function(s){return s.status==="Diajukan"}).length+(a.status==="Diajukan"?1:0);
+  var pv=sponsorBox("rak")+dukunganBox();
+  var pratinjau='<div class="card" style="margin-top:16px"><b style="font-size:14px">Pratinjau</b>'+
+    '<p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Seperti yang dilihat pembaca di Rak Baca. Hanya yang sudah disetujui yang tampil.</p>'+
+    (pv||'<p style="font-size:13px;color:var(--ink2)">Belum ada yang tayang.</p>')+
+    (a.status==="Disetujui"&&a.client?'<p style="font-size:12.5px;color:var(--ink2);margin-top:10px">Unit AdSense tayang di antara sponsor dan kartu dukungan. Sengaja tidak dimuat di panel admin.</p>':"")+"</div>";
+
+  return ph("Sponsor & Iklan",
+      sa?"Setiap pemasangan iklan harus kamu setujui sebelum tayang. Semua keputusan tercatat di jurnal audit."
+        :"Susun materi iklan di sini lalu ajukan. Iklan baru tayang setelah disetujui Super-Admin.",
+      "")+
+    '<div class="card"><div style="display:flex;align-items:center;gap:8px"><b style="font-size:14px">Antrean persetujuan</b>'+
+    (tunggu?'<span class="tag tag-b">'+tunggu+" menunggu</span>":'<span class="tag tag-g">bersih</span>')+"</div>"+
+    (baris||'<p style="font-size:13px;color:var(--ink2);margin-top:10px">Belum ada slot sponsor.</p>')+"</div>"+
+    pratinjau+kartuIklan();
+}
 
 bootstrap();
 </script>
