@@ -636,6 +636,17 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
 [data-tema="gelap"] .rks{background:rgba(255,255,255,.03)}
 [data-tema="gelap"] .rks-b{background:rgba(255,255,255,.05);color:var(--ink)}
 @media(max-width:520px){.rks{padding:16px}.rks-b{flex:1 1 auto;justify-content:center;padding:13px 16px}}
+.lcn{display:inline-block;margin-left:5px;font-size:14px;letter-spacing:2px;line-height:1;vertical-align:middle}
+.lcn-wrap{margin-top:3px}
+.lcn-wrap:empty{display:none}
+.lcn-wrap .lcn{margin-left:0;font-size:15px}
+.lcn-lg{font-size:20px;margin-left:0;margin-right:4px}
+.lcn-p{margin:8px 0 0;font-size:14px}
+.lcn-list{margin-top:10px;border-top:1px solid var(--line);padding-top:6px}
+.lcn-r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:5px 0;font-size:13px}
+.lcn-j{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lcn-s{flex:0 0 auto;color:var(--ink2);font-variant-numeric:tabular-nums}
+[data-tema="gelap"] .lcn-list{border-top-color:rgba(255,255,255,.12)}
 [data-tema="gelap"] .ik-aju{background:rgba(255,255,255,.03)}
 .sh-lain:hover{background:var(--line)}
 [data-tema="gelap"] .sh-lain{background:#22303f;color:#eef3f8;border-color:#2b313b}
@@ -823,6 +834,13 @@ async function bootstrap(){
 }
 function save(){}
 function reset(){bootstrap();toast("Data dimuat ulang dari server")}
+function bersihkanTembolok(){
+  if(!confirm("Bersihkan tembolok aplikasi di peramban ini? Halaman akan dimuat ulang dengan versi terbaru. Data akun dan isi situs tidak hilang."))return;
+  var janji=[];
+  try{if("caches" in window)janji.push(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k)}))}))}catch(e){}
+  try{if("serviceWorker" in navigator)janji.push(navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister()}))}))}catch(e){}
+  Promise.all(janji).then(function(){location.reload()},function(){location.reload()});
+}
 supa.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_IN"||event==="SIGNED_OUT"){bootstrap()}});
 S={mode:"public",pv:{n:"board"},av:"dasbor",filter:"Semua",me:null,draft:null,err:[]};
 const DRAFT_KEY="rcs_draft_kliping_v1";
@@ -966,7 +984,7 @@ function header(){
       +'<button class="avat avat-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Menu akun" onclick="toggleAkun(event)">'+_ini+'</button>'
       +'<span class="avat-caret" aria-hidden="true">\u25be</span>'
       +(_hintAkunOn?'<div class="akun-hint" id="akunHint" onclick="toggleAkun(event)">Ketuk untuk menu &amp; mode gelap</div>':'')
-      +'<div class="akun-meta"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+'</small></div>'
+      +'<div class="akun-meta"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+'</small><div class="lcn-wrap">'+lencanaHTML(rksTotalKurator(m.id).total)+'</div></div>'
       +_act
       +'<button class="btn btn-sm" onclick="keluar()">Keluar</button>'
       +'<div class="akun-pop" role="menu"><div class="akun-head"><div class="avat">'+_ini+'</div><div class="akun-id"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+(m.divisi?" \u00b7 "+esc(m.divisi):"")+'</small></div></div>'+_tmi+_pact+'<button class="ai ai-out" role="menuitem" onclick="tutupAkun();keluar()"><span class="ai-ic">\ud83d\udeaa</span>Keluar</button></div>'
@@ -1231,7 +1249,7 @@ function pPengaturan(){
    '<div class="f"><label><input type="checkbox" id="sWajib" '+(s.wajibTinjauan?"checked":"")+' /> Wajib tinjauan sebelum terbit untuk rubrik sensitif</label></div>'+
    '<div class="f"><label><input type="checkbox" id="sTipis" '+(s.sinyalTipis?"checked":"")+' /> Aktifkan mode sinyal tipis sebagai bawaan</label></div>'+
    '<button class="btn btn-p" onclick="simpanSetting()">Simpan pengaturan</button></div>'+
-   '<div class="card" style="margin-top:16px"><b style="font-size:14px">Data contoh</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Data tersimpan di Supabase. Tombol ini hanya memuat ulang isi contoh di peramban ini dan tidak mengubah data server.</p><button class="btn btn-d" onclick="reset()">Pulihkan data contoh</button></div>';
+   '<div class="card" style="margin-top:16px"><b style="font-size:14px">Pemeliharaan</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Data utama tersimpan di Supabase. Dua tombol ini untuk mengatasi tampilan yang terasa basi atau macet di perangkatmu \u2014 tidak ada yang menghapus data server.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="reset()">Muat ulang data dari server</button><button class="btn btn-d" onclick="bersihkanTembolok()">Bersihkan tembolok aplikasi</button></div></div>';
 }
 function simpanSetting(){const s=db.settings;s.nama=document.getElementById("sNama").value;s.tagline=document.getElementById("sTag").value;s.penyangkalan=document.getElementById("sDis").value;s.wajibTinjauan=document.getElementById("sWajib").checked;s.sinyalTipis=document.getElementById("sTipis").checked;log("Memperbarui pengaturan situs",s.nama);supa.from("app_settings").upsert({id:"situs",data:s}).then(({error})=>pErr(error,"pengaturan"));render();toast("Pengaturan disimpan")}
 
@@ -1627,7 +1645,7 @@ function viewClip(){
     '<div class="note o">'+esc(db.settings.penyangkalan)+'</div>'+
     (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+'</p>':'')+'</div>':'')+
     (rel.length?'<div class="sec"><h4>Kliping serupa</h4><div class="rel">'+rel.map(function(x){return '<a href="#" onclick=\'go({pv:{n:"clip",id:"'+x.id+'"}});return false\'><b>'+esc(x.judul)+'</b><small>'+esc(x.rubrik)+' \u00b7 \u23f1 '+menitBaca(x)+' menit</small></a>'}).join("")+'</div></div>':'')+
-    '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Digunting '+tglID(k.tglKliping)+' oleh '+esc(nm(k.kurator))+(k.peninjau?' \u00b7 ditinjau '+esc(nm(k.peninjau)):'')+'</p>'+
+    '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Digunting '+tglID(k.tglKliping)+' oleh '+esc(nm(k.kurator))+lencanaHTML(rksTotalKurator(k.kurator).total)+(k.peninjau?' \u00b7 ditinjau '+esc(nm(k.peninjau)):'')+'</p>'+
     '<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'<button class="sh sh-lain" onclick=\'bagikanAsli("'+k.id+'")\'>Lainnya\u2026</button></div>'+
     '<div class="pn">'+
       (prev?'<button class="btn" onclick=\'go({pv:{n:"clip",id:"'+prev.id+'"}})\'>\u2190 '+esc(prev.judul.slice(0,42))+(prev.judul.length>42?"\u2026":"")+'</button>':'')+
@@ -1902,7 +1920,7 @@ function kartuIklan(){
   var _set=pPengaturan;
   pPengaturan=function(){
     var h=_set.apply(this,arguments);
-    var tanda='<div class="card" style="margin-top:16px"><b style="font-size:14px">Data contoh</b>';
+    var tanda='<div class="card" style="margin-top:16px"><b style="font-size:14px">Pemeliharaan</b>';
     var i=h.indexOf(tanda);
     return i<0?h+kartuIklan():h.slice(0,i)+kartuIklan()+h.slice(i);
   };
@@ -2179,6 +2197,97 @@ function rksMini(k){
     var jalan=function(){muatReaksi().then(function(){try{render()}catch(e){}})};
     p.then(jalan,jalan);
     return p;
+  };
+})();
+
+
+/* ============ lencana kurator & notifikasi tanggapan ============ */
+function rksTotalKurator(uid){
+  var out={api:0,kopi:0,total:0,klip:[]};
+  if(!uid||typeof db==="undefined"||!db||!db.kliping)return out;
+  db.kliping.forEach(function(k){
+    if(k.kurator!==uid)return;
+    var h=(typeof RKS_HITUNG!=="undefined"&&RKS_HITUNG[k.id])||{};
+    var x=h.api||0,y=h.kopi||0;
+    out.api+=x;out.kopi+=y;
+    if(x+y>0)out.klip.push({judul:k.judul,api:x,kopi:y});
+  });
+  out.total=out.api+out.kopi;
+  out.klip.sort(function(a,b){return (b.api+b.kopi)-(a.api+a.kopi)});
+  return out;
+}
+function lencanaTingkat(total){
+  if(total>=110)return {icon:"\u2b50",n:Math.min(5,Math.floor((total-100)/10)),nama:"Bintang",basis:100};
+  if(total>=60)return {icon:"\ud83e\udded",n:Math.min(5,Math.floor((total-50)/10)),nama:"Mata angin",basis:50};
+  if(total>=10)return {icon:"\ud83c\udf3b",n:Math.min(5,Math.floor(total/10)),nama:"Bunga matahari",basis:0};
+  return null;
+}
+function lencanaLanjut(total){
+  var t=lencanaTingkat(total);
+  if(!t)return (10-total)+" tanggapan lagi menuju \ud83c\udf3b pertama";
+  if(t.n<5)return (t.basis+(t.n+1)*10-total)+" lagi menuju "+t.icon+" ke-"+(t.n+1);
+  if(t.icon==="\ud83c\udf3b")return (60-total)+" lagi menuju \ud83e\udded pertama";
+  if(t.icon==="\ud83e\udded")return (110-total)+" lagi menuju \u2b50 pertama";
+  return "Lencana tertinggi tercapai";
+}
+function lencanaHTML(total){
+  var t=lencanaTingkat(total);
+  if(!t)return "";
+  return '<span class="lcn" title="'+esc(t.nama+" \u2014 lencana kurator dari tanggapan pembaca")+'">'+t.icon.repeat(t.n)+"</span>";
+}
+var _rksBaruCache={};
+function _rksBaru(uid,total){
+  if(_rksBaruCache[uid]!==undefined)return _rksBaruCache[uid];
+  var kunci="rcs_rks_lihat_"+uid,lalu=0;
+  try{lalu=parseInt(localStorage.getItem(kunci)||"0",10)||0}catch(e){}
+  var d=Math.max(0,total-lalu);
+  _rksBaruCache[uid]=d;
+  try{localStorage.setItem(kunci,String(total))}catch(e){}
+  return d;
+}
+function kartuReaksiSaya(){
+  var m=(typeof me==="function")?me():null;
+  if(!m)return "";
+  var r=rksTotalKurator(m.id);
+  var baru=(typeof RKS_SIAP!=="undefined"&&RKS_SIAP)?_rksBaru(m.id,r.total):0;
+  var t=lencanaTingkat(r.total);
+  var progres=t
+    ? '<p class="lcn-p"><span class="lcn lcn-lg">'+t.icon.repeat(t.n)+"</span> <b>"+esc(t.nama)+"</b> \u00b7 "+esc(lencanaLanjut(r.total))+"</p>"
+    : '<p class="lcn-p">Kumpulkan '+(10-r.total)+" tanggapan lagi untuk \ud83c\udf3b pertama.</p>";
+  var baris=r.klip.slice(0,6).map(function(x){
+    return '<div class="lcn-r"><span class="lcn-j">'+esc(x.judul)+'</span><span class="lcn-s">\ud83d\udd25 '+x.api+" \u00b7 \u2615 "+x.kopi+"</span></div>";
+  }).join("");
+  return '<div class="card" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-size:14px">Tanggapan pembaca untuk klipingmu</b>'+
+    (baru?'<span class="tag tag-g">+'+baru+" baru</span>":"")+"</div>"+
+    '<p style="font-size:15px;margin:8px 0 2px">\ud83d\udd25 <b>'+r.api+"</b> Nyalakan \u00b7 \u2615 <b>"+r.kopi+"</b> Bahan ngopi \u00b7 total <b>"+r.total+"</b></p>"+
+    progres+
+    (baris?'<div class="lcn-list">'+baris+"</div>":'<p style="font-size:13px;color:var(--ink2);margin-top:8px">Belum ada tanggapan. Bagikan klipingmu supaya pembaca ikut menilai.</p>')+
+    "</div>";
+}
+(function(){
+  var _d=pDasbor;
+  pDasbor=function(){
+    var h=_d.apply(this,arguments);
+    var k=kartuReaksiSaya();
+    var i=h.indexOf('<div class="grid g4"');
+    return i<0?h+k:h.slice(0,i)+k+h.slice(i);
+  };
+  var _muat=muatReaksi;
+  muatReaksi=function(){
+    return Promise.resolve(_muat.apply(this,arguments)).then(function(r){
+      RKS_SIAP=!RKS_LURING;
+      try{
+        var m=(typeof me==="function")?me():null;
+        if(m&&!RKS_LURING&&!sessionStorage.getItem("rcs_rks_toast")){
+          var d=_rksBaru(m.id,rksTotalKurator(m.id).total);
+          if(d>0){
+            sessionStorage.setItem("rcs_rks_toast","1");
+            toast("\ud83d\udd25 +"+d+" tanggapan baru untuk klipingmu");
+          }
+        }
+      }catch(e){}
+      return r;
+    });
   };
 })();
 
