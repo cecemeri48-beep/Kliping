@@ -723,7 +723,7 @@ function header(){
       +'<div class="akun-pop" role="menu"><div class="akun-head"><div class="avat">'+_ini+'</div><div class="akun-id"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+(m.divisi?" \u00b7 "+esc(m.divisi):"")+'</small></div></div>'+_tmi+_pact+'<button class="ai ai-out" role="menuitem" onclick="tutupAkun();keluar()"><span class="ai-ic">\ud83d\udeaa</span>Keluar</button></div>'
       +'</div>';
   }
-  return '<header class="top"><div class="top-in'+(m?" auth":"")+'"><div class="brand"><img src="'+LOGO+'" alt="Logo REICHAS CHELEBES"'+(m?'':' onclick=\'go({mode:"login"})\' style="cursor:pointer"')+' /><div><h1>KLIPING REICHAS</h1><p>'+esc(db.settings.tagline)+'</p></div></div><nav class="nav">'+nav+"</nav>"+temaBtn()+right+"</div></header>";
+  return '<header class="top"><div class="top-in'+(m?" auth":"")+'"><div class="brand"><img src="'+LOGO+'" alt="Logo REICHAS CHELEBES"'+(m?'':' onclick=\'go({mode:"login"})\' style="cursor:pointer"')+' /><div><h1>KLIPING RCS.CBS</h1><p>'+esc(db.settings.tagline)+'</p></div></div><nav class="nav">'+nav+"</nav>"+temaBtn()+right+"</div></header>";
 }
 async function keluar(){try{await supa.auth.signOut()}catch(e){}S.me=null;go({mode:"public",pv:{n:"board"},draft:null});toast("Sesi diakhiri")}
 
@@ -876,7 +876,7 @@ function pKliping(){
   if(m.peran==="Kurator")list=list.filter(k=>k.kurator===m.id);
   const rows=list.map(k=>{
     const ok=k.pelajaran.filter(x=>x&&x.trim()).length>=3&&k.materi.length>0&&k.tautan;
-    return "<tr><td><b>"+esc(k.judul)+'</b><br /><span style="color:var(--ink2);font-size:13px">'+esc(k.media)+" \u00b7 "+tglID(k.tglBerita)+'</span></td><td><span class="tag">'+esc(k.rubrik)+'</span></td><td><span class="'+STAG[k.status]+'">'+k.status+"</span></td><td>"+esc(nm(k.kurator))+'</td><td>'+(ok?'<span class="tag tag-g">Lengkap</span>':'<span class="tag tag-r">Belum</span>')+'</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="sunting(\''+k.id+'\')">Sunting</button>'+(m.peran==="Super-Admin"?' <button class="btn btn-sm btn-d" onclick="hapus(\''+k.id+'\')">Hapus</button>':"")+"</td></tr>"}).join("");
+    return "<tr><td><b>"+esc(k.judul)+'</b><br /><span style="color:var(--ink2);font-size:13px">'+esc(k.media)+" \u00b7 "+tglID(k.tglBerita)+'</span></td><td><span class="tag">'+esc(k.rubrik)+'</span></td><td><span class="'+STAG[k.status]+'">'+k.status+"</span></td><td>"+esc(nm(k.kurator))+'</td><td>'+(ok?'<span class="tag tag-g">Lengkap</span>':'<span class="tag tag-r">Belum</span>')+'</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="sunting(\''+k.id+'\')">Sunting</button>'+((m.peran==="Super-Admin"||m.peran==="Admin")?' <button class="btn btn-sm btn-d" onclick="hapus(\''+k.id+'\')">Hapus</button>':"")+"</td></tr>"}).join("");
   return ph("Kliping",m.peran==="Kurator"?"Menampilkan kliping yang kamu kurasi.":"Seluruh entri, dari calon sampai terbit.",'<button class="btn btn-p" onclick="baru()">+ Kliping baru</button>')+
    '<div class="tbl tbl-scroll"><table><thead><tr><th>Judul</th><th>Rubrik</th><th>Status</th><th>Kurator</th><th>Anotasi</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">Belum ada entri.</td></tr>')+"</tbody></table></div>";
 }
@@ -969,7 +969,7 @@ function simpanSetting(){const s=db.settings;s.nama=document.getElementById("sNa
 /* ================= editor ================= */
 function baru(){S.av="kliping";S.draft={id:"",judul:"",lead:"",rubrik:db.rubrik[0],media:db.media[0],tautan:"",tglBerita:"2026-07-30",tglKliping:"2026-07-30",wilayah:"Sulawesi Selatan",lokasi:[],topik:[],potongan:"",konteks:"",pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",vonis:"",catatan:""};S.err=[];go({})}
 function sunting(id){S.av="kliping";const k=db.kliping.find(x=>x.id===id);S.draft=JSON.parse(JSON.stringify(k));while(S.draft.pelajaran.length<3)S.draft.pelajaran.push("");S.err=[];go({})}
-function hapus(id){if(!confirm("Hapus kliping ini?"))return;const k=db.kliping.find(x=>x.id===id);db.kliping=db.kliping.filter(x=>x.id!==id);log("Menghapus kliping",k.judul);supa.from("kliping").delete().eq("id",id).then(({error})=>pErr(error,"kliping"));render();toast("Kliping dihapus")}
+function hapus(id){var mp=me();if(!mp||(mp.peran!=="Super-Admin"&&mp.peran!=="Admin")){toast("Hanya Admin atau Super-Admin yang dapat menghapus kliping");return}if(!confirm("Hapus kliping ini?"))return;const k=db.kliping.find(x=>x.id===id);db.kliping=db.kliping.filter(x=>x.id!==id);log("Menghapus kliping",k.judul);supa.from("kliping").delete().eq("id",id).then(({error})=>pErr(error,"kliping"));render();toast("Kliping dihapus")}
 
 /* ============ gambar (Supabase Storage) ============ */
 function isImg(g){return typeof g==="string"&&g.slice(0,4)==="http";}
