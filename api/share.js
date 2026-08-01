@@ -80,19 +80,25 @@ module.exports = async function (req, res) {
   } catch (e) {}
   if (!k) return halamanKosong(res,id);
 
-  try {
-    const ids=[k.kurator,k.peninjau].filter(Boolean).map(function(x){return '"'+x+'"';}).join(',');
-    if(ids){
-      const r2=await fetch(SUPA+'/rest/v1/profiles?id=in.('+encodeURIComponent(ids)+')&select=id,nama',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});
-      const p=await r2.json();
-      if(Array.isArray(p)){
-        p.forEach(function(u){
-          if(u.id===k.kurator)kurator=u.nama;
-          if(u.id===k.peninjau)peninjau=u.nama;
-        });
-      }
+  // Nama kurator dibaca lewat tampilan publik kurator_publik yang hanya
+  // memuat id dan nama. Tabel profiles dipakai sebagai cadangan, dan
+  // keduanya boleh gagal tanpa merusak halaman.
+  const ids=[k.kurator,k.peninjau].filter(Boolean).map(function(x){return '"'+x+'"';}).join(',');
+  if(ids){
+    for(const tabel of ['kurator_publik','profiles']){
+      if(kurator)break;
+      try{
+        const r2=await fetch(SUPA+'/rest/v1/'+tabel+'?id=in.('+encodeURIComponent(ids)+')&select=id,nama',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});
+        const p=await r2.json();
+        if(Array.isArray(p)){
+          p.forEach(function(u){
+            if(String(u.id)===String(k.kurator))kurator=u.nama;
+            if(String(u.id)===String(k.peninjau))peninjau=u.nama;
+          });
+        }
+      }catch(e){}
     }
-  } catch (e) {}
+  }
 
   const kanonik = SITE+'/klip/'+encodeURIComponent(k.id);
   const buka = SITE+'/#klip='+encodeURIComponent(k.id);
