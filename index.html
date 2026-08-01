@@ -2913,6 +2913,107 @@ function kuisIsi(m){
 })();
 
 
+/* ===== LAPIS 10: audit kesiapan AdSense ===== */
+function _kata(s){s=String(s==null?"":s).replace(/\s+/g," ").trim();return s?s.split(" ").length:0}
+function adsKataAsli(k){
+  if(!k)return 0;
+  var n=_kata(k.konteks)+_kata(k.vonis)+_kata(k.catatan)+_kata(k.lead);
+  (k.pelajaran||[]).forEach(function(p){n+=_kata(p)});
+  return n;
+}
+function adsKataKutip(k){return k?_kata(k.potongan):0}
+function adsRasio(k){
+  var a=adsKataAsli(k),q=adsKataKutip(k),t=a+q;
+  return t?Math.round(q/t*100):0;
+}
+function adsAudit(){
+  var t=(typeof terbit==="function"?terbit():[]);
+  var n=t.length;
+  var totalAsli=0,lemah=[],kutipTinggi=[],tanpaTaut=[],tanpaKurator=[];
+  t.forEach(function(k){
+    var a=adsKataAsli(k);totalAsli+=a;
+    if(a<300)lemah.push({k:k,n:a});
+    if(adsRasio(k)>35)kutipTinggi.push({k:k,n:adsRasio(k)});
+    if(!k.tautan)tanpaTaut.push({k:k,n:0});
+    if(!k.kurator)tanpaKurator.push({k:k,n:0});
+  });
+  var rata=n?Math.round(totalAsli/n):0;
+  var mt=(db.materi||[]).length;
+  var kon=hkmKontak();
+  var ik=(typeof iklanCfg==="function"?iklanCfg():{});
+  var pub=(ik&&ik.adsense&&ik.adsense.klien)||"";
+  var poin=[
+    {j:"Jumlah kliping terbit",n:n,b:n>=25,s:n+" dari 25",
+     p:n>=25?"Cukup untuk dinilai sebagai situs yang hidup.":"Ini penghalang terbesar. AdSense hampir selalu menolak situs dengan sedikit halaman isi. Terbitkan sampai minimal 25 kliping sebelum mendaftar."},
+    {j:"Rata-rata kata tulisan sendiri",n:rata,b:rata>=300,s:rata+" kata per kliping",
+     p:rata>=300?"Panjangnya memadai untuk dianggap tulisan bernilai.":"Konteks dan pelajaran perlu lebih tebal. Di bawah 300 kata, kliping mudah dicap thin content."},
+    {j:"Kliping yang tulisannya masih tipis",n:lemah.length,b:lemah.length===0,s:lemah.length+" kliping",daftar:lemah,satuan:" kata asli",
+     p:"Setiap kliping sebaiknya punya minimal 300 kata konteks, pelajaran, dan vonis \u2014 di luar kutipan berita."},
+    {j:"Porsi kutipan terlalu besar",n:kutipTinggi.length,b:kutipTinggi.length===0,s:kutipTinggi.length+" kliping",daftar:kutipTinggi,satuan:"% kutipan",
+     p:"Kalau kutipan berita melebihi 35 persen isi halaman, Google bisa menilainya sebagai konten salinan. Perpendek potongan, perpanjang telaah."},
+    {j:"Semua kliping menyebut sumber",n:tanpaTaut.length,b:tanpaTaut.length===0,s:tanpaTaut.length?tanpaTaut.length+" belum bertaut":"lengkap",daftar:tanpaTaut,
+     p:"Tautan ke berita asli adalah bukti bahwa kalian mengutip, bukan mencuri."},
+    {j:"Semua kliping bernama kurator",n:tanpaKurator.length,b:tanpaKurator.length===0,s:tanpaKurator.length?tanpaKurator.length+" tanpa nama":"lengkap",daftar:tanpaKurator,
+     p:"Nama penulis memperkuat kredibilitas di mata peninjau dan mesin pencari."},
+    {j:"Materi belajar sebagai isi asli",n:mt,b:mt>=5,s:mt+" materi",
+     p:"Materi yang kalian tulis sendiri adalah bukti terkuat bahwa situs ini bukan sekadar pengumpul berita."},
+    {j:"Halaman Tentang, Privasi, Kontak",b:true,s:"terpasang",
+     p:"Ketiganya sudah tayang dan saling bertaut lewat footer."},
+    {j:"Surel kontak yang bisa dihubungi",b:!!kon.email,s:kon.email||"belum diisi",
+     p:"Peninjau AdSense kadang benar-benar mengirim surel percobaan."},
+    {j:"Sitemap dan umpan RSS",b:true,s:"/sitemap.xml \u00b7 /rss.xml",
+     p:"Sudah aktif. Daftarkan sitemap di Google Search Console supaya kliping cepat terindeks."},
+    {j:"Berkas ads.txt",b:!!pub,s:pub?"siap dibuat":"menunggu ID penerbit",
+     p:pub?"Setelah disetujui, unggah ads.txt berisi baris di bawah ke akar situs.":"Isi dulu ID penerbit AdSense di panel Sponsor & Iklan setelah pendaftaran diterima."}
+  ];
+  var lulus=poin.filter(function(p){return p.b}).length;
+  return {poin:poin,lulus:lulus,total:poin.length,n:n,rata:rata,pub:pub};
+}
+function kartuKesiapan(){
+  var a=adsAudit();
+  var persen=Math.round(a.lulus/a.total*100);
+  var warna=persen>=90?"var(--green)":persen>=60?"var(--orange)":"var(--red)";
+  var rows=a.poin.map(function(p){
+    var ikon=p.b?"\u2714":"\u2716";
+    var d="";
+    if(p.daftar&&p.daftar.length){
+      d='<ul class="ads-l">'+p.daftar.slice(0,8).map(function(x){
+        return "<li>"+esc(x.k.judul)+(p.satuan?' <span class="ads-a">'+x.n+esc(p.satuan)+"</span>":"")+"</li>";
+      }).join("")+(p.daftar.length>8?"<li>dan "+(p.daftar.length-8)+" lainnya\u2026</li>":"")+"</ul>";
+    }
+    return '<div class="ads-p'+(p.b?" ok":" no")+'"><div class="ads-i">'+ikon+'</div><div><div class="ads-j">'+esc(p.j)+' <span class="ads-s">'+esc(p.s||"")+'</span></div><div class="ads-k">'+esc(p.p)+"</div>"+d+"</div></div>";
+  }).join("");
+  var adstxt=a.pub?'<div class="ads-code">google.com, '+esc(a.pub.replace(/^ca-/,""))+", DIRECT, f08c47fec0942fa0</div>":"";
+  return '<div class="card" style="margin-top:16px"><div class="ads-h"><div><b style="font-size:15px">Kesiapan AdSense</b>'+
+   '<div style="font-size:12.5px;color:var(--ink2);margin-top:3px">Dihitung ulang dari data sebenarnya setiap kali halaman ini dibuka.</div></div>'+
+   '<div class="ads-skor" style="color:'+warna+'">'+a.lulus+"/"+a.total+"</div></div>"+
+   '<div class="ads-bar"><i style="width:'+persen+'%;background:'+warna+'"></i></div>'+
+   rows+adstxt+"</div>";
+}
+(function(){
+  var css=".ads-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}"+
+  ".ads-skor{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}"+
+  ".ads-bar{height:6px;background:var(--soft2);border-radius:999px;overflow:hidden;margin-bottom:16px}"+
+  ".ads-bar i{display:block;height:100%;border-radius:999px;transition:width .4s}"+
+  ".ads-p{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}"+
+  ".ads-i{flex:0 0 auto;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;margin-top:2px}"+
+  ".ads-p.ok .ads-i{background:var(--green)}.ads-p.no .ads-i{background:var(--red)}"+
+  ".ads-j{font-size:14px;font-weight:700}"+
+  ".ads-s{font-weight:600;color:var(--ink2);font-size:12.5px;margin-left:4px}"+
+  ".ads-k{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:3px}"+
+  ".ads-l{margin:8px 0 0;padding-left:18px;font-size:12.5px;color:var(--ink2)}.ads-l li{margin-bottom:3px}"+
+  ".ads-a{font-weight:700;color:var(--orange)}"+
+  ".ads-code{margin-top:14px;background:var(--soft2);border-radius:10px;padding:11px 13px;font-family:ui-monospace,monospace;font-size:12.5px;word-break:break-all}"+
+  "@media(max-width:520px){.ads-skor{font-size:22px}}";
+  try{document.head.insertAdjacentHTML("beforeend","<style>"+css+"</style>")}catch(e){}
+})();
+(function(){
+  if(typeof pIklan!=="function")return;
+  var _p=pIklan;
+  pIklan=function(){return kartuKesiapan()+_p.apply(this,arguments)};
+})();
+
+
 bootstrap();
 </script>
 </body>
