@@ -24,7 +24,10 @@ async function sitemap(res){
   let kl=[],mt=[];
   try{kl=await ambilKliping();}catch(e){}
   try{mt=await ambilMateri();}catch(e){}
-  const tetap=[['/',1.0,'daily'],['/#materi',0.7,'weekly'],['/#arsip',0.6,'weekly'],['/#pedoman',0.5,'monthly'],['/#tentang',0.5,'monthly'],['/#privasi',0.3,'yearly'],['/#kontak',0.4,'yearly']];
+  // Hanya URL sungguhan. Google mengabaikan bagian setelah tanda #, jadi
+  // alamat seperti /#materi dibaca sebagai duplikat beranda dan memicu
+  // peringatan "duplicate, submitted URL not selected as canonical".
+  const tetap=[['/',1.0,'daily']];
   const now=new Date().toISOString().slice(0,10);
   let x='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   tetap.forEach(function(t){
@@ -34,9 +37,6 @@ async function sitemap(res){
     x+='<url><loc>'+esc(SITE+'/klip/'+encodeURIComponent(k.id))+'</loc>'+
        (k.tglKliping?'<lastmod>'+esc(k.tglKliping)+'</lastmod>':'')+
        '<changefreq>monthly</changefreq><priority>0.8</priority></url>\n';
-  });
-  mt.forEach(function(m){
-    x+='<url><loc>'+esc(SITE+'/#materi='+encodeURIComponent(m.id))+'</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>\n';
   });
   x+='</urlset>\n';
   res.setHeader('Content-Type','application/xml; charset=utf-8');
