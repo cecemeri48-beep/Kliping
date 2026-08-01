@@ -2525,6 +2525,203 @@ function _gerakHalaman(){
   };
 })();
 
+/* ===== LAPIS 8: Tentang, Privasi, Kontak ===== */
+var RCS_EMAIL_BAWAAN="rcs.cbs@gmail.com";
+var RCS_EMAIL2_BAWAAN="kliping.rcscbs@gmail.com";
+function hkmKontak(){
+  var s=(typeof db!=="undefined"&&db&&db.settings)||{};
+  var k=s.kontak||{};
+  return {email:k.email||RCS_EMAIL_BAWAAN,email2:(k.email2===""?"":(k.email2||RCS_EMAIL2_BAWAAN)),wa:k.wa||"",alamat:k.alamat||"Makassar, Sulawesi Selatan",org:k.org||"REICHAS CHELEBES"};
+}
+function hkmBaca(){if(!db.settings.kontak)db.settings.kontak=hkmKontak();return db.settings.kontak}
+function hkmSurel(subjek,ke){var c=hkmKontak();var a=(ke==="redaksi"&&c.email2)?c.email2:c.email;return "mailto:"+a+"?subject="+encodeURIComponent(subjek)}
+function hkmSurelRedaksi(){var c=hkmKontak();return c.email2||c.email}
+function _hkmTgl(){try{return tglID(new Date().toISOString().slice(0,10))}catch(e){return ""}}
+
+function hkmHead(judul,lead){
+  return '<div class="art hkm"><h2 style="margin-top:0">'+esc(judul)+'</h2><p class="lead">'+esc(lead)+'</p>';
+}
+function hkmNav(aktif){
+  var t=[["tentang","Tentang"],["privasi","Kebijakan Privasi"],["kontak","Kontak"],["pedoman","Pedoman Kurasi"]];
+  return '<div class="hkm-nav">'+t.map(function(p){
+    return '<button class="hkm-t'+(p[0]===aktif?" on":"")+'" onclick=\'go({pv:{n:"'+p[0]+'"}})\'>'+p[1]+"</button>";
+  }).join("")+"</div>";
+}
+
+/* ---------- Tentang ---------- */
+function viewTentang(){
+  var c=hkmKontak();
+  var s=(db&&db.settings)||{};
+  var jml=(typeof terbit==="function"?terbit().length:0);
+  var rub=(db&&db.rubrik&&db.rubrik.length)||0;
+  var mat=(db&&db.materi&&db.materi.length)||0;
+  return hkmHead("Tentang Kliping REICHAS",esc(s.tagline||"Menggunting berita, menanam pengetahuan."))+
+   hkmNav("tentang")+
+   '<div class="sec"><h4>Apa ini</h4>'+
+   "<p>Kliping REICHAS adalah ruang baca yang dikelola "+esc(c.org)+", organisasi pencinta alam dan penggiat kegiatan luar ruang di "+esc(c.alamat)+". Kami menggunting pemberitaan tentang kecelakaan pendakian, cuaca ekstrem, regulasi kawasan, dan praktik kegiatan alam bebas, lalu membacanya ulang sebagai bahan belajar.</p>"+
+   "<p>Yang kami kerjakan bukan jurnalisme. Kami tidak turun ke lapangan, tidak mewawancarai narasumber, dan tidak memproduksi berita sendiri. Kami membaca apa yang sudah diterbitkan media lain, mengutip secukupnya, lalu menambahkan konteks dan pelajaran yang bisa dipakai anggota di lapangan. Itu sebabnya setiap kliping selalu mencantumkan nama media dan tautan ke sumber aslinya.</p></div>"+
+   '<div class="sec"><h4>Kenapa dikerjakan</h4>'+
+   "<p>Berita kecelakaan di gunung datang dan pergi dalam hitungan hari. Padahal di dalamnya hampir selalu ada pola yang berulang: berangkat terlalu siang, membaca cuaca dengan harapan, meremehkan jalur turun, membawa perlengkapan yang salah. Kalau potongan-potongan itu dibiarkan hanyut di lini masa, pelajarannya ikut hilang. Kami menjilidnya supaya bisa dibaca lagi tahun depan.</p>"+
+   "<p>Sampai hari ini ada <b>"+jml+" kliping terbit</b>, tersebar di <b>"+rub+" rubrik</b>, ditemani <b>"+mat+" materi belajar</b> yang disusun Divisi Pendidikan dan Edukasi.</p></div>"+
+   '<div class="sec"><h4>Cara kami bekerja</h4>'+
+   "<p>Setiap potongan melewati lima tahap: <b>Calon</b> saat baru ditemukan, <b>Ditulis</b> saat konteks dan pelajaran disusun, <b>Ditinjau</b> saat dibaca ulang oleh pengelola lain, <b>Terbit</b> setelah lolos, dan <b>Diarsipkan</b> saat sudah dijilid per bulan. Nama kurator dan peninjau dicantumkan di bawah setiap kliping supaya tanggung jawabnya jelas.</p>"+
+   '<p>Batas kerja yang kami pegang ditulis terbuka di halaman <a href="#" onclick=\'go({pv:{n:"pedoman"}});return false\'>Pedoman Kurasi</a>.</p></div>'+
+   '<div class="sec"><h4>Siapa yang mengelola</h4>'+
+   "<p>Portal ini dijalankan Divisi Komunikasi dan Publikasi bersama Divisi Pendidikan dan Edukasi "+esc(c.org)+". Kliping ditulis kurator dari berbagai divisi, ditinjau pengelola, dan disunting bersama.</p></div>"+
+   '<div class="note o">'+esc(s.penyangkalan||"Semua materi di sini bersifat edukatif dan bukan pengganti pelatihan langsung.")+"</div>"+
+   '<div class="note">Urusan isi kliping \u2014 koreksi, keberatan, atau usul bahan \u2014 kirim ke <a href="'+hkmSurel("Pertanyaan tentang isi kliping","redaksi")+'">'+esc(hkmSurelRedaksi())+'</a>. Urusan organisasi dan kerja sama ke <a href="'+hkmSurel("Pertanyaan tentang Kliping REICHAS")+'">'+esc(c.email)+'</a>.</div>'+
+   "</div>"+foot();
+}
+
+/* ---------- Privasi ---------- */
+function viewPrivasi(){
+  var c=hkmKontak();
+  var ik=(typeof iklanCfg==="function"?iklanCfg():{});
+  var ads=(ik&&ik.adsense)||{};
+  var pakaiAds=!!(ads.aktif&&ads.klien);
+  return hkmHead("Kebijakan Privasi","Ditulis sependek mungkin, dengan bahasa yang bisa dibaca orang biasa. Berlaku sejak "+_hkmTgl()+".")+
+   hkmNav("privasi")+
+   '<div class="sec"><h4>Ringkasnya</h4>'+
+   "<p>Untuk membaca kliping di sini, kamu <b>tidak perlu mendaftar dan tidak kami mintai data apa pun</b>. Kami tidak punya formulir pendaftaran pembaca, tidak mengumpulkan nama, dan tidak menjual data siapa pun kepada siapa pun.</p></div>"+
+   '<div class="sec"><h4>Yang disimpan di perangkatmu sendiri</h4>'+
+   "<p>Beberapa fitur menyimpan catatan di peramban kamu, bukan di server kami. Isinya tidak pernah dikirim ke mana-mana dan hilang begitu kamu membersihkan data situs:</p>"+
+   "<ul><li><b>Rak Baca</b> \u2014 daftar kliping yang kamu simpan untuk dibaca nanti.</li>"+
+   "<li><b>Riwayat baca</b> \u2014 kliping yang terakhir kamu buka, supaya bisa dilanjutkan.</li>"+
+   "<li><b>Pilihan tampilan</b> \u2014 tema terang atau gelap, dan suara narator yang kamu pilih.</li>"+
+   "<li><b>Penanda perangkat</b> \u2014 kode acak untuk tombol \uD83D\uDD25 dan \u2615, supaya satu perangkat tidak bisa menekan tombol yang sama berkali-kali. Kode ini tidak berisi identitas apa pun dan tidak bisa dilacak balik ke kamu.</li></ul>"+
+   "<p>Semuanya bisa kamu hapus kapan saja lewat pengaturan peramban, atau dengan membersihkan data situs.</p></div>"+
+   '<div class="sec"><h4>Yang tersimpan di server kami</h4>'+
+   "<p>Hanya dua hal. Pertama, <b>jumlah tanggapan</b> \uD83D\uDD25 dan \u2615 pada tiap kliping, tersimpan bersama penanda perangkat acak tadi \u2014 tanpa nama, tanpa alamat surel, tanpa lokasi. Kedua, <b>akun pengelola</b>: kurator dan admin yang menulis kliping punya akun berisi nama, surel, dan divisi. Akun itu hanya untuk mereka yang bekerja di redaksi, bukan untuk pembaca.</p>"+
+   "<p>Layanan basis data yang kami pakai adalah Supabase. Seperti hampir semua layanan web, penyedia peladen kami mencatat alamat IP untuk keperluan keamanan dan pencegahan penyalahgunaan. Kami sendiri tidak mengolah catatan itu.</p></div>"+
+   '<div class="sec"><h4>Iklan dan dukungan</h4>'+
+   (pakaiAds
+     ? "<p>Halaman tertentu menampilkan iklan dari Google AdSense. Google dan mitranya dapat menggunakan cookie untuk menayangkan iklan berdasarkan kunjungan kamu ke situs ini dan situs lain. Kamu bisa mematikan iklan yang dipersonalisasi lewat <a href=\"https://www.google.com/settings/ads\" target=\"_blank\" rel=\"noopener\">Setelan Iklan Google</a>, atau lewat <a href=\"https://www.aboutads.info/choices/\" target=\"_blank\" rel=\"noopener\">aboutads.info</a>.</p>"
+     : "<p>Saat ini kami belum menayangkan iklan dari jaringan pihak ketiga. Kalau nanti dipasang, bagian ini akan diperbarui lebih dulu dan penjelasannya ditulis di sini sebelum iklannya tayang.</p>")+
+   "<p>Slot sponsor dan tautan afiliasi yang mungkin kamu lihat di Lemari Gear adalah <b>gambar dan tautan biasa</b>. Kami tidak menanam pelacak di dalamnya. Kalau kamu membeli lewat tautan afiliasi, kami bisa mendapat komisi kecil dari toko, tanpa menambah harga yang kamu bayar. Tautan semacam itu selalu kami beri keterangan.</p>"+
+   "<p>Kami tidak memakai Google Analytics atau alat pelacak pengunjung sejenis.</p></div>"+
+   '<div class="sec"><h4>Hak cipta dan keberatan media</h4>'+
+   "<p>Kutipan berita di sini dipakai secukupnya untuk keperluan pendidikan dan ulasan, selalu dengan menyebut nama media dan menautkan ke sumber aslinya. Hak cipta atas berita tetap milik penerbitnya masing-masing.</p>"+
+   '<p>Kalau kamu mewakili media dan keberatan atas kutipan, gambar, atau ringkasan yang kami muat, kirim surel ke <a href="'+hkmSurel("Keberatan atas materi kliping","redaksi")+'">'+esc(hkmSurelRedaksi())+'</a> dengan menyertakan tautan klipingnya. Kami menanggapi dalam <b>tiga hari kerja</b> dan akan mencabut atau memperbaiki materi yang terbukti bermasalah.</p></div>'+
+   '<div class="sec"><h4>Anak-anak</h4><p>Portal ini ditujukan untuk pembaca umum dan anggota organisasi. Kami tidak sengaja mengumpulkan data dari anak di bawah 13 tahun.</p></div>'+
+   '<div class="sec"><h4>Perubahan kebijakan</h4><p>Kalau ada perubahan, tanggal berlaku di atas akan diperbarui. Perubahan yang menyangkut data pembaca akan kami sebutkan terang-terangan, bukan diselipkan diam-diam.</p></div>'+
+   '<div class="note">Pertanyaan soal privasi? <a href="'+hkmSurel("Pertanyaan privasi Kliping REICHAS")+'">'+esc(c.email)+'</a></div>'+
+   "</div>"+foot();
+}
+
+/* ---------- Kontak ---------- */
+function viewKontak(){
+  var c=hkmKontak();
+  var baris=[];
+  if(c.email2)baris.push(["\uD83D\uDCF0","Surel redaksi kliping",'<a href="'+hkmSurel("Halo redaksi Kliping REICHAS","redaksi")+'">'+esc(c.email2)+"</a>","Untuk isi kliping: keberatan media, ralat fakta, dan usul bahan."]);
+  baris.push(["\u2709\uFE0F","Surel organisasi",'<a href="'+hkmSurel("Halo Kliping REICHAS")+'">'+esc(c.email)+"</a>",c.email2?"Untuk urusan di luar isi kliping: kerja sama, sponsor, kelembagaan.":"Jalur utama. Paling cepat dibalas."]);
+  baris.push(["\uD83D\uDCCD","Sekretariat",esc(c.alamat),"Kunjungan sebaiknya membuat janji lebih dulu lewat surel."]);
+  if(c.wa)baris.splice(1,0,["\uD83D\uDCAC","WhatsApp",esc(c.wa),"Untuk hal yang mendesak."]);
+  var alasan=[
+    ["Keberatan atau ralat","Kamu mewakili media, atau menemukan kekeliruan fakta di salah satu kliping.","Keberatan atas materi kliping","redaksi"],
+    ["Usul bahan kliping","Menemukan berita yang layak dibedah? Kirim tautannya, sebutkan kenapa menurutmu penting.","Usulan bahan kliping","redaksi"],
+    ["Kerja sama sponsor","Toko perlengkapan, penyelenggara pelatihan, atau lembaga yang ingin memasang slot sponsor.","Penawaran kerja sama sponsor",""],
+    ["Gabung jadi kurator","Anggota REICHAS yang ingin ikut menggunting dan menulis konteks.","Ingin bergabung sebagai kurator","redaksi"]
+  ];
+  return hkmHead("Kontak","Satu pintu untuk semua urusan: keberatan media, usul bahan, kerja sama, atau sekadar bertanya.")+
+   hkmNav("kontak")+
+   '<div class="sec"><h4>Cara menghubungi</h4><div class="kon-g">'+
+   baris.map(function(b){return '<div class="kon-c"><div class="kon-e">'+b[0]+'</div><div><div class="kon-l">'+b[1]+'</div><div class="kon-v">'+b[2]+'</div><div class="kon-k">'+b[3]+"</div></div></div>"}).join("")+
+   "</div></div>"+
+   '<div class="sec"><h4>Tulis dengan keperluan yang tepat</h4>'+
+   "<p>Supaya tidak tenggelam, pilih salah satu di bawah ini \u2014 subjek surelnya akan terisi otomatis.</p>"+
+   '<div class="kon-g">'+alasan.map(function(a){
+     return '<a class="kon-c kon-a" href="'+hkmSurel(a[2],a[3])+'"><div><div class="kon-l">'+a[0]+'</div><div class="kon-k">'+a[1]+'</div><div class="kon-v" style="margin-top:8px;font-size:13px">Kirim ke '+esc(a[3]==="redaksi"?hkmSurelRedaksi():c.email)+' \u2192</div></div></a>';
+   }).join("")+"</div></div>"+
+   '<div class="sec"><h4>Berapa lama dibalas</h4>'+
+   "<p>Kami mengelola portal ini di sela kegiatan organisasi, jadi jangan berharap balasan dalam hitungan menit. Keberatan media dan permintaan pencabutan kami tangani lebih dulu, paling lama <b>tiga hari kerja</b>. Sisanya menyusul.</p></div>"+
+   '<div class="note o">Sebelum menulis soal isi kliping, ada baiknya membaca <a href="#" onclick=\'go({pv:{n:"pedoman"}});return false\'>Pedoman Kurasi</a> lebih dulu \u2014 banyak pertanyaan sudah terjawab di sana.</div>'+
+   "</div>"+foot();
+}
+
+/* ---------- gaya ---------- */
+(function(){
+  var css=".hkm-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px}"+
+  ".hkm-t{border:1px solid var(--line);background:#fff;color:var(--ink2);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}"+
+  ".hkm-t:hover{color:var(--ink);border-color:var(--ink2)}"+
+  ".hkm-t.on{background:var(--ink);color:#fff;border-color:var(--ink)}"+
+  ".hkm .sec ul{margin:10px 0 0;padding-left:20px}.hkm .sec li{margin-bottom:7px}"+
+  ".kon-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}"+
+  ".kon-c{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--soft)}"+
+  ".kon-a{text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s,border-color .15s}"+
+  ".kon-a:hover{border-color:var(--violet);box-shadow:0 6px 18px rgba(0,0,0,.07);transform:translateY(-2px)}"+
+  ".kon-e{font-size:22px;line-height:1}"+
+  ".kon-l{font-weight:700;font-size:15px;color:var(--ink)}"+
+  ".kon-v{font-size:14px;margin-top:2px;word-break:break-word}"+
+  ".kon-k{font-size:12.5px;color:var(--ink2);margin-top:4px;line-height:1.5}"+
+  ".foot-hkm{margin-top:16px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px}"+
+  ".foot-hkm a{color:#cdd8e3;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.25);cursor:pointer}"+
+  ".foot-hkm a:hover{color:#fff}"+
+  '[data-tema="gelap"] .hkm-t{background:transparent}[data-tema="gelap"] .kon-c{background:rgba(255,255,255,.03)}'+
+  "@media(max-width:520px){.kon-g{grid-template-columns:1fr}.hkm-t{padding:6px 12px;font-size:12.5px}}"+
+  "@media(hover:none){.kon-a:active{transform:scale(.985)}.hkm-t:active{transform:scale(.95)}}";
+  try{document.head.insertAdjacentHTML("beforeend","<style>"+css+"</style>")}catch(e){}
+})();
+
+/* ---------- kartu pengaturan kontak ---------- */
+function kartuKontak(){
+  var c=hkmKontak();
+  return '<div class="card" style="margin-top:16px"><b style="font-size:14px">Kontak &amp; halaman resmi</b>'+
+   '<p style="font-size:12.5px;color:var(--ink2);margin:6px 0 12px">Surel redaksi dipakai untuk urusan isi kliping (keberatan media, ralat, usul bahan); surel organisasi untuk sisanya. Kosongkan surel redaksi bila ingin semua masuk ke satu kotak. Halaman-halaman ini juga jadi syarat kalau nanti mendaftar Google AdSense.</p>'+
+   '<div class="grid g2">'+
+   '<label>Surel organisasi<input id="kEmail" value="'+esc(c.email)+'" placeholder="rcs.cbs@gmail.com" /></label>'+
+   '<label>Surel redaksi kliping<input id="kEmail2" value="'+esc(c.email2)+'" placeholder="kliping.rcscbs@gmail.com" /></label>'+
+   '<label>WhatsApp (opsional)<input id="kWa" value="'+esc(c.wa)+'" placeholder="kosongkan bila tidak dipakai" /></label>'+
+   '<label>Kota / sekretariat<input id="kAlamat" value="'+esc(c.alamat)+'" /></label>'+
+   '<label>Nama organisasi<input id="kOrg" value="'+esc(c.org)+'" /></label>'+
+   "</div>"+
+   '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-p btn-sm" onclick="kontakSimpan()">Simpan kontak</button>'+
+   '<button class="btn btn-sm" onclick=\'go({mode:"public",pv:{n:"tentang"}})\'>Lihat halaman Tentang</button>'+
+   '<button class="btn btn-sm" onclick=\'go({mode:"public",pv:{n:"privasi"}})\'>Lihat Kebijakan Privasi</button>'+
+   '<button class="btn btn-sm" onclick=\'go({mode:"public",pv:{n:"kontak"}})\'>Lihat halaman Kontak</button></div></div>';
+}
+function kontakSimpan(){
+  var k=hkmBaca();
+  function v(i){var e=document.getElementById(i);return e?e.value.trim():""}
+  k.email=v("kEmail")||RCS_EMAIL_BAWAAN;k.email2=v("kEmail2");k.wa=v("kWa");k.alamat=v("kAlamat")||"Makassar, Sulawesi Selatan";k.org=v("kOrg")||"REICHAS CHELEBES";
+  save();
+  try{supa.from("app_settings").upsert({id:"situs",data:db.settings}).then(function(r){if(!pErr(r&&r.error,"kontak"))toast("Kontak disimpan")})}catch(e){toast("Kontak disimpan")}
+  render();
+}
+(function(){
+  if(typeof pPengaturan!=="function")return;
+  var _p=pPengaturan;
+  pPengaturan=function(){return _p.apply(this,arguments)+kartuKontak()};
+})();
+
+/* ---------- footer + router ---------- */
+(function(){
+  if(typeof foot!=="function")return;
+  var _f=foot;
+  foot=function(){
+    var h=_f.apply(this,arguments);
+    var t='<div class="foot-hkm"><a onclick=\'go({pv:{n:"tentang"}})\'>Tentang</a><a onclick=\'go({pv:{n:"privasi"}})\'>Kebijakan Privasi</a><a onclick=\'go({pv:{n:"kontak"}})\'>Kontak</a><a href="'+hkmSurel("Halo Kliping REICHAS","redaksi")+'">'+esc(hkmSurelRedaksi())+"</a></div>";
+    return h.replace("</div></footer>",t+"</div></footer>");
+  };
+})();
+
+var HKM_HAL={tentang:function(){return viewTentang()},privasi:function(){return viewPrivasi()},kontak:function(){return viewKontak()}};
+(function(){
+  if(typeof render!=="function")return;
+  var _r=render;
+  render=function(){
+    var n=(S.mode==="public"&&S.pv&&S.pv.n)||"";
+    if(!HKM_HAL[n])return _r.apply(this,arguments);
+    document.body.className=db.settings.sinyalTipis?"thin":"";
+    document.getElementById("app").innerHTML=header()+HKM_HAL[n]()+modalView()+bottomNav();
+    try{if(typeof _ldHapus==="function")_ldHapus()}catch(e){}
+    try{if(typeof _gerakHalaman==="function")_gerakHalaman()}catch(e){}
+    try{if(typeof pasangGerak==="function")pasangGerak()}catch(e){}
+    try{if(typeof _tabelKartu==="function")_tabelKartu()}catch(e){}
+    save();
+  };
+})();
+
+
 bootstrap();
 </script>
 </body>
