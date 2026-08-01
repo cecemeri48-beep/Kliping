@@ -1114,16 +1114,27 @@ function pPengguna(){
 }
 function ubahPeran(id,p){if(me().peran!=="Super-Admin"){toast("Hanya Super-Admin dapat mengubah peran");render();return}const u=user(id);u.peran=p;log("Mengubah peran pengguna",u.nama+" menjadi "+p);supa.from("profiles").update({peran:p}).eq("id",id).then(({error})=>pErr(error,"peran"));render();toast(u.nama+" kini "+p)}
 function toggleAktif(id){if(me().peran!=="Super-Admin"){toast("Hanya Super-Admin dapat mengubah status akun");return}const u=user(id);u.aktif=!u.aktif;log(u.aktif?"Mengaktifkan akun":"Menonaktifkan akun",u.nama);supa.from("profiles").update({aktif:u.aktif}).eq("id",id).then(({error})=>pErr(error,"status akun"));render();toast(u.nama+(u.aktif?" diaktifkan":" dinonaktifkan"))}
-function hapusPengguna(id){
+async function hapusPengguna(id){
   const u=user(id);if(!u)return;
   var _pk=me().peran;if(_pk!=="Super-Admin"&&!(_pk==="Admin"&&u.peran==="Kurator")){toast("Admin hanya dapat menghapus akun Kurator");return}
   if(id===S.me){toast("Tidak bisa menghapus akun sendiri");return}
   if(u.peran==="Super-Admin"&&db.pengguna.filter(x=>x.peran==="Super-Admin").length<=1){toast("Minimal harus ada satu Super-Admin");return}
   if(!confirm("Hapus pengguna \""+u.nama+"\"? Tindakan ini permanen."))return;
-  db.pengguna=db.pengguna.filter(x=>x.id!==id);
+  toast("Menghapus "+u.nama+"\u2026");
+  var res;
+  try{res=await supa.from("profiles").delete().eq("id",id).select()}catch(e){res={error:e}}
+  if(res.error){toast("Gagal menghapus di server: "+(res.error.message||res.error));return}
+  if(!res.data||!res.data.length){
+    var r2;
+    try{r2=await supa.from("profiles").update({aktif:false}).eq("id",id).select()}catch(e){r2={error:e}}
+    if(r2.error||!r2.data||!r2.data.length){toast("Server menolak: kebijakan RLS tabel profiles belum mengizinkan hapus")}
+    else{log("Menonaktifkan akun (hapus ditolak server)",u.nama);toast("Hapus ditolak server \u2014 akun dinonaktifkan")}
+    await bootstrap();return;
+  }
   log("Menghapus pengguna",u.nama);
-  supa.from("profiles").delete().eq("id",id).then(({error})=>pErr(error,"pengguna"));
+  db.pengguna=db.pengguna.filter(x=>x.id!==id);
   render();toast("Pengguna dihapus");
+  await bootstrap();
 }
 function tambahUser(){openModal("pengguna")}
 
@@ -1164,7 +1175,7 @@ function pPengaturan(){
    '<div class="f"><label><input type="checkbox" id="sWajib" '+(s.wajibTinjauan?"checked":"")+' /> Wajib tinjauan sebelum terbit untuk rubrik sensitif</label></div>'+
    '<div class="f"><label><input type="checkbox" id="sTipis" '+(s.sinyalTipis?"checked":"")+' /> Aktifkan mode sinyal tipis sebagai bawaan</label></div>'+
    '<button class="btn btn-p" onclick="simpanSetting()">Simpan pengaturan</button></div>'+
-   '<div class="card" style="margin-top:16px"><b style="font-size:14px">Data prototipe</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Seluruh data disimpan di peramban ini saja.</p><button class="btn btn-d" onclick="reset()">Pulihkan data contoh</button></div>';
+   '<div class="card" style="margin-top:16px"><b style="font-size:14px">Data contoh</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Data tersimpan di Supabase. Tombol ini hanya memuat ulang isi contoh di peramban ini dan tidak mengubah data server.</p><button class="btn btn-d" onclick="reset()">Pulihkan data contoh</button></div>';
 }
 function simpanSetting(){const s=db.settings;s.nama=document.getElementById("sNama").value;s.tagline=document.getElementById("sTag").value;s.penyangkalan=document.getElementById("sDis").value;s.wajibTinjauan=document.getElementById("sWajib").checked;s.sinyalTipis=document.getElementById("sTipis").checked;log("Memperbarui pengaturan situs",s.nama);supa.from("app_settings").upsert({id:"situs",data:s}).then(({error})=>pErr(error,"pengaturan"));render();toast("Pengaturan disimpan")}
 
