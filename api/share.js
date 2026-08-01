@@ -5,6 +5,7 @@ module.exports = async function (req, res) {
   const id = (req.query && req.query.id) || '';
   const esc = function (s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
   const go = SITE + '/#klip=' + encodeURIComponent(id);
+  const self = SITE + '/api/share?id=' + encodeURIComponent(id);
   let k = null;
   try {
     if (id) {
@@ -15,7 +16,13 @@ module.exports = async function (req, res) {
   } catch (e) {}
   const title = k ? k.judul : 'Kliping REICHAS \u2014 Galeri Literasi & Cek Fakta';
   const desc = k ? k.lead : 'Galeri kliping literasi & cek fakta REICHAS \u2014 baca, telaah, dan bagikan.';
-  const img = (k && k.gambar && /^https?:\/\//.test(k.gambar)) ? k.gambar : (SITE + '/og-image.jpg?v=3');
+  const clipImg = (k && k.gambar && /^https?:\/\//.test(k.gambar)) ? k.gambar : null;
+  const img = clipImg || (SITE + '/og-image.jpg?v=3');
+  const imgMeta = clipImg
+    ? ''
+    : '<meta property="og:image:type" content="image/jpeg" />' +
+      '<meta property="og:image:width" content="1200" />' +
+      '<meta property="og:image:height" content="630" />';
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600');
   res.status(200).send(
@@ -28,7 +35,9 @@ module.exports = async function (req, res) {
     '<meta property="og:description" content="' + esc(desc) + '" />' +
     '<meta property="og:image" content="' + esc(img) + '" />' +
     '<meta property="og:image:secure_url" content="' + esc(img) + '" />' +
-    '<meta property="og:url" content="' + esc(go) + '" />' +
+    imgMeta +
+    '<meta property="og:image:alt" content="' + esc(title) + '" />' +
+    '<meta property="og:url" content="' + esc(self) + '" />' +
     '<meta property="og:locale" content="id_ID" />' +
     '<meta name="twitter:card" content="summary_large_image" />' +
     '<meta name="twitter:title" content="' + esc(title) + '" />' +

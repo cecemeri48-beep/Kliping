@@ -973,12 +973,15 @@ function hapus(id){if(!confirm("Hapus kliping ini?"))return;const k=db.kliping.f
 
 /* ============ gambar (Supabase Storage) ============ */
 function isImg(g){return typeof g==="string"&&g.slice(0,4)==="http";}
+function kompresGambar(file){return new Promise(function(res){try{const url=URL.createObjectURL(file);const img=new Image();img.onload=function(){try{const M=1600;let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;const sc=Math.min(1,M/Math.max(w,h));w=Math.max(1,Math.round(w*sc));h=Math.max(1,Math.round(h*sc));const cv=document.createElement("canvas");cv.width=w;cv.height=h;const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,w,h);cx.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);let q=0.85;(function step(){cv.toBlob(function(b){if(b&&b.size>290*1024&&q>0.5){q-=0.12;step();}else res(b||null);},"image/jpeg",q);})();}catch(e){res(null);}};img.onerror=function(){URL.revokeObjectURL(url);res(null);};img.src=url;}catch(e){res(null);}});}
 async function uploadGambar(file){
   try{
-    if(file.size>5*1024*1024){toast("Ukuran gambar maksimal 5 MB");return null;}
-    const ext=((file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,""))||"jpg";
+    if(file.size>10*1024*1024){toast("Ukuran gambar maksimal 10 MB");return null;}
+    let body=file,ext=((file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,""))||"jpg",ctype=file.type||"image/jpeg";
+    const kb=await kompresGambar(file);
+    if(kb){body=kb;ext="jpg";ctype="image/jpeg";}
     const path="kliping/"+Date.now()+"-"+Math.random().toString(36).slice(2,8)+"."+ext;
-    const up=await supa.storage.from("gambar-kliping").upload(path,file,{cacheControl:"3600",upsert:false});
+    const up=await supa.storage.from("gambar-kliping").upload(path,body,{cacheControl:"3600",upsert:false,contentType:ctype});
     if(up.error){toast("Gagal unggah: "+up.error.message);return null;}
     return supa.storage.from("gambar-kliping").getPublicUrl(path).data.publicUrl;
   }catch(e){toast("Gagal unggah gambar");return null;}
