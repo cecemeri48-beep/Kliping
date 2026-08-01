@@ -1078,17 +1078,21 @@ function ttsSet(h){var b=document.getElementById("ttsBtn");if(b)b.innerHTML=h}
 function ttsVoices(){try{return window.speechSynthesis.getVoices()||[]}catch(e){return []}}
 function ttsPick(v){try{localStorage.setItem("ttsVoice",v)}catch(e){}}
 function ttsScore(v){var n=(v.name||"").toLowerCase();return /google|natural|neural|wavenet|enhanced|premium/.test(n)?0:1}
-function ttsPakai(v){var l=(v&&v.lang)||"";return /^id/i.test(l)||/^en/i.test(l)}
+function _ttsLang(v){return String((v&&v.lang)||"").replace(/_/g,"-").toLowerCase()}
+function ttsID(v){var l=_ttsLang(v),n=String((v&&v.name)||"").toLowerCase();return /^(id|in|ind)(-|$)/.test(l)||n.indexOf("indonesia")>=0||n.indexOf("damayanti")>=0}
+function ttsEN(v){var l=_ttsLang(v);return l==="en"||l==="en-us"||l==="en-gb"}
+function ttsPakai(v){return ttsID(v)||ttsEN(v)}
 function ttsVoiceOptions(){
   var vs=ttsVoices().filter(ttsPakai);
   if(!vs.length)return '<option value="">(memuat suara\u2026)</option>';
   var pref="";try{pref=localStorage.getItem("ttsVoice")||""}catch(e){}
   var urut=function(a,b){return ttsScore(a)-ttsScore(b)};
-  var id=vs.filter(function(v){return /^id/i.test(v.lang)}).sort(urut);
-  var en=vs.filter(function(v){return /^en/i.test(v.lang)}).sort(urut);
+  var id=vs.filter(ttsID).sort(urut);
+  var en=vs.filter(function(v){return ttsEN(v)&&!ttsID(v)}).sort(urut);
   function op(v){return '<option value="'+esc(v.name)+'"'+(v.name===pref?" selected":"")+'>'+esc(v.name+" ("+v.lang+")")+"</option>"}
   var h="";
   if(id.length)h+='<optgroup label="Bahasa Indonesia">'+id.map(op).join("")+"</optgroup>";
+  else h+='<optgroup label="Bahasa Indonesia"><option value="" disabled>Belum terpasang di perangkat ini</option></optgroup>';
   if(en.length)h+='<optgroup label="English">'+en.map(op).join("")+"</optgroup>";
   return h;
 }
@@ -1098,13 +1102,22 @@ function ttsBest(){
   var urut=function(a,b){return ttsScore(a)-ttsScore(b)};
   var v=null;
   if(pref)v=vs.find(function(x){return x.name===pref});
-  if(!v)v=vs.filter(function(x){return /^id/i.test(x.lang)}).sort(urut)[0];
-  if(!v)v=vs.filter(function(x){return /^en/i.test(x.lang)}).sort(urut)[0];
+  if(!v)v=vs.filter(ttsID).sort(urut)[0];
+  if(!v)v=vs.filter(ttsEN).sort(urut)[0];
   return v||null;
 }
 function dengarkan(id){id=id||(S.pv&&S.pv.id);if(!id)return;if(!("speechSynthesis" in window)){toast("Peramban tidak mendukung pembacaan suara");return}var synth=window.speechSynthesis;if(TTS.on&&TTS.id===id){if(synth.paused){synth.resume();TTS.paused=false;ttsSet("⏸ Jeda")}else{synth.pause();TTS.paused=true;ttsSet("▶ Lanjut")}return}synth.cancel();var k=db.kliping.find(function(x){return x.id===id});if(!k)return;var chunks=ttsText(k).match(/[^.!?]+[.!?]*/g)||[ttsText(k)];var voice=ttsBest();TTS={id:id,on:true,paused:false};ttsSet("⏸ Jeda");var i=0;(function next(){if(!TTS.on||TTS.id!==id)return;if(i>=chunks.length){TTS.on=false;ttsSet("🔊 Dengarkan");return}var u=new SpeechSynthesisUtterance((chunks[i]||"").trim());u.lang=voice?voice.lang:"id-ID";if(voice)u.voice=voice;u.rate=0.95;u.pitch=1.0;u.onend=function(){i++;next()};u.onerror=function(){i++;next()};synth.speak(u)})()}
 function hentikanTTS(){try{if("speechSynthesis" in window)window.speechSynthesis.cancel()}catch(e){}TTS={id:null,on:false,paused:false};ttsSet("🔊 Dengarkan")}
-try{if("speechSynthesis" in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){var s=document.getElementById("ttsVoice");if(s)s.innerHTML=ttsVoiceOptions()}}}catch(e){}
+function ttsSegarkanPilihan(){var s=document.getElementById("ttsVoice");if(!s)return false;var h=ttsVoiceOptions();if(h.indexOf("memuat suara")>=0)return false;if(s.innerHTML!==h)s.innerHTML=h;return true}
+try{if("speechSynthesis" in window){
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged=function(){ttsSegarkanPilihan()};
+  var _ttsCoba=0,_ttsJam=setInterval(function(){
+    _ttsCoba++;
+    try{window.speechSynthesis.getVoices()}catch(e){}
+    if(ttsSegarkanPilihan()||_ttsCoba>24)clearInterval(_ttsJam);
+  },400);
+}}catch(e){}
 function viewClip(){
   const k=db.kliping.find(x=>x.id===S.pv.id);
   if(!k)return '<div class="art"><p class="empty">Kliping tidak ditemukan.</p></div>';
