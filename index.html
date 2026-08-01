@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Kliping REICHAS — Galeri Literasi & Cek Fakta</title>
 <meta name="description" content="Membaca hari ini, melek fakta selamanya. Galeri kliping literasi & cek fakta REICHAS — baca, telaah, dan bagikan." />
 <link rel="canonical" href="https://kliping-reichas.my.id/" />
@@ -646,6 +646,33 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
 .lcn-r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:5px 0;font-size:13px}
 .lcn-j{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lcn-s{flex:0 0 auto;color:var(--ink2);font-variant-numeric:tabular-nums}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+.pk{margin-top:8px}
+.pk-r{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.pk-r:first-child{border-top:0}
+.pk-no{flex:0 0 24px;text-align:center;font-weight:700;color:var(--ink2);font-variant-numeric:tabular-nums}
+.pk-n{flex:1 1 auto;min-width:0;display:flex;flex-direction:column}
+.pk-n b{font-size:14px}
+.pk-n small,.pk-s small{display:block;font-size:12px;color:var(--ink2);font-weight:400;margin-top:2px}
+.pk-s{flex:0 0 auto;text-align:right;font-size:14px;font-variant-numeric:tabular-nums}
+@media(max-width:520px){.pk-s{font-size:13px}.pk-s small{max-width:150px}}
+[data-tema="gelap"] .pk-r{border-top-color:rgba(255,255,255,.12)}
+@media(max-width:640px){
+  .panel .tbl-scroll table,.tbl-scroll table{min-width:0}
+  .tbl-kartu{overflow-x:visible}
+  .tbl-kartu table,.tbl-kartu tbody,.tbl-kartu tr,.tbl-kartu td{display:block;width:auto}
+  .tbl-kartu thead{display:none}
+  .tbl-kartu tr{padding:12px 14px;border-bottom:1px solid var(--line)}
+  .tbl-kartu tr:last-child{border-bottom:0}
+  .tbl-kartu td{border:0;padding:4px 0;display:flex;justify-content:space-between;align-items:baseline;gap:14px;text-align:right}
+  .tbl-kartu td:before{content:attr(data-l);flex:0 0 auto;text-align:left;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2)}
+  .tbl-kartu td[data-l=""]{justify-content:flex-start;flex-wrap:wrap;gap:8px;text-align:left;padding-top:8px}
+  .tbl-kartu td[data-l=""]:before{display:none}
+  .tbl-kartu td[colspan]{display:block;text-align:center}
+  .tbl-kartu td[colspan]:before{display:none}
+  .tbl-kartu td select,.tbl-kartu td .btn{max-width:100%}
+}
+[data-tema="gelap"] .tbl-kartu tr{border-bottom-color:rgba(255,255,255,.12)}
 [data-tema="gelap"] .lcn-list{border-top-color:rgba(255,255,255,.12)}
 [data-tema="gelap"] .ik-aju{background:rgba(255,255,255,.03)}
 .sh-lain:hover{background:var(--line)}
@@ -726,6 +753,17 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
 </style>
 </head>
 <body>
+<noscript>
+<div style="max-width:720px;margin:0 auto;padding:32px 20px;font-family:system-ui,sans-serif;color:#2C2C2B;line-height:1.6">
+<h1 style="font-size:26px;margin:0 0 6px">Kliping REICHAS</h1>
+<p style="color:#7D7A75;margin:0 0 18px">Menggunting berita, menanam pengetahuan.</p>
+<p>Meja kliping bersama pencinta alam Sulawesi. Setiap berita digunting, diberi konteks, lalu diringkas menjadi tiga poin pelajaran yang bisa dipakai di lapangan: bedah insiden, cek fakta, baca regulasi, baca cuaca, kamus lapangan, terjemahan ilmu, dan telaah perlengkapan.</p>
+<p><b>Situs ini membutuhkan JavaScript</b> untuk menampilkan isi kliping. Aktifkan JavaScript di peramban, lalu muat ulang halaman ini.</p>
+<p style="font-size:14px;color:#7D7A75">Materi bersifat edukatif dan bukan pengganti pelatihan langsung serta penilaian di lapangan.</p>
+<p><a href="https://kliping-reichas.my.id/" style="color:#2783DE">https://kliping-reichas.my.id</a></p>
+</div>
+</noscript>
+
 <div id="app"></div>
 <div id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2288,6 +2326,99 @@ function kartuReaksiSaya(){
       }catch(e){}
       return r;
     });
+  };
+})();
+
+
+/* ============ poles teknis: JSON-LD, tabel kartu, papan peringkat ============ */
+function _ldHapus(){var e=document.getElementById("ldArtikel");if(e&&e.parentNode)e.parentNode.removeChild(e)}
+function _ldArtikel(){
+  try{
+    _ldHapus();
+    if(S.mode!=="public"||!S.pv||S.pv.n!=="clip")return;
+    var k=_kKlip(S.pv.id);
+    if(!k||k.status!=="Terbit")return;
+    var situs=(db.settings&&db.settings.nama)||"Kliping REICHAS";
+    var url="https://kliping-reichas.my.id/klip/"+k.id;
+    var d={
+      "@context":"https://schema.org",
+      "@type":"Article",
+      "headline":String(k.judul||"").slice(0,110),
+      "description":k.lead||"",
+      "datePublished":k.tglKliping||undefined,
+      "dateModified":k.tglKliping||undefined,
+      "inLanguage":"id-ID",
+      "mainEntityOfPage":{"@type":"WebPage","@id":url},
+      "url":url,
+      "author":{"@type":"Person","name":nm(k.kurator)},
+      "publisher":{"@type":"Organization","name":situs,"url":"https://kliping-reichas.my.id/"},
+      "articleSection":k.rubrik||undefined,
+      "keywords":(k.topik&&k.topik.length)?k.topik.join(", "):undefined,
+      "isBasedOn":k.tautan||undefined
+    };
+    if(isImg(k.gambar))d.image=[k.gambar];
+    var s=document.createElement("script");
+    s.type="application/ld+json";s.id="ldArtikel";
+    s.textContent=JSON.stringify(d,function(a,b){return b===undefined?undefined:b});
+    document.head.appendChild(s);
+  }catch(e){}
+}
+function _tabelKartu(){
+  try{
+    var ts=document.querySelectorAll(".tbl-scroll table");
+    for(var i=0;i<ts.length;i++){
+      var t=ts[i];
+      if(t.parentNode&&t.parentNode.classList)t.parentNode.classList.add("tbl-kartu");
+      var th=t.querySelectorAll("thead th"),lbl=[];
+      for(var a=0;a<th.length;a++)lbl.push((th[a].textContent||"").trim());
+      var tr=t.querySelectorAll("tbody tr");
+      for(var b=0;b<tr.length;b++){
+        var td=tr[b].children;
+        for(var c=0;c<td.length;c++){
+          if(td[c].getAttribute("colspan"))continue;
+          td[c].setAttribute("data-l",lbl[c]||"");
+        }
+      }
+    }
+  }catch(e){}
+}
+function papanKurator(){
+  if(typeof db==="undefined"||!db||!db.pengguna)return "";
+  var baris=db.pengguna.map(function(u){
+    var r=rksTotalKurator(u.id);
+    var n=db.kliping.filter(function(k){return k.kurator===u.id}).length;
+    return {u:u,r:r,n:n};
+  }).filter(function(x){return x.n>0}).sort(function(a,b){
+    return (b.r.total-a.r.total)||(b.n-a.n)||a.u.nama.localeCompare(b.u.nama);
+  });
+  if(!baris.length)return "";
+  var isi=baris.map(function(x,i){
+    var t=lencanaTingkat(x.r.total);
+    return '<div class="pk-r">'+
+      '<span class="pk-no">'+(i+1)+"</span>"+
+      '<span class="pk-n"><b>'+esc(x.u.nama)+"</b>"+lencanaHTML(x.r.total)+
+        '<small>'+esc(x.u.divisi||x.u.peran)+" \u00b7 "+x.n+" kliping"+(t?" \u00b7 "+esc(t.nama)+" \u00d7"+t.n:"")+"</small></span>"+
+      '<span class="pk-s">\ud83d\udd25 '+x.r.api+" \u00b7 \u2615 "+x.r.kopi+'<small>'+esc(lencanaLanjut(x.r.total))+"</small></span>"+
+      "</div>";
+  }).join("");
+  return '<div class="card" style="margin-bottom:22px"><b style="font-size:14px">Papan apresiasi kurator</b>'+
+    '<p style="font-size:13px;color:var(--ink2);margin:6px 0 4px">Diurutkan dari tanggapan pembaca yang diterima, bukan dari jumlah kliping. \ud83c\udf3b tiap 10 tanggapan \u00b7 lima bunga menjadi \ud83e\udded \u00b7 lima mata angin menjadi \u2b50.</p>'+
+    '<div class="pk">'+isi+"</div></div>";
+}
+(function(){
+  var _pu=pPengguna,_r=render;
+  pPengguna=function(){
+    var h=_pu.apply(this,arguments);
+    var i=h.indexOf('<div class="grp-lbl">');
+    var p=papanKurator();
+    if(!p)return h;
+    return i<0?h+p:h.slice(0,i)+p+h.slice(i);
+  };
+  render=function(){
+    var out=_r.apply(this,arguments);
+    try{_ldArtikel()}catch(e){}
+    try{_tabelKartu()}catch(e){}
+    return out;
   };
 })();
 
