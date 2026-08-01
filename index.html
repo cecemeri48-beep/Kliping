@@ -647,6 +647,20 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
 .lcn-j{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lcn-s{flex:0 0 auto;color:var(--ink2);font-variant-numeric:tabular-nums}
 body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+/* --- lapisan gerak layar sentuh --- */
+.muncul{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.muncul.on{opacity:1;transform:none}
+@keyframes halMasuk{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hal-masuk{animation:halMasuk .34s cubic-bezier(.2,.8,.2,1) both}
+@media(hover:none){
+  .btn:hover{transform:none;box-shadow:none}
+  .btn:active{transform:scale(.96);opacity:.9}
+  .clip:hover{transform:none}
+  .clip:active{transform:scale(.985)}
+  .chip:active,.tchip:active,.sh:active,.ai:active,.btabs button:active{transform:scale(.95)}
+  .clip,.chip,.tchip,.sh,.ai,.btabs button{transition:transform .16s cubic-bezier(.2,.8,.2,1),opacity .16s ease,background .16s ease}
+}
+@media(prefers-reduced-motion:reduce){.muncul{opacity:1!important;transform:none!important}.hal-masuk{animation:none!important}}
 .pk{margin-top:8px}
 .pk-r{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
 .pk-r:first-child{border-top:0}
@@ -2418,6 +2432,60 @@ function papanKurator(){
     var out=_r.apply(this,arguments);
     try{_ldArtikel()}catch(e){}
     try{_tabelKartu()}catch(e){}
+    return out;
+  };
+})();
+
+
+/* ============ lapisan gerak untuk layar sentuh ============ */
+var GERAK_OFF=false;
+try{GERAK_OFF=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches}catch(e){}
+var _gerakObs=null;
+function _gerakSiap(){
+  if(_gerakObs||GERAK_OFF||!("IntersectionObserver" in window))return _gerakObs;
+  _gerakObs=new IntersectionObserver(function(en){
+    for(var i=0;i<en.length;i++){
+      if(!en[i].isIntersecting)continue;
+      var el=en[i].target;
+      el.classList.add("on");
+      _gerakObs.unobserve(el);
+    }
+  },{rootMargin:"0px 0px -8% 0px",threshold:.04});
+  return _gerakObs;
+}
+function pasangGerak(){
+  if(GERAK_OFF)return;
+  var ob=_gerakSiap();
+  if(!ob)return;
+  var el=document.querySelectorAll(".clip, .panel .card, .art .sec, .rks, .spon, .dukung, .pk-r");
+  var n=0;
+  for(var i=0;i<el.length&&i<60;i++){
+    var e=el[i];
+    if(e.classList.contains("muncul"))continue;
+    e.classList.add("muncul");
+    e.style.transitionDelay=(Math.min(n,7)*45)+"ms";
+    n++;
+    ob.observe(e);
+  }
+  setTimeout(function(){
+    var s=document.querySelectorAll(".muncul:not(.on)");
+    for(var j=0;j<s.length;j++)s[j].classList.add("on");
+  },1400);
+}
+function _gerakHalaman(){
+  if(GERAK_OFF)return;
+  var w=document.querySelector("main")||document.querySelector(".panel")||document.querySelector(".wrap");
+  if(!w)return;
+  w.classList.remove("hal-masuk");
+  void w.offsetWidth;
+  w.classList.add("hal-masuk");
+}
+(function(){
+  var _r=render;
+  render=function(){
+    var out=_r.apply(this,arguments);
+    try{_gerakHalaman()}catch(e){}
+    try{pasangGerak()}catch(e){}
     return out;
   };
 })();
