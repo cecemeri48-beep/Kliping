@@ -948,7 +948,7 @@ function pPengguna(){
     if(!us.length)return "";
     return '<div class="grp-lbl">'+peran+' <span class="grp-n">'+us.length+'</span></div>'+tbl(us);
   };
-  return ph("Pengguna & Peran",sa?"Hanya Super-Admin dapat mengubah peran. Setiap perubahan tercatat di jurnal audit.":"Kamu dapat menambahkan dan menghapus akun Kurator. Perubahan peran hanya oleh Super-Admin.",'<button class="btn btn-p" onclick="tambahUser()">+ '+(sa?"Pengguna":"Kurator")+'</button>')+
+  return ph("Pengguna & Peran",sa?"Hanya Super-Admin dapat mengubah peran. Setiap perubahan tercatat di jurnal audit.":"Kamu dapat menambahkan dan menghapus akun Kurator.",'<button class="btn btn-p" onclick="tambahUser()">+ '+(sa?"Pengguna":"Kurator")+'</button>')+
    grup("Super-Admin")+grup("Admin")+grup("Kurator");
 }
 function ubahPeran(id,p){if(me().peran!=="Super-Admin"){toast("Hanya Super-Admin dapat mengubah peran");render();return}const u=user(id);u.peran=p;log("Mengubah peran pengguna",u.nama+" menjadi "+p);supa.from("profiles").update({peran:p}).eq("id",id).then(({error})=>pErr(error,"peran"));render();toast(u.nama+" kini "+p)}
