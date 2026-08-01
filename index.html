@@ -939,8 +939,8 @@ function hapusMateri(id){const m=mat(id);if(!m)return;const used=db.kliping.filt
 function pPengguna(){
   const sa=me().peran==="Super-Admin";
   const list=db.pengguna.filter(u=>sa||u.peran!=="Super-Admin");
-  const rowU=u=>"<tr><td><b>"+esc(u.nama)+'</b></td><td>'+esc(u.divisi)+'</td><td><select onchange="ubahPeran(\''+u.id+'\',this.value)" style="padding:6px 8px;border:1px solid var(--line);border-radius:6px">'+
-    ["Super-Admin","Admin","Kurator"].map(p=>'<option '+(u.peran===p?"selected":"")+">"+p+"</option>").join("")+'</select></td><td>'+(u.aktif?'<span class="tag tag-g">Aktif</span>':'<span class="tag tag-r">Nonaktif</span>')+
+  const rowU=u=>"<tr><td><b>"+esc(u.nama)+'</b></td><td>'+esc(u.divisi)+'</td><td>'+(sa?'<select onchange="ubahPeran(\''+u.id+'\',this.value)" style="padding:6px 8px;border:1px solid var(--line);border-radius:6px">'+
+    ["Super-Admin","Admin","Kurator"].map(p=>'<option '+(u.peran===p?"selected":"")+">"+p+"</option>").join("")+'</select>':'<span class="tag">'+esc(u.peran)+'</span>')+'</td><td>'+(u.aktif?'<span class="tag tag-g">Aktif</span>':'<span class="tag tag-r">Nonaktif</span>')+
     '</td><td>'+(sa?'<button class="btn btn-sm" onclick="toggleAktif(\''+u.id+'\')">'+(u.aktif?"Nonaktifkan":"Aktifkan")+'</button> ':"")+((sa||u.peran==="Kurator")?'<button class="btn btn-sm btn-d" onclick="hapusPengguna(\''+u.id+'\')">Hapus</button>':"")+'</td></tr>';
   const tbl=us=>'<div class="tbl tbl-scroll" style="margin-bottom:22px"><table><thead><tr><th>Nama</th><th>Divisi</th><th>Peran</th><th>Status</th><th></th></tr></thead><tbody>'+us.map(rowU).join("")+"</tbody></table></div>";
   const grup=peran=>{
@@ -948,7 +948,7 @@ function pPengguna(){
     if(!us.length)return "";
     return '<div class="grp-lbl">'+peran+' <span class="grp-n">'+us.length+'</span></div>'+tbl(us);
   };
-  return ph("Pengguna & Peran",sa?"Hanya Super-Admin dapat mengubah peran. Setiap perubahan tercatat di jurnal audit.":"Sebagai Admin kamu dapat menambahkan akun Kurator.",'<button class="btn btn-p" onclick="tambahUser()">+ '+(sa?"Pengguna":"Kurator")+'</button>')+
+  return ph("Pengguna & Peran",sa?"Hanya Super-Admin dapat mengubah peran. Setiap perubahan tercatat di jurnal audit.":"Kamu dapat menambahkan dan menghapus akun Kurator. Perubahan peran hanya oleh Super-Admin.",'<button class="btn btn-p" onclick="tambahUser()">+ '+(sa?"Pengguna":"Kurator")+'</button>')+
    grup("Super-Admin")+grup("Admin")+grup("Kurator");
 }
 function ubahPeran(id,p){if(me().peran!=="Super-Admin"){toast("Hanya Super-Admin dapat mengubah peran");render();return}const u=user(id);u.peran=p;log("Mengubah peran pengguna",u.nama+" menjadi "+p);supa.from("profiles").update({peran:p}).eq("id",id).then(({error})=>pErr(error,"peran"));render();toast(u.nama+" kini "+p)}
