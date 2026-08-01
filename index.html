@@ -581,6 +581,39 @@ mark{background:#fff2a8;color:inherit;padding:0 2px;border-radius:3px}
   .board{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
 }
 
+/* --- sponsor, iklan, dukungan, afiliasi --- */
+.spon-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:26px 0 6px}
+.spon{position:relative;display:block;border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px;text-decoration:none;color:inherit;transition:box-shadow .18s ease,transform .18s ease}
+a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px)}
+.spon img{width:100%;border-radius:10px;border:1px solid var(--line);margin:8px 0 10px;display:block}
+.spon-lbl{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+.spon-tx{display:block;margin-top:8px}
+.spon-tx b{display:block;font-size:15.5px}
+.spon-tx small{display:block;color:var(--ink2);font-size:13.5px;margin-top:3px;line-height:1.5}
+.spon-go{display:inline-block;margin-top:10px;font-size:13px;color:var(--blue);font-weight:600}
+.ads-wrap{margin:26px 0 6px;padding:12px;border:1px dashed var(--line);border-radius:14px;background:var(--soft);min-height:60px}
+.ads-wrap .adsbygoogle{margin-top:8px}
+.dukung{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:22px 0 4px;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(120deg,var(--soft),#fff)}
+.dukung b{font-size:15.5px}
+.dukung p{margin:4px 0 0;font-size:13.5px;color:var(--ink2);max-width:560px;line-height:1.55}
+.dukung .btn{margin-left:auto}
+.afl h4{margin:0 0 10px}
+.afl-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.afl-list a{display:block;border:1px solid var(--line);border-radius:12px;padding:11px 12px;text-decoration:none;color:inherit;background:#fff}
+.afl-list a:hover{border-color:var(--blue)}
+.afl-list b{display:block;font-size:14.5px}
+.afl-list small{display:block;color:var(--ink2);font-size:12.5px;margin-top:2px;line-height:1.45}
+.afl-list span{display:inline-block;margin-top:7px;font-size:12.5px;color:var(--blue);font-weight:600}
+.afl-note{font-size:12.5px;color:var(--ink2);margin:12px 0 0;line-height:1.55}
+.ik-slot{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0;background:var(--soft)}
+.ik-slot-h{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ik-cek{font-weight:400;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+[data-tema="gelap"] .spon,[data-tema="gelap"] .afl-list a{background:#1b2430;border-color:#2b313b}
+[data-tema="gelap"] .dukung,[data-tema="gelap"] .ads-wrap,[data-tema="gelap"] .ik-slot{background:#19202a;border-color:#2b313b}
+@media (max-width:640px){
+  .spon-wrap,.ads-wrap,.dukung{margin-top:20px}
+  .dukung .btn{margin-left:0;width:100%;text-align:center}
+}
 .sh-lain{background:var(--soft2);color:var(--ink);border:1px solid var(--line)}
 .sh-lain:hover{background:var(--line)}
 [data-tema="gelap"] .sh-lain{background:#22303f;color:#eef3f8;border-color:#2b313b}
@@ -1660,6 +1693,196 @@ function render(){
   pasangEkstra();
   save();
 }
+
+
+/* ================= sponsor, AdSense, dukungan pembaca, afiliasi ================= */
+function iklanCfg(){
+  var s=(typeof db!=="undefined"&&db&&db.settings)||{};
+  var c=s.iklan||{};
+  var d=c.dukungan||{};
+  var a=c.adsense||{};
+  return {
+    aktif:c.aktif!==false,
+    adsense:{aktif:!!a.aktif,client:a.client||"",slotRak:a.slotRak||"",slotMateri:a.slotMateri||""},
+    dukungan:{
+      aktif:!!d.aktif,
+      judul:d.judul||"Dukung meja kliping ini",
+      teks:d.teks||"Domain, server, dan kelas literasi dibiayai bersama. Dukungan sekecil apa pun membuat kliping tetap gratis dibaca.",
+      tombol:d.tombol||"Kirim dukungan",
+      url:d.url||""
+    },
+    slot:c.slot||[],
+    afiliasi:c.afiliasi||[]
+  };
+}
+function _slotHidup(sl,tempat){
+  if(!sl||sl.aktif===false)return false;
+  var t=sl.tempat||[];
+  if(t.length&&t.indexOf(tempat)<0)return false;
+  if(sl.sampai&&sl.sampai<new Date().toISOString().slice(0,10))return false;
+  return !!(sl.nama||sl.teks||sl.gambar);
+}
+function sponsorBox(tempat){
+  var c=iklanCfg();if(!c.aktif)return "";
+  var list=c.slot.filter(function(s){return _slotHidup(s,tempat)}).slice(0,2);
+  if(!list.length)return "";
+  return '<div class="spon-wrap">'+list.map(function(s){
+    var isi='<span class="spon-lbl">Sponsor</span>'+
+      (isImg(s.gambar)?'<img src="'+esc(s.gambar)+'" alt="'+esc(s.nama||"Sponsor")+'" loading="lazy" />':'')+
+      '<span class="spon-tx"><b>'+esc(s.nama||"")+'</b>'+(s.teks?'<small>'+esc(s.teks)+'</small>':'')+'</span>';
+    return s.tautan
+      ? '<a class="spon" href="'+esc(s.tautan)+'" target="_blank" rel="sponsored nofollow noopener">'+isi+'<span class="spon-go">Kunjungi \u2197</span></a>'
+      : '<div class="spon">'+isi+'</div>';
+  }).join("")+'</div>';
+}
+function adsBox(tempat){
+  var c=iklanCfg(),a=c.adsense;
+  if(!c.aktif||!a.aktif||!a.client)return "";
+  var slot=tempat==="rak"?a.slotRak:a.slotMateri;
+  if(!slot)return "";
+  return '<div class="ads-wrap"><span class="spon-lbl">Iklan</span>'+
+    '<ins class="adsbygoogle" style="display:block" data-ad-client="'+esc(a.client)+'" data-ad-slot="'+esc(slot)+'" data-ad-format="auto" data-full-width-responsive="true"></ins></div>';
+}
+function pasangIklan(){
+  var c=iklanCfg(),a=c.adsense;
+  if(!c.aktif||!a.aktif||!a.client)return;
+  if(!document.getElementById("adsenseLib")){
+    var sc=document.createElement("script");
+    sc.id="adsenseLib";sc.async=true;sc.crossOrigin="anonymous";
+    sc.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="+encodeURIComponent(a.client);
+    document.head.appendChild(sc);
+  }
+  var ins=document.querySelectorAll("ins.adsbygoogle");
+  for(var i=0;i<ins.length;i++){
+    if(ins[i].getAttribute("data-dipasang"))continue;
+    ins[i].setAttribute("data-dipasang","1");
+    try{(window.adsbygoogle=window.adsbygoogle||[]).push({})}catch(e){}
+  }
+}
+function dukunganBox(){
+  var c=iklanCfg(),d=c.dukungan;
+  if(!c.aktif||!d.aktif||!d.url)return "";
+  return '<div class="dukung"><div><b>'+esc(d.judul)+'</b><p>'+esc(d.teks)+'</p></div>'+
+    '<a class="btn btn-p" href="'+esc(d.url)+'" target="_blank" rel="noopener">'+esc(d.tombol)+'</a></div>';
+}
+function afiliasiBox(k){
+  var c=iklanCfg();
+  if(!c.aktif||!k||k.rubrik!=="Lemari Gear")return "";
+  var list=c.afiliasi.filter(function(a){return a&&a.nama&&a.tautan});
+  if(!list.length)return "";
+  return '<div class="sec afl"><h4>Alat yang disebut di kliping ini</h4>'+
+    '<div class="afl-list">'+list.map(function(a){
+      return '<a href="'+esc(a.tautan)+'" target="_blank" rel="sponsored nofollow noopener"><b>'+esc(a.nama)+'</b>'+(a.catatan?'<small>'+esc(a.catatan)+'</small>':'')+'<span>Lihat \u2197</span></a>';
+    }).join("")+'</div>'+
+    '<p class="afl-note">Tautan afiliasi. Pembelian lewat tautan ini memberi komisi kecil untuk kas REICHAS tanpa menambah harga, dan tidak memengaruhi isi penilaian alat.</p></div>';
+}
+function _sisipSebelumFooter(html,tambah){
+  if(!tambah)return html;
+  var i=html.lastIndexOf('<footer class="foot"');
+  if(i<0)return html+tambah;
+  var j=html.lastIndexOf("</div>",i);
+  if(j<0)return html.slice(0,i)+tambah+html.slice(i);
+  return html.slice(0,j)+tambah+html.slice(j);
+}
+(function(){
+  var _rak=viewRak,_mat=viewMateri,_matD=viewMateriDetail,_clip=viewClip,_render=render;
+  viewRak=function(){return _sisipSebelumFooter(_rak.apply(this,arguments),sponsorBox("rak")+adsBox("rak")+dukunganBox())};
+  viewMateri=function(){return _sisipSebelumFooter(_mat.apply(this,arguments),sponsorBox("materi")+adsBox("materi")+dukunganBox())};
+  viewMateriDetail=function(){return _sisipSebelumFooter(_matD.apply(this,arguments),sponsorBox("materi"))};
+  viewClip=function(){return _sisipSebelumFooter(_clip.apply(this,arguments),afiliasiBox(klip(S.pv.id)))};
+  render=function(){_render.apply(this,arguments);try{pasangIklan()}catch(e){}};
+})();
+
+/* ---- panel admin: pengaturan sponsor ---- */
+function _ikNilai(id){var el=document.getElementById(id);return el?(el.type==="checkbox"?el.checked:el.value.trim()):null}
+function iklanBaca(){
+  var c=iklanCfg();
+  if(!document.getElementById("ikAktif")){db.settings.iklan=c;return c}
+  var i,n=c.slot.length,m=c.afiliasi.length;
+  var out={aktif:_ikNilai("ikAktif"),
+    adsense:{aktif:_ikNilai("ikAdsAktif"),client:_ikNilai("ikAdsClient"),slotRak:_ikNilai("ikAdsRak"),slotMateri:_ikNilai("ikAdsMateri")},
+    dukungan:{aktif:_ikNilai("ikDukAktif"),judul:_ikNilai("ikDukJudul"),teks:_ikNilai("ikDukTeks"),tombol:_ikNilai("ikDukTombol"),url:_ikNilai("ikDukUrl")},
+    slot:[],afiliasi:[]};
+  for(i=0;i<n;i++){
+    var t=[];if(_ikNilai("ikS"+i+"rak"))t.push("rak");if(_ikNilai("ikS"+i+"materi"))t.push("materi");
+    out.slot.push({nama:_ikNilai("ikS"+i+"nama"),teks:_ikNilai("ikS"+i+"teks"),gambar:_ikNilai("ikS"+i+"gbr"),
+      tautan:_ikNilai("ikS"+i+"url"),sampai:_ikNilai("ikS"+i+"sampai"),aktif:_ikNilai("ikS"+i+"aktif"),tempat:t});
+  }
+  for(i=0;i<m;i++){out.afiliasi.push({nama:_ikNilai("ikA"+i+"nama"),tautan:_ikNilai("ikA"+i+"url"),catatan:_ikNilai("ikA"+i+"ket")})}
+  db.settings.iklan=out;
+  return out;
+}
+function iklanTambahSlot(){iklanBaca();db.settings.iklan.slot.push({nama:"",teks:"",gambar:"",tautan:"",sampai:"",aktif:true,tempat:["rak","materi"]});render()}
+function iklanHapusSlot(i){iklanBaca();db.settings.iklan.slot.splice(i,1);render()}
+function iklanTambahAfl(){iklanBaca();db.settings.iklan.afiliasi.push({nama:"",tautan:"",catatan:""});render()}
+function iklanHapusAfl(i){iklanBaca();db.settings.iklan.afiliasi.splice(i,1);render()}
+function iklanMerekUmum(){
+  iklanBaca();
+  var mer=[["Petzl","Headlamp, helm, dan alat vertikal"],["KONG","Karabiner dan konektor"],["CAMP","Alat panjat dan alpine"],["Black Diamond","Headlamp dan trekking pole"],["Deuter","Carrier dan daypack"],["Eiger","Perlengkapan harian pendakian"]];
+  var ada=db.settings.iklan.afiliasi.map(function(a){return (a.nama||"").toLowerCase()});
+  mer.forEach(function(m){if(ada.indexOf(m[0].toLowerCase())<0)db.settings.iklan.afiliasi.push({nama:m[0],tautan:"",catatan:m[1]})});
+  render();toast("Daftar merek ditambahkan \u2014 tinggal isi tautan afiliasinya");
+}
+function iklanSimpan(){
+  iklanBaca();
+  log("Memperbarui sponsor & dukungan",db.settings.iklan.slot.length+" slot sponsor");
+  supa.from("app_settings").upsert({id:"situs",data:db.settings}).then(function(r){if(!pErr(r&&r.error,"sponsor"))toast("Pengaturan sponsor disimpan")});
+  render();
+}
+function kartuIklan(){
+  var c=iklanCfg();
+  var f=function(lbl,inp){return '<div class="f"><label>'+lbl+'</label>'+inp+'</div>'};
+  var txt=function(id,v,ph){return '<input id="'+id+'" value="'+esc(v||"")+'" placeholder="'+esc(ph||"")+'" />'};
+  var slot=c.slot.map(function(s,i){
+    var t=s.tempat||[];
+    return '<div class="ik-slot"><div class="ik-slot-h"><b>Slot '+(i+1)+'</b>'+
+      '<label class="ik-cek"><input type="checkbox" id="ikS'+i+'aktif" '+(s.aktif===false?"":"checked")+' /> aktif</label>'+
+      '<button class="btn btn-sm btn-d" style="margin-left:auto" onclick="iklanHapusSlot('+i+')">Hapus</button></div>'+
+      f("Nama sponsor",txt("ikS"+i+"nama",s.nama,"Toko Rimba Makassar"))+
+      f("Kalimat singkat",txt("ikS"+i+"teks",s.teks,"Sewa carrier dan servis kompor"))+
+      f("URL gambar (opsional)",txt("ikS"+i+"gbr",s.gambar,"https://\u2026/banner.jpg"))+
+      f("Tautan tujuan",txt("ikS"+i+"url",s.tautan,"https://\u2026"))+
+      f("Tayang sampai (opsional)",'<input type="date" id="ikS'+i+'sampai" value="'+esc(s.sampai||"")+'" />')+
+      '<div class="f"><label>Tempat tayang</label><label class="ik-cek"><input type="checkbox" id="ikS'+i+'rak" '+(t.indexOf("rak")>=0?"checked":"")+' /> Rak Baca</label> '+
+      '<label class="ik-cek"><input type="checkbox" id="ikS'+i+'materi" '+(t.indexOf("materi")>=0?"checked":"")+' /> Materi</label></div></div>';
+  }).join("");
+  var afl=c.afiliasi.map(function(a,i){
+    return '<div class="ik-slot"><div class="ik-slot-h"><b>'+esc(a.nama||("Barang "+(i+1)))+'</b><button class="btn btn-sm btn-d" style="margin-left:auto" onclick="iklanHapusAfl('+i+')">Hapus</button></div>'+
+      f("Nama alat / merek",txt("ikA"+i+"nama",a.nama,"Petzl Tikka"))+
+      f("Tautan afiliasi",txt("ikA"+i+"url",a.tautan,"https://tokopedia.link/\u2026"))+
+      f("Catatan singkat",txt("ikA"+i+"ket",a.catatan,"Dipakai pada kliping Lemari Gear"))+'</div>';
+  }).join("");
+  return '<div class="card" style="margin-top:16px"><b style="font-size:14px">Sponsor, iklan &amp; afiliasi</b>'+
+    '<p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Semua iklan hanya tayang di Rak Baca dan halaman Materi. Halaman kliping dibiarkan bersih, kecuali blok afiliasi pada rubrik Lemari Gear.</p>'+
+    '<div class="f"><label class="ik-cek"><input type="checkbox" id="ikAktif" '+(c.aktif?"checked":"")+' /> Tampilkan sponsor, iklan, dan dukungan di situs</label></div>'+
+    '<div class="grp-lbl">Google AdSense</div>'+
+    '<p style="font-size:12.5px;color:var(--ink2);margin:0 0 10px">Isi setelah situs disetujui AdSense. Pengiklan ditentukan lelang Google, jadi merek tertentu tidak bisa dipesan dari sini.</p>'+
+    '<div class="f"><label class="ik-cek"><input type="checkbox" id="ikAdsAktif" '+(c.adsense.aktif?"checked":"")+' /> Aktifkan AdSense</label></div>'+
+    f("ID penerbit",txt("ikAdsClient",c.adsense.client,"ca-pub-0000000000000000"))+
+    f("Slot Rak Baca",txt("ikAdsRak",c.adsense.slotRak,"1234567890"))+
+    f("Slot Materi",txt("ikAdsMateri",c.adsense.slotMateri,"0987654321"))+
+    '<div class="grp-lbl">Dukungan pembaca</div>'+
+    '<div class="f"><label class="ik-cek"><input type="checkbox" id="ikDukAktif" '+(c.dukungan.aktif?"checked":"")+' /> Tampilkan ajakan dukungan</label></div>'+
+    f("Judul",txt("ikDukJudul",c.dukungan.judul,""))+
+    f("Kalimat",txt("ikDukTeks",c.dukungan.teks,""))+
+    f("Label tombol",txt("ikDukTombol",c.dukungan.tombol,"Kirim dukungan"))+
+    f("Tautan Saweria / Trakteer",txt("ikDukUrl",c.dukungan.url,"https://saweria.co/\u2026"))+
+    '<div class="grp-lbl">Slot sponsor <span class="grp-n">'+c.slot.length+'</span></div>'+slot+
+    '<button class="btn btn-sm" onclick="iklanTambahSlot()">+ Slot sponsor</button>'+
+    '<div class="grp-lbl" style="margin-top:18px">Afiliasi Lemari Gear <span class="grp-n">'+c.afiliasi.length+'</span></div>'+afl+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm" onclick="iklanTambahAfl()">+ Barang afiliasi</button>'+
+    '<button class="btn btn-sm" onclick="iklanMerekUmum()">Isi merek umum (Petzl, KONG, CAMP\u2026)</button></div>'+
+    '<div style="margin-top:16px"><button class="btn btn-p" onclick="iklanSimpan()">Simpan sponsor</button></div></div>';
+}
+(function(){
+  var _set=pPengaturan;
+  pPengaturan=function(){
+    var h=_set.apply(this,arguments);
+    var tanda='<div class="card" style="margin-top:16px"><b style="font-size:14px">Data contoh</b>';
+    var i=h.indexOf(tanda);
+    return i<0?h+kartuIklan():h.slice(0,i)+kartuIklan()+h.slice(i);
+  };
+})();
 
 bootstrap();
 </script>
