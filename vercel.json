@@ -1,6 +1,9 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/klip/:id", "destination": "/api/share?id=:id" }
+    { "source": "/klip/:id", "destination": "/api/share?id=:id" },
+    { "source": "/rss.xml", "destination": "/api/feed?jenis=rss" },
+    { "source": "/feed", "destination": "/api/feed?jenis=rss" },
+    { "source": "/sitemap.xml", "destination": "/api/feed?jenis=sitemap" }
   ]
 }

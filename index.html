@@ -6,6 +6,7 @@
 <title>Kliping REICHAS — Galeri Literasi & Cek Fakta</title>
 <meta name="description" content="Membaca hari ini, melek fakta selamanya. Galeri kliping literasi & cek fakta REICHAS — baca, telaah, dan bagikan." />
 <link rel="canonical" href="https://kliping-reichas.my.id/" />
+<link rel="alternate" type="application/rss+xml" title="Kliping REICHAS" href="/rss.xml" />
 <!-- Open Graph (WhatsApp / Facebook) -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Kliping REICHAS" />
@@ -2721,6 +2722,193 @@ var HKM_HAL={tentang:function(){return viewTentang()},privasi:function(){return 
     try{if(typeof pasangGerak==="function")pasangGerak()}catch(e){}
     try{if(typeof _tabelKartu==="function")_tabelKartu()}catch(e){}
     save();
+  };
+})();
+
+
+/* ===== LAPIS 9: kuis materi + tautan umpan ===== */
+var KUIS_SEED={
+ m1:"Apa pemicu hipotermia yang paling sering di gunung tropis? | Suhu udara di bawah nol | *Pakaian basah dipadu angin dan kelelahan | Ketinggian di atas 3.000 mdpl | # Di gunung tropis suhu jarang ekstrem; yang mematikan adalah kombinasi basah, angin, dan lelah.\n"+
+  "Manakah yang termasuk tanda awal hipotermia? | Kulit memerah dan berkeringat deras | Denyut nadi melambat drastis | *Menggigil hebat, bicara melambat, keputusan mulai kacau | # Gangguan berpikir muncul lebih dulu daripada yang banyak orang kira, dan itu yang membuatnya berbahaya.\n"+
+  "Di bawah suhu inti berapa tubuh dinyatakan hipotermia? | 37 derajat Celsius | *35 derajat Celsius | 30 derajat Celsius | # Ambangnya 35 derajat; di bawah itu tubuh kehilangan kemampuan menghangatkan diri sendiri.",
+ m2:"Kenapa kompas tetap wajib dibawa meski ada telepon pintar? | Kompas lebih akurat daripada GPS | *Kompas tidak pernah kehabisan baterai | Kompas bisa membaca cuaca | # Alat yang mati saat dibutuhkan sama saja dengan tidak dibawa.\n"+
+  "Teknik menentukan posisi sendiri dari dua atau lebih titik acuan disebut? | Azimuth | Triangulasi kontur | *Resection | # Resection adalah keterampilan dasar yang membedakan tersesat sementara dan tersesat sungguhan.",
+ m3:"Berapa perkiraan kebutuhan air per orang per hari di jalur terbuka? | 1 sampai 2 liter | *3 sampai 4 liter | 6 sampai 7 liter | # Jalur terbuka tanpa naungan menguras cairan jauh lebih cepat daripada jalur hutan.\n"+
+  "Apa kebiasaan yang paling penting sebelum naik punggungan? | Mengisi air sebanyak mungkin di pos pertama | *Mencatat titik sumber air terakhir sebelum punggungan | Menghemat air sejak awal pendakian | # Punggungan hampir selalu kering; sumber terakhir itulah batas perhitunganmu.",
+ m4:"Laporan SAR yang baik memuat berapa hal pokok? | Tiga | *Lima | Delapan | # Siapa, berapa orang, titik terakhir diketahui, kondisi terkini, dan perlengkapan yang dibawa.\n"+
+  "Kenapa titik terakhir diketahui begitu penting dalam laporan? | Menentukan siapa yang bertanggung jawab | *Mempersempit area pencarian | Menghitung biaya evakuasi | # Setiap jam keterlambatan informasi memperluas area pencarian secara berlipat.",
+ m5:"Tanda paling jelas untuk membatalkan pendakian ke puncak terbuka? | Kabut tipis sejak pagi | *Cumulonimbus tumbuh cepat sebelum tengah hari | Angin dingin di pos bayangan | # Awan yang tumbuh vertikal cepat sebelum siang hampir selalu berujung badai sore.",
+ m6:"Tujuh prinsip Leave No Trace bisa diringkas menjadi kebiasaan apa? | Berjalan hanya di jalur resmi | *Bawa turun lebih banyak daripada yang kamu bawa naik | Berkemah jauh dari sumber air | # Prinsipnya sederhana dan bisa diingat siapa pun tanpa menghafal daftar.",
+ m7:"Apa fungsi simaksi yang paling sering dilupakan pendaki? | Bukti pembayaran retribusi | *Catatan resmi keberadaan kita yang jadi titik awal pencarian | Izin mendirikan tenda | # Simaksi bukan karcis; ia adalah jejak administratif yang menyelamatkan saat terjadi sesuatu."
+};
+
+function kuisTeks(m){
+  if(!m)return "";
+  if(typeof m.kuis==="string"&&m.kuis.trim())return m.kuis;
+  return KUIS_SEED[m.id]||"";
+}
+function kuisParse(teks){
+  var out=[];
+  String(teks||"").split(/\n+/).forEach(function(baris){
+    if(!baris.trim())return;
+    var ket="";var b=baris;
+    var h=b.indexOf("#");
+    if(h>=0&&b.lastIndexOf("|",h)>=0){ket=b.slice(h+1).trim();b=b.slice(0,b.lastIndexOf("|",h))}
+    var bag=b.split("|").map(function(x){return x.trim()}).filter(function(x){return x!==""});
+    if(bag.length<3)return;
+    var t=bag.shift(),j=0;
+    var opsi=bag.map(function(o,i){if(o.charAt(0)==="*"){j=i;return o.slice(1).trim()}return o});
+    out.push({t:t,o:opsi,j:j,k:ket});
+  });
+  return out;
+}
+function kuisAda(m){return kuisParse(kuisTeks(m)).length>0}
+
+/* ---- simpanan nilai ---- */
+function kuisNilaiSemua(){try{return JSON.parse(localStorage.getItem("rcs_kuis")||"{}")||{}}catch(e){return {}}}
+function kuisNilai(id){var a=kuisNilaiSemua();return a[id]||null}
+function kuisSimpanNilai(id,benar,total){
+  var a=kuisNilaiSemua(),l=a[id];
+  if(!l||benar>l.b||(benar===l.b&&total!==l.t))a[id]={b:benar,t:total,w:Date.now()};
+  try{localStorage.setItem("rcs_kuis",JSON.stringify(a))}catch(e){}
+}
+
+/* ---- keadaan berjalan ---- */
+var KUIS_ST=null;
+function kuisMulai(id){
+  var s=kuisParse(kuisTeks(mat(id)));
+  KUIS_ST={id:id,soal:s,i:0,benar:0,pilih:null,selesai:false};
+  kuisGambar();
+}
+function kuisPilih(i){
+  if(!KUIS_ST||KUIS_ST.pilih!==null)return;
+  KUIS_ST.pilih=i;
+  if(i===KUIS_ST.soal[KUIS_ST.i].j)KUIS_ST.benar++;
+  kuisGambar();
+}
+function kuisLanjut(){
+  if(!KUIS_ST)return;
+  if(KUIS_ST.i+1>=KUIS_ST.soal.length){
+    KUIS_ST.selesai=true;
+    kuisSimpanNilai(KUIS_ST.id,KUIS_ST.benar,KUIS_ST.soal.length);
+  }else{KUIS_ST.i++;KUIS_ST.pilih=null}
+  kuisGambar();
+}
+function kuisUlang(){if(KUIS_ST)kuisMulai(KUIS_ST.id)}
+function kuisTutup(){KUIS_ST=null;kuisGambar()}
+function kuisGambar(){
+  var el=document.getElementById("kuisBox");
+  if(!el)return;
+  var m=mat((KUIS_ST&&KUIS_ST.id)||(S.pv&&S.pv.id));
+  el.innerHTML=kuisIsi(m);
+}
+
+/* ---- tampilan ---- */
+function kuisIsi(m){
+  if(!m||!kuisAda(m))return "";
+  var soal=kuisParse(kuisTeks(m));
+  var lama=kuisNilai(m.id);
+  if(!KUIS_ST||KUIS_ST.id!==m.id){
+    return '<div class="kz"><div class="kz-h"><div><b>Uji paham</b><div class="kz-s">'+soal.length+' soal singkat untuk mengecek apakah materi ini benar-benar nempel.</div></div>'+
+      (lama?'<span class="kz-n">Nilai terbaikmu '+lama.b+"/"+lama.t+"</span>":"")+
+      '</div><button class="btn btn-p" onclick="kuisMulai(\''+m.id+'\')">'+(lama?"Ulangi kuis":"Mulai kuis")+"</button></div>";
+  }
+  var st=KUIS_ST;
+  if(st.selesai){
+    var n=st.benar,t=st.soal.length;
+    var pesan=n===t?"Semua benar. Materi ini sudah kamu pegang.":(n>=Math.ceil(t/2)?"Lumayan. Baca ulang bagian yang tadi meleset.":"Belum nempel. Tidak apa-apa, baca lagi materinya lalu coba sekali lagi.");
+    return '<div class="kz"><div class="kz-skor"><div class="kz-ang">'+n+"/"+t+'</div><div><b>Selesai</b><div class="kz-s">'+esc(pesan)+"</div></div></div>"+
+     '<div class="kz-akhir"><button class="btn btn-p" onclick="kuisUlang()">Ulangi</button><button class="btn" onclick="kuisTutup()">Tutup</button></div></div>';
+  }
+  var q=st.soal[st.i],jw=st.pilih;
+  var maju=Math.round(((st.i+(jw===null?0:1))/st.soal.length)*100);
+  return '<div class="kz"><div class="kz-h"><div><b>Uji paham</b><div class="kz-s">Soal '+(st.i+1)+" dari "+st.soal.length+'</div></div><span class="kz-n">'+st.benar+" benar</span></div>"+
+   '<div class="kz-bar"><i style="width:'+maju+'%"></i></div>'+
+   '<div class="kz-t">'+esc(q.t)+"</div>"+
+   q.o.map(function(o,i){
+     var kls="kz-o";
+     if(jw!==null){if(i===q.j)kls+=" benar";else if(i===jw)kls+=" salah";else kls+=" pudar"}
+     return '<button class="'+kls+'"'+(jw===null?' onclick="kuisPilih('+i+')"':" disabled")+">"+esc(o)+"</button>";
+   }).join("")+
+   (jw!==null?'<div class="kz-k '+(jw===q.j?"ok":"no")+'">'+(jw===q.j?"Tepat. ":"Belum tepat. ")+esc(q.k||("Jawaban yang benar: "+q.o[q.j]+"."))+"</div>"+
+     '<div class="kz-akhir"><button class="btn btn-p" onclick="kuisLanjut()">'+(st.i+1>=st.soal.length?"Lihat hasil":"Soal berikutnya")+"</button></div>":"")+
+   "</div>";
+}
+
+(function(){
+  var css=".kz{border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-top:20px;background:var(--soft)}"+
+  ".kz-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}"+
+  ".kz-h b{font-size:16px}.kz-s{font-size:13px;color:var(--ink2);margin-top:3px;line-height:1.5}"+
+  ".kz-n{font-size:12.5px;font-weight:700;color:var(--ink2);white-space:nowrap;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px}"+
+  ".kz-bar{height:5px;background:var(--soft2);border-radius:999px;overflow:hidden;margin-bottom:14px}"+
+  ".kz-bar i{display:block;height:100%;background:var(--violet);border-radius:999px;transition:width .3s}"+
+  ".kz-t{font-size:16px;font-weight:600;line-height:1.55;margin-bottom:12px}"+
+  ".kz-o{display:block;width:100%;text-align:left;font:inherit;font-size:14.5px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;color:var(--ink);transition:border-color .15s,transform .12s,background .15s}"+
+  ".kz-o:hover:not(:disabled){border-color:var(--violet);transform:translateX(2px)}"+
+  ".kz-o.benar{border-color:var(--green);background:rgba(70,161,113,.12);font-weight:700}"+
+  ".kz-o.salah{border-color:var(--red);background:rgba(229,100,88,.1)}"+
+  ".kz-o.pudar{opacity:.5}.kz-o:disabled{cursor:default}"+
+  ".kz-k{font-size:13.5px;line-height:1.6;border-radius:12px;padding:11px 14px;margin:10px 0 4px}"+
+  ".kz-k.ok{background:rgba(70,161,113,.12);color:var(--ink)}"+
+  ".kz-k.no{background:rgba(213,128,59,.13);color:var(--ink)}"+
+  ".kz-akhir{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}"+
+  ".kz-skor{display:flex;align-items:center;gap:14px;margin-bottom:6px}"+
+  ".kz-ang{font-size:30px;font-weight:800;color:var(--violet);font-variant-numeric:tabular-nums}"+
+  '[data-tema="gelap"] .kz{background:rgba(255,255,255,.03)}[data-tema="gelap"] .kz-o,[data-tema="gelap"] .kz-n{background:rgba(255,255,255,.05)}'+
+  "@media(max-width:520px){.kz{padding:16px}.kz-t{font-size:15.5px}}"+
+  "@media(hover:none){.kz-o:active:not(:disabled){transform:scale(.98)}}";
+  try{document.head.insertAdjacentHTML("beforeend","<style>"+css+"</style>")}catch(e){}
+})();
+
+/* ---- sisipkan ke halaman materi ---- */
+(function(){
+  if(typeof viewMateriDetail!=="function")return;
+  var _v=viewMateriDetail;
+  viewMateriDetail=function(){
+    var h=_v.apply(this,arguments);
+    var m=mat(S.pv&&S.pv.id);
+    if(!m||!kuisAda(m))return h;
+    if(KUIS_ST&&KUIS_ST.id!==m.id)KUIS_ST=null;
+    var blok='<div id="kuisBox">'+kuisIsi(m)+"</div>";
+    var i=h.indexOf('<footer class="foot"');
+    return i<0?h+blok:h.slice(0,i)+blok+h.slice(i);
+  };
+})();
+
+/* ---- kolom kuis di formulir materi ---- */
+(function(){
+  if(typeof mFormMateri!=="function")return;
+  var _m=mFormMateri;
+  mFormMateri=function(){
+    var h=_m.apply(this,arguments);
+    var m=(S.modal&&S.modal.id?mat(S.modal.id):null)||{};
+    var isi=(typeof m.kuis==="string"&&m.kuis)||"";
+    var f='<div class="f"><label>Soal uji paham <span class="hint">satu soal per baris: Pertanyaan | opsi | *opsi benar | opsi | # penjelasan</span></label>'+
+      '<textarea id="mKuis" style="min-height:110px;font-family:ui-monospace,monospace;font-size:13px" placeholder="Berapa liter air per orang per hari di jalur terbuka? | 1-2 liter | *3-4 liter | 6-7 liter | # Jalur terbuka menguras cairan lebih cepat.">'+esc(isi)+"</textarea>"+
+      (!isi&&KUIS_SEED[m.id]?'<div class="hint" style="margin-top:6px">Materi ini memakai soal bawaan. Isi kolom ini untuk menggantinya.</div>':"")+"</div>";
+    var a='<div class="end"><button class="btn" onclick="closeModal()">Batal</button>';
+    var i=h.indexOf(a);
+    return i<0?h+f:h.slice(0,i)+f+h.slice(i);
+  };
+})();
+(function(){
+  if(typeof simpanMateri!=="function")return;
+  var _s=simpanMateri;
+  simpanMateri=function(){
+    var e=document.getElementById("mKuis");
+    var teks=e?e.value.trim():null;
+    var id=S.modal&&S.modal.id;
+    var r=_s.apply(this,arguments);
+    if(teks!==null){
+      var m=null;
+      if(id)m=mat(id);
+      else m=db.materi[db.materi.length-1];
+      if(m){
+        m.kuis=teks;
+        try{supa.from("materi").upsert({id:m.id,kuis:teks}).then(function(x){pErr(x&&x.error,"materi")})}catch(err){}
+      }
+    }
+    return r;
   };
 })();
 
