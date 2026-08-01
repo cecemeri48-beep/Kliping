@@ -53,7 +53,7 @@ module.exports = async function (req, res) {
     if (id) {
       const r = await fetch(SUPA+'/rest/v1/kliping?id=eq.'+encodeURIComponent(id)+'&select=*',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});
       const rows = await r.json();
-      if (Array.isArray(rows) && rows.length && rows[0].status === 'Terbit') k = rows[0];
+      if (Array.isArray(rows) && rows.length && String(rows[0].status||'').trim().toLowerCase() === 'terbit') k = rows[0];
     }
   } catch (e) {}
   if (!k) return halamanKosong(res,id);

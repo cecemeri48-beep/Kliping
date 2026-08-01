@@ -8,16 +8,75 @@ function hariRFC(tgl){
   try{var d=new Date(String(tgl)+'T07:00:00+08:00');if(isNaN(d))return new Date().toUTCString();return d.toUTCString();}
   catch(e){return new Date().toUTCString();}
 }
+// Ambil apa adanya: tanpa filter kolom, tanpa order, tanpa select bernama.
+// PostgREST membalas 400 kalau satu saja nama kolom tidak cocok huruf besar
+// kecilnya, dan galat itu dulu tertelan diam-diam sehingga sitemap kosong.
+async function ambilTabel(tabel){
+  const url=SUPA+'/rest/v1/'+tabel+'?select=*&limit=300';
+  const r=await fetch(url,{headers:{apikey:KEY,Authorization:'Bearer '+KEY,Accept:'application/json'}});
+  const teks=await r.text();
+  let data=null;
+  try{data=JSON.parse(teks);}catch(e){}
+  return {
+    ok:r.ok&&Array.isArray(data),
+    kode:r.status,
+    baris:Array.isArray(data)?data:[],
+    pesan:Array.isArray(data)?'':String(teks).slice(0,400)
+  };
+}
+// Nama kolom dicari lentur supaya tahan kalau Postgres melipat huruf besar.
+function ambilNilai(o,nama){
+  if(!o)return undefined;
+  if(o[nama]!==undefined)return o[nama];
+  const cari=String(nama).toLowerCase().replace(/[^a-z0-9]/g,'');
+  for(const k in o){
+    if(String(k).toLowerCase().replace(/[^a-z0-9]/g,'')===cari)return o[k];
+  }
+  return undefined;
+}
+function tglKlip(k){return ambilNilai(k,'tglKliping')||ambilNilai(k,'tglBerita')||'';}
 async function ambilKliping(){
-  const url=SUPA+'/rest/v1/kliping?status=eq.Terbit&select=id,judul,lead,rubrik,media,gambar,tglKliping,tglBerita,topik,wilayah&order=tglKliping.desc&limit=200';
-  const r=await fetch(url,{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});
-  const rows=await r.json();
-  return Array.isArray(rows)?rows:[];
+  const h=await ambilTabel('kliping');
+  return h.baris
+    .filter(function(k){
+      const s=String(ambilNilai(k,'status')||'').trim().toLowerCase();
+      return s==='terbit' && ambilNilai(k,'id');
+    })
+    .sort(function(a,b){return String(tglKlip(b)).localeCompare(String(tglKlip(a)));})
+    .slice(0,200);
 }
 async function ambilMateri(){
-  const r=await fetch(SUPA+'/rest/v1/materi?select=id,judul,rumpun&limit=200',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});
-  const rows=await r.json();
-  return Array.isArray(rows)?rows:[];
+  const h=await ambilTabel('materi');
+  return h.baris;
+}
+async function cek(res){
+  const out=[];
+  for(const t of ['kliping','materi']){
+    let h;
+    try{h=await ambilTabel(t);}catch(e){h={ok:false,kode:0,baris:[],pesan:String(e&&e.message||e)};}
+    const satu=h.baris[0]||null;
+    const status={};
+    h.baris.forEach(function(r){
+      const s=String(ambilNilai(r,'status')||'(kosong)');
+      status[s]=(status[s]||0)+1;
+    });
+    out.push({
+      tabel:t,
+      httpKode:h.kode,
+      berhasil:h.ok,
+      jumlahBaris:h.baris.length,
+      sebaranStatus:status,
+      namaKolom:satu?Object.keys(satu):[],
+      contohId:satu?ambilNilai(satu,'id'):null,
+      contohTanggal:satu?tglKlip(satu):null,
+      pesanGalat:h.pesan||null
+    });
+  }
+  let n=0;
+  try{n=(await ambilKliping()).length;}catch(e){}
+  res.setHeader('Content-Type','application/json; charset=utf-8');
+  res.setHeader('Cache-Control','no-store');
+  res.status(200).send(JSON.stringify({klipingTerbitTerbaca:n,tabel:out},null,2));
 }
 
 async function sitemap(res){
@@ -35,7 +94,7 @@ async function sitemap(res){
   });
   kl.forEach(function(k){
     x+='<url><loc>'+esc(SITE+'/klip/'+encodeURIComponent(k.id))+'</loc>'+
-       (k.tglKliping?'<lastmod>'+esc(k.tglKliping)+'</lastmod>':'')+
+       (tglKlip(k)?'<lastmod>'+esc(String(tglKlip(k)).slice(0,10))+'</lastmod>':'')+
        '<changefreq>monthly</changefreq><priority>0.8</priority></url>\n';
   });
   x+='</urlset>\n';
@@ -60,12 +119,12 @@ async function rss(res){
    '<image><url>'+esc(SITE+'/icon-512.png')+'</url><title>Kliping REICHAS</title><link>'+esc(SITE)+'</link></image>\n'+
    '<atom:link href="'+esc(SITE+'/rss.xml')+'" rel="self" type="application/rss+xml" />\n';
   kl.forEach(function(k){
-    const tautan=SITE+'/klip/'+encodeURIComponent(k.id);
-    const isi=(k.lead||'')+(k.media?' \u2014 disarikan dari '+k.media+'.':'');
-    x+='<item>\n<title>'+cdata(k.judul)+'</title>\n'+
+    const tautan=SITE+'/klip/'+encodeURIComponent(ambilNilai(k,'id'));
+    const isi=(ambilNilai(k,'lead')||'')+(ambilNilai(k,'media')?' \u2014 disarikan dari '+ambilNilai(k,'media')+'.':'');
+    x+='<item>\n<title>'+cdata(ambilNilai(k,'judul'))+'</title>\n'+
        '<link>'+esc(tautan)+'</link>\n'+
        '<guid isPermaLink="true">'+esc(tautan)+'</guid>\n'+
-       '<pubDate>'+hariRFC(k.tglKliping||k.tglBerita)+'</pubDate>\n'+
+       '<pubDate>'+hariRFC(String(tglKlip(k)).slice(0,10))+'</pubDate>'+'\n'+
        (k.rubrik?'<category>'+cdata(k.rubrik)+'</category>\n':'')+
        (Array.isArray(k.topik)?k.topik.map(function(t){return '<category>'+cdata(t)+'</category>\n';}).join(''):'')+
        '<description>'+cdata(isi)+'</description>\n'+
@@ -81,6 +140,7 @@ async function rss(res){
 module.exports = async function (req, res) {
   const jenis = (req.query && req.query.jenis) || 'rss';
   try {
+    if (jenis === 'cek') return await cek(res);
     if (jenis === 'sitemap') return await sitemap(res);
     return await rss(res);
   } catch (e) {
