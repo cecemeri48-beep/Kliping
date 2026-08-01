@@ -1160,7 +1160,7 @@ function viewArsip(){
 function viewPedomanPublik(){
   return '<div class="art"><h2 style="margin-top:0">Pedoman Kurasi</h2><p class="lead">Kami bekerja dari meja, bukan dari lapangan. Karena itu batas kerja kami harus terbuka untuk dibaca siapa pun.</p>'+
    '<div class="sec">'+db.pedoman.split("\n").map(l=>"<p>"+esc(l)+"</p>").join("")+"</div>"+
-   '<div class="note r">Menemukan kekeliruan atau ingin materinya dicabut? Sampaikan kepada Divisi Komunikasi dan Publikasi REICHAS CHELEBES. Kami menanggapi dalam tiga hari kerja.</div></div>'+foot();
+   '<div class="note r">Menemukan kekeliruan atau ingin materinya dicabut? Sampaikan kepada Divisi Komunikasi dan Publikasi REICHAS CHELEBES. Kami menanggapi dalam tiga hari kalender.</div></div>'+foot();
 }
 function foot(){
   return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping REICHAS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · REICHAS CHELEBES, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
@@ -2601,8 +2601,11 @@ function viewPrivasi(){
    "<p>Kami tidak memakai Google Analytics atau alat pelacak pengunjung sejenis.</p></div>"+
    '<div class="sec"><h4>Hak cipta dan keberatan media</h4>'+
    "<p>Kutipan berita di sini dipakai secukupnya untuk keperluan pendidikan dan ulasan, selalu dengan menyebut nama media dan menautkan ke sumber aslinya. Hak cipta atas berita tetap milik penerbitnya masing-masing.</p>"+
-   '<p>Kalau kamu mewakili media dan keberatan atas kutipan, gambar, atau ringkasan yang kami muat, kirim surel ke <a href="'+hkmSurel("Keberatan atas materi kliping","redaksi")+'">'+esc(hkmSurelRedaksi())+'</a> dengan menyertakan tautan klipingnya. Kami menanggapi dalam <b>tiga hari kerja</b> dan akan mencabut atau memperbaiki materi yang terbukti bermasalah.</p></div>'+
-   '<div class="sec"><h4>Anak-anak</h4><p>Portal ini ditujukan untuk pembaca umum dan anggota organisasi. Kami tidak sengaja mengumpulkan data dari anak di bawah 13 tahun.</p></div>'+
+   '<p>Kalau kamu mewakili media dan keberatan atas kutipan, gambar, atau ringkasan yang kami muat, kirim surel ke <a href="'+hkmSurel("Keberatan atas materi kliping","redaksi")+'">'+esc(hkmSurelRedaksi())+'</a> dengan menyertakan tautan klipingnya. Kami menanggapi dalam <b>tiga hari kalender</b> \u2014 dihitung sejak surel masuk, termasuk akhir pekan \u2014 dan akan mencabut atau memperbaiki materi yang terbukti bermasalah.</p></div>'+
+   '<div class="sec"><h4>Pembaca di bawah umur</h4>'+
+   "<p>Portal ini ditujukan untuk pembaca umum dan anggota organisasi, bukan untuk anak-anak. Isinya juga membahas kecelakaan dan risiko kegiatan alam bebas, jadi sebagian materi memang tidak nyaman dibaca anak kecil.</p>"+
+   "<p>Kami tidak pernah meminta data pribadi dari pembaca berusia berapa pun. Tidak ada pendaftaran, tidak ada formulir, dan tidak ada kolom nama atau umur \u2014 jadi data anak di bawah 13 tahun tidak mungkin sampai ke kami, baik disengaja maupun tidak. Satu-satunya akun di sini adalah akun pengelola, yang dibuatkan untuk anggota dewasa.</p>"+
+   '<p>Kalau kamu orang tua atau wali dan tetap menemukan data anakmu tersimpan di sini, kabari kami di <a href="'+hkmSurel("Data anak di bawah umur")+'">'+esc(c.email)+'</a> dan akan segera kami hapus.</p></div>'+
    '<div class="sec"><h4>Perubahan kebijakan</h4><p>Kalau ada perubahan, tanggal berlaku di atas akan diperbarui. Perubahan yang menyangkut data pembaca akan kami sebutkan terang-terangan, bukan diselipkan diam-diam.</p></div>'+
    '<div class="note">Pertanyaan soal privasi? <a href="'+hkmSurel("Pertanyaan privasi Kliping REICHAS")+'">'+esc(c.email)+'</a></div>'+
    "</div>"+foot();
@@ -2633,7 +2636,7 @@ function viewKontak(){
      return '<a class="kon-c kon-a" href="'+hkmSurel(a[2],a[3])+'"><div><div class="kon-l">'+a[0]+'</div><div class="kon-k">'+a[1]+'</div><div class="kon-v" style="margin-top:8px;font-size:13px">Kirim ke '+esc(a[3]==="redaksi"?hkmSurelRedaksi():c.email)+' \u2192</div></div></a>';
    }).join("")+"</div></div>"+
    '<div class="sec"><h4>Berapa lama dibalas</h4>'+
-   "<p>Kami mengelola portal ini di sela kegiatan organisasi, jadi jangan berharap balasan dalam hitungan menit. Keberatan media dan permintaan pencabutan kami tangani lebih dulu, paling lama <b>tiga hari kerja</b>. Sisanya menyusul.</p></div>"+
+   "<p>Kami mengelola portal ini di sela kegiatan organisasi, jadi jangan berharap balasan dalam hitungan menit. Keberatan media dan permintaan pencabutan kami tangani lebih dulu, paling lama <b>tiga hari kalender</b> sejak surelnya masuk, akhir pekan ikut dihitung. Sisanya menyusul.</p></div>"+
    '<div class="note o">Sebelum menulis soal isi kliping, ada baiknya membaca <a href="#" onclick=\'go({pv:{n:"pedoman"}});return false\'>Pedoman Kurasi</a> lebih dulu \u2014 banyak pertanyaan sudah terjawab di sana.</div>'+
    "</div>"+foot();
 }
