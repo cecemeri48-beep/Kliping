@@ -3448,6 +3448,162 @@ var _suntingAsli=sunting;
 sunting=function(){S.slugPilih="";return _suntingAsli.apply(this,arguments)};
 
 
+
+/* ===== lapis 15: ekspor jilid arsip ke PDF (cetak) ===== */
+var CETAK_CSS='<style>'+
+'*{box-sizing:border-box}'+
+'body{font-family:Georgia,"Times New Roman",serif;color:#2C2C2B;margin:0;padding:28px 30px;line-height:1.6;font-size:12pt}'+
+'h1,h2,h3,h4{font-family:Helvetica,Arial,sans-serif;line-height:1.25}'+
+'.jk{border-bottom:3px double #2C2C2B;padding-bottom:14px;margin-bottom:18px}'+
+'.jk h1{margin:0 0 4px;font-size:24pt;letter-spacing:.02em}'+
+'.jk .sub{font-family:Helvetica,Arial,sans-serif;font-size:10pt;color:#7D7A75;font-style:italic}'+
+'.jk .met{font-family:Helvetica,Arial,sans-serif;font-size:9.5pt;color:#7D7A75;margin-top:8px}'+
+'.isi{margin:0 0 26px}'+
+'.isi h3{font-size:11pt;text-transform:uppercase;letter-spacing:.08em;color:#7D7A75;margin:0 0 8px}'+
+'.isi ol{margin:0;padding-left:22px;font-size:11pt}'+
+'.isi ol li{margin-bottom:3px}'+
+'.klp{padding-top:6px;margin-bottom:26px;break-inside:auto}'+
+'.klp+.klp{border-top:1px solid #E6E5E3;padding-top:20px}'+
+'.klp h2{font-size:16pt;margin:0 0 6px}'+
+'.klp .lead{font-size:11.5pt;color:#4a4845;margin:0 0 10px;font-style:italic}'+
+'.klp .tags{font-family:Helvetica,Arial,sans-serif;font-size:9pt;color:#7D7A75;margin-bottom:12px}'+
+'.sec{margin:0 0 12px;break-inside:avoid}'+
+'.sec h4{font-size:9.5pt;text-transform:uppercase;letter-spacing:.08em;color:#7D7A75;margin:0 0 5px;font-family:Helvetica,Arial,sans-serif}'+
+'.cut{border-left:3px solid #2783DE;padding:8px 12px;background:#F9F8F7;font-size:11pt}'+
+'.src{font-family:Helvetica,Arial,sans-serif;font-size:9pt;color:#7D7A75;margin-top:5px}'+
+'.sec p{margin:0;text-align:justify}'+
+'.sec ol,.sec ul{margin:0;padding-left:22px}'+
+'.sec li{margin-bottom:4px}'+
+'.gbr{width:100%;max-height:78mm;object-fit:cover;border:1px solid #E6E5E3;border-radius:6px}'+
+'.ket{font-size:9pt;color:#7D7A75;font-style:italic;margin:5px 0 0}'+
+'.by{font-family:Helvetica,Arial,sans-serif;font-size:9pt;color:#7D7A75;border-top:1px dashed #E6E5E3;padding-top:6px;margin-top:10px}'+
+'.dis{font-size:9pt;color:#7D7A75;border:1px solid #E6E5E3;border-radius:6px;padding:8px 10px;margin-top:14px}'+
+'.ft{border-top:1px solid #E6E5E3;margin-top:26px;padding-top:10px;font-family:Helvetica,Arial,sans-serif;font-size:8.5pt;color:#7D7A75;text-align:center}'+
+'@page{size:A4;margin:16mm 14mm}'+
+'@media print{.noprint{display:none!important}.klp{break-before:page}.klp:first-of-type{break-before:auto}}'+
+'.noprint{position:fixed;top:0;left:0;right:0;background:#102a43;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:13px;padding:10px 14px;display:flex;gap:10px;align-items:center;justify-content:center}'+
+'.noprint button{font:inherit;padding:6px 14px;border-radius:8px;border:0;background:#b7ea5e;color:#102a43;font-weight:700;cursor:pointer}'+
+'.noprint+*{margin-top:44px}'+
+'</style>';
+
+function cetakEsc(s){return esc(String(s==null?"":s))}
+
+function jilidNama(j){
+  var B=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  var p=String(j||"").split("-");
+  if(p.length<2)return String(j||"");
+  var i=parseInt(p[1],10)-1;
+  return (B[i]||p[1])+" "+p[0];
+}
+
+function jilidKlip(j){
+  return terbit().filter(function(k){return jilid(k.tglKliping)===j})
+    .sort(function(a,b){return String(a.tglKliping).localeCompare(String(b.tglKliping))});
+}
+
+function cetakKlipHTML(k,no){
+  var rj=(k.materi||[]).map(function(id){var m=mat(id);return m?"<li>"+cetakEsc(m.judul)+" \u00b7 "+cetakEsc(m.rumpun)+"</li>":""}).join("");
+  var pel=(k.pelajaran||[]).filter(function(p){return p&&String(p).trim()});
+  var h='<article class="klp">';
+  h+='<div class="tags">'+no+' \u00b7 '+cetakEsc(k.rubrik)+' \u00b7 '+cetakEsc(k.wilayah)+'</div>';
+  h+='<h2>'+cetakEsc(k.judul)+'</h2>';
+  if(k.lead)h+='<p class="lead">'+cetakEsc(k.lead)+'</p>';
+  if(isImg(k.gambar)){
+    h+='<div class="sec"><img class="gbr" src="'+cetakEsc(k.gambar)+'" alt="" />';
+    if(k.gbrKet)h+='<p class="ket">'+cetakEsc(k.gbrKet)+'</p>';
+    h+='</div>';
+  }
+  h+='<div class="sec"><h4>1 \u00b7 Potongan</h4><div class="cut">'+cetakEsc(k.potongan)+'</div>'+
+     '<div class="src">'+cetakEsc(k.media)+' \u00b7 '+cetakEsc(tglID(k.tglBerita))+(k.tautan?' \u00b7 '+cetakEsc(k.tautan):'')+'</div></div>';
+  if(k.konteks)h+='<div class="sec"><h4>2 \u00b7 Konteks</h4><p>'+cetakEsc(k.konteks)+'</p></div>';
+  if(pel.length)h+='<div class="sec"><h4>3 \u00b7 Pelajaran</h4><ol>'+pel.map(function(p){return "<li>"+cetakEsc(p)+"</li>"}).join("")+'</ol></div>';
+  h+='<div class="sec"><h4>4 \u00b7 Rujukan materi</h4><ul>'+(rj||"<li>\u2014</li>")+'</ul></div>';
+  h+='<div class="by">Digunting '+cetakEsc(tglID(k.tglKliping))+' oleh '+cetakEsc(nm(k.kurator))+
+     (k.peninjau?' \u00b7 ditinjau '+cetakEsc(nm(k.peninjau)):'')+
+     ' \u00b7 kliping-reichas.my.id/klip/'+cetakEsc(k.id)+'</div>';
+  h+='</article>';
+  return h;
+}
+
+function cetakDokumen(judul,subjudul,daftar){
+  var tglCetak=new Date().toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
+  var h='<!doctype html><html lang="id"><head><meta charset="utf-8" /><title>'+cetakEsc(judul)+'</title>'+CETAK_CSS+'</head><body>';
+  h+='<div class="noprint"><span>Pilih tujuan <b>Simpan sebagai PDF</b> pada jendela cetak.</span><button onclick="window.print()">Cetak / Simpan PDF</button></div>';
+  h+='<header class="jk"><h1>'+cetakEsc(judul)+'</h1><div class="sub">Kliping RCS.CBS \u00b7 Baca. Pahami. Bagikan.</div>'+
+     '<div class="met">'+cetakEsc(subjudul)+' \u00b7 dicetak '+cetakEsc(tglCetak)+'</div></header>';
+  h+='<div class="isi"><h3>Daftar isi</h3><ol>'+daftar.map(function(k){return "<li>"+cetakEsc(k.judul)+" \u2014 "+cetakEsc(k.rubrik)+"</li>"}).join("")+'</ol></div>';
+  h+=daftar.map(function(k,i){return cetakKlipHTML(k,i+1)}).join("");
+  h+='<div class="ft">Kliping RCS.CBS \u00b7 Dikelola Divisi Komunikasi &amp; Publikasi bersama Divisi Pendidikan &amp; Edukasi \u00b7 REICHAS CHELEBES, Makassar<br />'+
+     'Arsip daring: kliping-reichas.my.id \u00b7 Surel redaksi: kliping.rcscbs@gmail.com</div>';
+  h+='</body></html>';
+  return h;
+}
+
+function cetakBuka(html,namaBerkas){
+  try{
+    var w=window.open("","_blank");
+    if(w&&w.document){
+      w.document.open();w.document.write(html);w.document.close();
+      try{w.document.title=namaBerkas}catch(e){}
+      setTimeout(function(){try{w.focus();w.print()}catch(e){}},700);
+      return true;
+    }
+  }catch(e){}
+  try{
+    var lama=document.getElementById("cetakFrame");
+    if(lama)lama.parentNode.removeChild(lama);
+    var f=document.createElement("iframe");
+    f.id="cetakFrame";
+    f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0;opacity:0";
+    document.body.appendChild(f);
+    var d=f.contentWindow.document;
+    d.open();d.write(html);d.close();
+    setTimeout(function(){try{f.contentWindow.focus();f.contentWindow.print()}catch(e){}},900);
+    return true;
+  }catch(e){}
+  return false;
+}
+
+function cetakJilid(j){
+  var kl=jilidKlip(j);
+  if(!kl.length){toast("Jilid ini belum berisi kliping terbit");return}
+  var nama="Jilid "+jilidNama(j);
+  var ok=cetakBuka(cetakDokumen(nama,kl.length+" potongan",kl),"Kliping RCS.CBS \u2014 "+nama);
+  toast(ok?"Menyiapkan "+nama+" \u2014 pilih Simpan sebagai PDF":"Peramban menolak membuka jendela cetak");
+}
+
+function cetakSemua(){
+  var kl=terbit().slice().sort(function(a,b){return String(b.tglKliping).localeCompare(String(a.tglKliping))});
+  if(!kl.length){toast("Belum ada kliping terbit");return}
+  var ok=cetakBuka(cetakDokumen("Arsip Lengkap",kl.length+" potongan dari "+new Set(kl.map(function(k){return jilid(k.tglKliping)})).size+" jilid",kl),"Kliping RCS.CBS \u2014 Arsip Lengkap");
+  toast(ok?"Menyiapkan arsip lengkap \u2014 pilih Simpan sebagai PDF":"Peramban menolak membuka jendela cetak");
+}
+
+viewArsip=function(){
+  var g={};
+  terbit().forEach(function(k){var j=jilid(k.tglKliping);(g[j]=g[j]||[]).push(k)});
+  var keys=Object.keys(g).sort().reverse();
+  var jml=terbit().length;
+  var h='<div class="wrap" style="padding:32px 24px 56px"><h2 style="margin:0 0 6px;font-size:26px">Arsip</h2>'+
+   '<p style="color:var(--ink2);max-width:680px;margin:0 0 16px">Setiap bulan dijilid menjadi satu. Arsip inilah yang membuat kliping terasa seperti koleksi, bukan aliran yang hilang.</p>';
+  if(jml)h+='<div class="card" style="margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">'+
+    '<div style="flex:1;min-width:200px"><b>Cetak jilid sebagai PDF</b><div style="font-size:13px;color:var(--ink2);margin-top:2px">Satu berkas siap cetak, lengkap dengan daftar isi \u2014 pilih <b>Simpan sebagai PDF</b> di jendela cetak.</div></div>'+
+    '<button class="btn btn-sm btn-p" onclick="cetakSemua()">\ud83d\uddb6 Cetak seluruh arsip ('+jml+')</button></div>';
+  h+=keys.map(function(j){
+    return '<div class="card" style="margin-bottom:12px">'+
+     '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><b style="font-size:17px">Jilid '+esc(jilidNama(j))+'</b>'+
+     '<span class="tag">'+g[j].length+' potongan</span>'+
+     '<button class="btn btn-sm" style="margin-left:auto" onclick="cetakJilid(\''+j+'\')">\ud83d\uddb6 Simpan PDF</button></div>'+
+     '<ul style="margin:12px 0 0;padding-left:20px;font-size:14px">'+
+     g[j].map(function(k){return '<li style="margin-bottom:4px"><a href="#" onclick=\'go({pv:{n:"clip",id:"'+k.id+'"}});return false\'>'+esc(k.judul)+'</a> <span style="color:var(--ink2)">\u00b7 '+esc(k.rubrik)+'</span></li>'}).join("")+
+     '</ul></div>';
+  }).join("");
+  if(!keys.length)h+='<p class="empty">Belum ada kliping terbit untuk dijilid.</p>';
+  h+='</div>';
+  return h+foot();
+};
+
+
 bootstrap();
 </script>
 </body>
