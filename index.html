@@ -3654,6 +3654,53 @@ mutuIsi=function(h){
   }catch(e){}
   return t;
 };
+/* --- istilah sisi pembaca untuk Buah Pikir --- */
+function opiAcak(){
+  var l=[];try{l=terbit().filter(isOpini)}catch(e){}
+  var kini=(S.pv&&S.pv.id)||"";
+  var sisa=l.filter(function(k){return k.id!==kini});
+  if(!sisa.length){toast("Belum ada Buah Pikir lain");return}
+  var k=sisa[Math.floor(Math.random()*sisa.length)];
+  go({pv:{n:"clip",id:k.id}});
+}
+var _ambilOpiAsli=ambil;
+ambil=function(){
+  _ambilOpiAsli.apply(this,arguments);
+  try{
+    if(isOpini(S.draft)){
+      S.draft.media="";S.draft.tautan="";S.draft.potongan="";S.draft.vonis="";
+      S.draft.tglBerita=S.draft.tglKliping||S.draft.tglBerita||null;
+    }
+  }catch(e){}
+};
+var _sorotOpiAsli=sorotanBox;
+sorotanBox=function(){
+  var h=_sorotOpiAsli.apply(this,arguments);
+  try{
+    var t=terbit().slice().sort(function(a,b){return String(b.tglKliping).localeCompare(String(a.tglKliping))});
+    var k=t[0];
+    if(k&&isOpini(k)){
+      h=h.replace("Guntingan terbaru","Buah Pikir terbaru");
+      if(k.media)h=h.replace(" \u00b7 "+esc(k.media)+" \u00b7 "," \u00b7 "+esc(nm(k.kurator))+" \u00b7 ");
+      h=h.replace("klipAcak()","opiAcak()").replace("\ud83c\udfb2 Kliping acak","\u270d Buah Pikir lain");
+      h=h.replace("Baca sekarang","Baca tulisannya");
+    }
+  }catch(e){}
+  return h;
+};
+var _kartuOpiAsli=kartuKlip;
+kartuKlip=function(k){
+  var h=_kartuOpiAsli.apply(this,arguments);
+  try{
+    if(isOpini(k)){
+      var sumber='<div class="src"><span>'+esc(k.media)+"</span>";
+      if(k.media&&h.indexOf(sumber)>=0)h=h.replace(sumber,'<div class="src"><span>'+esc(nm(k.kurator))+"</span>");
+      else h=h.replace('<div class="src"><span></span>','<div class="src"><span>'+esc(nm(k.kurator))+"</span>");
+      h=h.replace("Buka kliping","Baca tulisan");
+    }
+  }catch(e){}
+  return h;
+};
 function pBuahPikir(){
   var m=me();
   var list=db.kliping.filter(function(k){return isOpini(k)});
@@ -3801,7 +3848,7 @@ function viewOpini(k){
   var isi=String(k.konteks||"").split(/\n+/).filter(function(p){return String(p).trim()})
     .map(function(p){return "<p>"+esc(p)+"</p>"}).join("");
   var tts='<div class="tts"><button id="ttsBtn" class="btn btn-sm btn-p" onclick="dengarkan()">\ud83d\udd0a Dengarkan</button> <button class="btn btn-sm" onclick="hentikanTTS()">\u23f9 Stop</button> <select id="ttsVoice" class="tts-sel" onchange="ttsPick(this.value)" title="Pilih suara">'+ttsVoiceOptions()+'</select><span class="tts-hint">Pilih suara ternatural di perangkatmu</span></div>';
-  return '<div class="art"><button class="btn btn-sm" onclick=\'go({pv:{n:"board"}})\'>\u2190 Papan kliping</button>'+
+  return '<div class="art"><button class="btn btn-sm" onclick=\'go({pv:{n:"board"}})\'>\u2190 Kembali ke papan</button>'+
    '<div class="opi-head"><span class="tag tag-opi">\u270d Buah Pikir</span><span class="tag tag-b">'+esc(k.rubrik)+'</span><span class="tag">'+esc(k.wilayah)+'</span></div>'+
    "<h2>"+esc(k.judul)+'</h2><p class="lead">'+esc(k.lead)+"</p>"+tts+bar+
    (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+"</div>":"")+
