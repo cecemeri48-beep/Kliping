@@ -3609,7 +3609,7 @@ viewArsip=function(){
 var OPI_CSS='.tag-opi{background:#fdecea;color:#b23227;border:1px solid #f3c6c0;font-weight:700}'
 +'.opi-note{border:1px solid var(--line);border-left:4px solid var(--red);background:var(--soft);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--ink2);margin:16px 0}'
 +'.opi-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}'
-+'.opi-form{border:1px solid #f3c6c0;background:#fdecea;color:#8f2a20;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:16px}';
++'.opi-form{border:1px solid #f3c6c0;background:#fdecea;color:#8f2a20;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:16px}'+'.btn-rasta{position:relative;border:0;color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.45);background:linear-gradient(90deg,#d7262a 0%,#d7262a 33%,#f5c518 33%,#f5c518 66%,#1a9c4b 66%,#1a9c4b 100%)}'+'.btn-rasta:hover{filter:brightness(1.06)}'+'.btn-rasta:active{transform:translateY(1px)}';
 (function(){try{var st=document.createElement("style");st.textContent=OPI_CSS;document.head.appendChild(st)}catch(e){}})();
 
 function isOpini(k){return !!k&&String(k.jenis||"").toLowerCase()==="opini"}
@@ -3626,11 +3626,19 @@ toKliping=function(d){
 /* --- draf baru --- */
 var _baruOpiAsli=baru;
 baru=function(){_baruOpiAsli.apply(this,arguments);try{S.draft.jenis="kliping"}catch(e){}};
+function _opiRubrik(){
+  try{
+    var r=db.rubrik||[];
+    for(var i=0;i<r.length;i++){var t=String(r[i]).toLowerCase();if(t==="opini"||t==="buah pikir")return r[i]}
+  }catch(e){}
+  return "Opini";
+}
 function tulisOpini(){
   _baruOpiAsli();
   try{
     var d=S.draft;
     d.jenis="opini";
+    d.rubrik=_opiRubrik();
     d.potongan="";d.tautan="";d.vonis="";
     d.pelajaran=["","",""];
     d.materi=[];
@@ -3685,7 +3693,7 @@ function opiPasang(){
       if(oc.indexOf("baru()")>=0&&!b.getAttribute("data-opi")){
         b.setAttribute("data-opi","1");
         var n=document.createElement("button");
-        n.className="btn";
+        n.className="btn btn-rasta";
         n.innerHTML="\u270d Tulis Buah Pikir";
         n.setAttribute("onclick","tulisOpini()");
         if(b.parentNode)b.parentNode.insertBefore(n,b.nextSibling);
@@ -3694,6 +3702,17 @@ function opiPasang(){
     var d=S.draft;
     if(!d||!isOpini(d))return;
     if(!document.getElementById("fJudul"))return;
+    var rb=document.getElementById("fRubrik");
+    if(rb){
+      var mau=_opiRubrik(),ada=false;
+      for(var i=0;i<rb.options.length;i++){if(rb.options[i].value===mau)ada=true}
+      if(!ada){var op=document.createElement("option");op.value=mau;op.text=mau;rb.insertBefore(op,rb.firstChild)}
+      if(d.rubrik!==rb.value&&d.rubrik===mau)rb.value=mau;
+    }
+    [].slice.call(document.querySelectorAll("p")).forEach(function(pp){
+      if((pp.textContent||"").trim()==="Empat bagian wajib: potongan, konteks, pelajaran, rujukan.")
+        pp.textContent="Tulisan sendiri: judul, ringkasan satu baris, dan isi tulisan. Tetap melewati tinjauan admin sebelum terbit.";
+    });
     _opiSembunyi("fTautan");_opiSembunyi("fMedia");_opiSembunyi("fPot");_opiSembunyi("fVonis");
     _opiLabel("fJudul",'Judul Buah Pikir <span class="hint">satu gagasan, bukan judul berita</span>',true);
     _opiLabel("fLead",'Ringkasan satu baris <span class="hint">inti pendapatmu dalam satu kalimat</span>',true);
