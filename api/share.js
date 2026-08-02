@@ -39,7 +39,7 @@ function potong(s,n){s=String(s==null?'':s).replace(/\s+/g,' ').trim();return s.
 const GAYA='*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#2C2C2B;background:#fff;line-height:1.65}'+
 '.w{max-width:720px;margin:0 auto;padding:28px 22px 60px}'+
 'header.t{border-bottom:1px solid #E6E5E3;background:#F9F8F7}header.t .w{padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}'+
-'header.t .bm{display:flex;align-items:center;gap:10px;text-decoration:none;color:#2C2C2B}header.t .bm img{width:42px;height:42px;border-radius:50%;flex:none}header.t .bm b{display:block;font-size:15px;font-weight:800;letter-spacing:.05em;line-height:1.2}header.t .bm i{display:block;font-size:12px;color:#7D7A75;font-style:italic;font-family:Georgia,serif}'+
+'header.t .bm{display:flex;align-items:center;gap:10px;text-decoration:none;color:#2C2C2B}header.t .bm img{width:auto;height:46px;flex:none;background:none;object-fit:contain}header.t .bm b{display:block;font-size:15px;font-weight:800;letter-spacing:.05em;line-height:1.2}header.t .bm i{display:block;font-size:12px;color:#7D7A75;font-style:italic;font-family:Georgia,serif}'+
 'a{color:#2783DE}h1{font-size:29px;line-height:1.3;margin:14px 0 10px}h2{font-size:19px;margin:32px 0 10px}'+
 '.lead{font-size:18px;color:#4a4845;margin:0 0 20px}'+
 '.meta{font-size:13.5px;color:#7D7A75;border-bottom:1px solid #E6E5E3;padding-bottom:16px;margin-bottom:22px}'+
@@ -178,7 +178,7 @@ module.exports = async function (req, res) {
     '<meta name="twitter:image" content="'+esc(img)+'" />'+
     '<script type="application/ld+json">'+JSON.stringify(ld).replace(/</g,'\\u003c')+'<\/script>'+
     '<style>'+GAYA+'</style></head><body>'+
-    '<header class="t"><div class="w"><a class="bm" href="'+esc(SITE)+'">'+'<img src="'+esc(SITE)+'/icon-192.png" alt="Logo REICHAS CHELEBES" width="42" height="42" />'+'<span><b>KLIPING RCS.CBS</b><i>Propaganda literasi</i></span></a>'+
+    '<header class="t"><div class="w"><a class="bm" href="'+esc(SITE)+'">'+'<img src="'+esc(SITE)+'/logo.png" alt="Logo REICHAS CHELEBES" width="38" height="46" />'+'<span><b>KLIPING RCS.CBS</b><i>Baca. Pahami. Bagikan.</i></span></a>'+
     '<a href="'+esc(SITE)+'/#materi" style="font-size:14px">Materi belajar</a></div></header>'+
     '<div class="w"><article><h1>'+esc(k.judul)+'</h1>'+
     (k.lead?'<p class="lead">'+esc(k.lead)+'</p>':'')+
