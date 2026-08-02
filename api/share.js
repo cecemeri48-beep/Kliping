@@ -61,6 +61,7 @@ function halamanKosong(res,id){
   res.status(404).send('<!doctype html><html lang="id"><head><meta charset="utf-8" />'+
    '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />'+
    '<title>Kliping tidak ditemukan \u2014 Kliping RCS.CBS</title>'+
+   '<meta name="google-site-verification" content="qNMqPYjzdndI4etjWI23Ee0iSSSOpDBrJYeOiaABXyk" />'+
    '<meta name="robots" content="noindex" /><style>'+GAYA+'</style></head><body><div class="w">'+
    '<h1>Kliping ini tidak ditemukan</h1>'+
    '<p class="lead">Mungkin sudah dicabut, masih dalam peninjauan, atau tautannya keliru.</p>'+
@@ -158,6 +159,7 @@ module.exports = async function (req, res) {
     '<meta name="description" content="'+esc(desc)+'" />'+
     '<link rel="canonical" href="'+esc(kanonik)+'" />'+
     '<link rel="icon" href="/icon-192.png" />'+
+    '<meta name="google-site-verification" content="qNMqPYjzdndI4etjWI23Ee0iSSSOpDBrJYeOiaABXyk" />'+
     '<link rel="alternate" type="application/rss+xml" title="Kliping RCS.CBS" href="/rss.xml" />'+
     '<meta name="robots" content="index,follow,max-image-preview:large" />'+
     '<meta property="og:type" content="article" />'+
