@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Kliping REICHAS — Galeri Literasi & Cek Fakta</title>
+<title>Kliping RCS.CBS — Propaganda Literasi &amp; Cek Fakta</title>
 <meta name="description" content="Membaca hari ini, melek fakta selamanya. Galeri kliping literasi & cek fakta REICHAS — baca, telaah, dan bagikan." />
 <link rel="canonical" href="https://kliping-reichas.my.id/" />
-<link rel="alternate" type="application/rss+xml" title="Kliping REICHAS" href="/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="Kliping RCS.CBS" href="/rss.xml" />
 <!-- Open Graph (WhatsApp / Facebook) -->
 <meta property="og:type" content="website" />
-<meta property="og:site_name" content="Kliping REICHAS" />
+<meta property="og:site_name" content="Kliping RCS.CBS" />
 <meta property="og:title" content="Membaca Hari Ini, Melek Fakta Selamanya" />
 <meta property="og:description" content="Galeri kliping literasi & cek fakta REICHAS — baca, telaah, dan bagikan." />
 <meta property="og:url" content="https://kliping-reichas.my.id/" />
@@ -18,7 +18,7 @@
 <meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Kliping REICHAS — propaganda literasi & membaca" />
+<meta property="og:image:alt" content="Kliping RCS.CBS — propaganda literasi & membaca" />
 <meta property="og:locale" content="id_ID" />
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image" />
@@ -770,7 +770,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
 <body>
 <noscript>
 <div style="max-width:720px;margin:0 auto;padding:32px 20px;font-family:system-ui,sans-serif;color:#2C2C2B;line-height:1.6">
-<h1 style="font-size:26px;margin:0 0 6px">Kliping REICHAS</h1>
+<h1 style="font-size:26px;margin:0 0 6px">Kliping RCS.CBS</h1>
 <p style="color:#7D7A75;margin:0 0 18px">Menggunting berita, menanam pengetahuan.</p>
 <p>Meja kliping bersama pencinta alam Sulawesi. Setiap berita digunting, diberi konteks, lalu diringkas menjadi tiga poin pelajaran yang bisa dipakai di lapangan: bedah insiden, cek fakta, baca regulasi, baca cuaca, kamus lapangan, terjemahan ilmu, dan telaah perlengkapan.</p>
 <p><b>Situs ini membutuhkan JavaScript</b> untuk menampilkan isi kliping. Aktifkan JavaScript di peramban, lalu muat ulang halaman ini.</p>
@@ -795,7 +795,7 @@ const KEY = "kliping-reichas-v2";
 
 /* ================= seed ================= */
 function seed(){return{
- settings:{nama:"Kliping REICHAS",tagline:"Menggunting berita, menanam pengetahuan",wajibTinjauan:true,sinyalTipis:false,penyangkalan:"Materi bersifat edukatif dan bukan pengganti pelatihan langsung serta penilaian di lapangan."},
+ settings:{nama:"Kliping RCS.CBS",tagline:"Menggunting berita, menanam pengetahuan",wajibTinjauan:true,sinyalTipis:false,penyangkalan:"Materi bersifat edukatif dan bukan pengganti pelatihan langsung serta penilaian di lapangan."},
  rubrik:["Bedah Insiden","Cek Fakta","Baca Regulasi","Kamus Lapangan","Terjemahan Ilmu","Baca Cuaca","Lemari Gear","Rubrik Sampah"],
  sensitif:["Bedah Insiden","Cek Fakta"],
  media:["Antara","Kompas","Tribun Timur","Detik","BMKG","Basarnas","KLHK","Outside","Alpinist"],
@@ -859,7 +859,7 @@ async function fetchAll(){
     sensitif:(rr.data||[]).filter(r=>r.sensitif).map(r=>r.nama),
     media:(rmd.data||[]).map(r=>r.nama),
     pedoman:(rp.data&&rp.data.isi)||"",
-    settings:(rs.data&&rs.data.data)||{nama:"Kliping REICHAS",tagline:"Menggunting berita, menanam pengetahuan",wajibTinjauan:true,sinyalTipis:false,penyangkalan:""},
+    settings:(rs.data&&rs.data.data)||{nama:"Kliping RCS.CBS",tagline:"Menggunting berita, menanam pengetahuan",wajibTinjauan:true,sinyalTipis:false,penyangkalan:""},
     pengguna:(rpr.data||[]),
     audit:(ra.data||[]).map(a=>({ts:a.ts,user:a.aktor,aksi:a.aksi,obj:a.obj}))
   };
@@ -960,7 +960,7 @@ function _tampilBanner(){
   var d=document.createElement("div");
   d.className="pasang-bar";d.id="pasangBar";d.setAttribute("role","dialog");d.setAttribute("aria-label","Pasang aplikasi");
   d.innerHTML='<img src="'+LOGO+'" alt="" />'
-    +'<div class="pasang-tx"><b>Simpan Kliping REICHAS</b><small>Buka dari layar utama, tetap terbaca saat sinyal tipis.</small></div>'
+    +'<div class="pasang-tx"><b>Simpan Kliping RCS.CBS</b><small>Buka dari layar utama, tetap terbaca saat sinyal tipis.</small></div>'
     +'<button class="pb pb-no" type="button" onclick="_tundaInstal()">Nanti</button>'
     +'<button class="pb pb-ya" type="button" onclick="instalApp()">Pasang</button>';
   document.body.appendChild(d);
@@ -968,7 +968,7 @@ function _tampilBanner(){
 setTimeout(_tampilBanner,2500);
 if(_mandiri())_tandaiPasang(true);
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();_bip=e;_terinstal=false;_tandaiPasang(false);_segarkanInstal()});
-window.addEventListener("appinstalled",function(){_bip=null;_terinstal=true;_tandaiPasang(true);_tutupBanner();_segarkanInstal();toast("Kliping REICHAS tersimpan di HP kamu")});
+window.addEventListener("appinstalled",function(){_bip=null;_terinstal=true;_tandaiPasang(true);_tutupBanner();_segarkanInstal();toast("Kliping RCS.CBS tersimpan di HP kamu")});
 function instalApp(){
   if(_bip){var p=_bip;_bip=null;try{p.prompt()}catch(e){_bip=p;openModal("instal");return}
     if(p.userChoice&&p.userChoice.then){p.userChoice.then(function(r){if(!r||r.outcome!=="accepted")_bip=p;_segarkanInstal()},function(){_bip=p;_segarkanInstal()})}
@@ -988,15 +988,15 @@ var PANDUAN={
 };
 function mInstal(){
   var k=_peramban(),p=PANDUAN[k]||PANDUAN["desktop"];
-  return mHead("Simpan di layar utama","Kliping REICHAS bisa dipasang seperti aplikasi biasa: tanpa toko aplikasi, ringan, dan kliping yang sudah dibuka tetap bisa dibaca saat sinyal hilang.")+
+  return mHead("Simpan di layar utama","Kliping RCS.CBS bisa dipasang seperti aplikasi biasa: tanpa toko aplikasi, ringan, dan kliping yang sudah dibuka tetap bisa dibaca saat sinyal hilang.")+
    '<div class="note" style="margin-bottom:14px"><b>'+esc(p[0])+'</b><ol style="margin:10px 0 0 18px;padding:0;line-height:1.75">'+p[1]+'</ol></div>'+
    (p[2]?'<div class="note o" style="margin-bottom:14px">'+esc(p[2])+'</div>':'')+
    '<div class="end"><button class="btn btn-p" onclick="closeModal()">Mengerti</button></div>';
 }
 var PANDUAN_LEPAS={
- "ios":["iPhone / iPad",'<li>Cari ikon <b>Kliping REICHAS</b> di layar utama.</li><li>Tekan lama ikonnya sampai muncul menu.</li><li>Pilih <b>Hapus Bookmark</b> atau <b>Hapus Aplikasi</b>, lalu konfirmasi.</li>',"Tidak ada data yang hilang &mdash; kliping tersimpan di server. Situsnya tetap bisa dibuka lewat Safari."],
- "android":["Android",'<li>Tekan lama ikon <b>Kliping REICHAS</b> di layar utama atau laci aplikasi.</li><li>Pilih <b>Copot pemasangan</b> (Uninstall), atau seret ke <b>Hapus</b>.</li><li>Konfirmasi.</li>',"Bisa juga lewat Setelan &rsaquo; Aplikasi &rsaquo; Kliping REICHAS &rsaquo; Copot pemasangan."],
- "desktop":["Di komputer",'<li>Buka Kliping REICHAS dari jendela aplikasinya.</li><li>Klik menu <b>tiga titik</b> di pojok kanan atas jendela itu.</li><li>Pilih <b>Copot pemasangan Kliping REICHAS</b> (Uninstall).</li>',"Alternatif: buka chrome://apps, klik kanan ikonnya, lalu pilih Hapus dari Chrome."]
+ "ios":["iPhone / iPad",'<li>Cari ikon <b>Kliping RCS.CBS</b> di layar utama.</li><li>Tekan lama ikonnya sampai muncul menu.</li><li>Pilih <b>Hapus Bookmark</b> atau <b>Hapus Aplikasi</b>, lalu konfirmasi.</li>',"Tidak ada data yang hilang &mdash; kliping tersimpan di server. Situsnya tetap bisa dibuka lewat Safari."],
+ "android":["Android",'<li>Tekan lama ikon <b>Kliping RCS.CBS</b> di layar utama atau laci aplikasi.</li><li>Pilih <b>Copot pemasangan</b> (Uninstall), atau seret ke <b>Hapus</b>.</li><li>Konfirmasi.</li>',"Bisa juga lewat Setelan &rsaquo; Aplikasi &rsaquo; Kliping RCS.CBS &rsaquo; Copot pemasangan."],
+ "desktop":["Di komputer",'<li>Buka Kliping RCS.CBS dari jendela aplikasinya.</li><li>Klik menu <b>tiga titik</b> di pojok kanan atas jendela itu.</li><li>Pilih <b>Copot pemasangan Kliping RCS.CBS</b> (Uninstall).</li>',"Alternatif: buka chrome://apps, klik kanan ikonnya, lalu pilih Hapus dari Chrome."]
 };
 function _grupLepas(){var k=_peramban();if(k.indexOf("ios")===0)return "ios";if(k==="desktop"||k==="edge")return "desktop";return "android"}
 function sudahLepas(){_tandaiPasang(false);_terinstal=false;closeModal();render();toast("Oke, tombol pasang muncul lagi")}
@@ -1071,7 +1071,7 @@ function viewBoard(){
   const list=terbit().filter(k=>(S.filter==="Semua"||k.rubrik===S.filter)&&_match(k)).sort((a,b)=>b.tglKliping.localeCompare(a.tglKliping));
   const chips=["Semua"].concat(db.rubrik.filter(r=>terbit().some(k=>k.rubrik===r))).map(r=>'<button class="chip '+(S.filter===r?"on":"")+'" onclick=\'go({filter:"'+r+'"})\'>'+r+"</button>").join("");
   const cards=list.map(k=>'<article class="clip">'+(isImg(k.gambar)?'<img src="'+esc(k.gambar)+'" alt="" style="width:100%;height:150px;object-fit:cover;border-radius:10px;margin-bottom:12px" />':"")+'<span class="tag tag-b">'+esc(k.rubrik)+'</span>'+vonisTag(k)+'<h3>'+esc(k.judul)+'</h3><p class="lead">'+esc(k.lead)+'</p><div class="src"><span>'+esc(k.media)+'</span><span>'+tglID(k.tglBerita)+'</span></div><button class="btn btn-sm open" onclick=\'go({pv:{n:"clip",id:"'+k.id+'"}})\'>Buka kliping ↗</button></article>').join("");
-  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping REICHAS — menggunting berita, menanam pengetahuan"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p></div></div></section>'+litBanner()+'<div class="wrap"><div class="cari-row"><input id="cari" class="cari-inp" type="search" placeholder="🔎 Cari judul, media, wilayah, atau isi…" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" /></div><div class="filters" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0 22px;margin:0">'+chips+'</div><div class="board">'+(cards||'<p class="empty">Tidak ada kliping yang cocok dengan pencarian/filter ini.</p>')+"</div></div>"+foot();
+  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS — menggunting berita, menanam pengetahuan"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p></div></div></section>'+litBanner()+'<div class="wrap"><div class="cari-row"><input id="cari" class="cari-inp" type="search" placeholder="🔎 Cari judul, media, wilayah, atau isi…" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" /></div><div class="filters" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0 22px;margin:0">'+chips+'</div><div class="board">'+(cards||'<p class="empty">Tidak ada kliping yang cocok dengan pencarian/filter ini.</p>')+"</div></div>"+foot();
 }
 var TTS={id:null,on:false,paused:false};
 function ttsText(k){var p=[k.judul+".",k.lead+".","Potongan berita. "+k.potongan,"Konteks. "+k.konteks,"Pelajaran."];k.pelajaran.forEach(function(x,i){if(x&&x.trim())p.push((i+1)+". "+x)});return p.join(" ")}
@@ -1164,7 +1164,7 @@ function viewPedomanPublik(){
    '<div class="note r">Menemukan kekeliruan atau ingin materinya dicabut? Sampaikan kepada Divisi Komunikasi dan Publikasi REICHAS CHELEBES. Kami menanggapi dalam tiga hari kalender.</div></div>'+foot();
 }
 function foot(){
-  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping REICHAS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · REICHAS CHELEBES, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
+  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · REICHAS CHELEBES, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
 }
 function tipis(){db.settings.sinyalTipis=!db.settings.sinyalTipis;save();render();toast(db.settings.sinyalTipis?"Mode sinyal tipis aktif":"Mode sinyal tipis nonaktif")}
 
@@ -1701,7 +1701,7 @@ function viewBoard(){
   '</div>';
   var hasil='<p class="hasil">Menampilkan <b>'+list.length+'</b> dari '+terbit().length+' kliping'+(S.topik?' \u00b7 topik <b>#'+esc(S.topik)+'</b>':'')+(S.q?' \u00b7 kata kunci \u201c'+esc(S.q)+'\u201d':'')+'</p>';
   var polos=!S.q&&!S.topik&&(!S.filter||S.filter==="Semua");
-  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping REICHAS"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p></div></div></section>'+
+  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p></div></div></section>'+
     litBanner()+
     '<div class="wrap">'+statStrip()+(polos?sorotanBox():"")+alat+
     '<div class="filters rubrik-row">'+chips+'</div>'+trow+hasil+
@@ -2395,7 +2395,7 @@ function _ldArtikel(){
     if(S.mode!=="public"||!S.pv||S.pv.n!=="clip")return;
     var k=_kKlip(S.pv.id);
     if(!k||k.status!=="Terbit")return;
-    var situs=(db.settings&&db.settings.nama)||"Kliping REICHAS";
+    var situs=(db.settings&&db.settings.nama)||"Kliping RCS.CBS";
     var url="https://kliping-reichas.my.id/klip/"+k.id;
     var d={
       "@context":"https://schema.org",
@@ -2563,10 +2563,10 @@ function viewTentang(){
   var jml=(typeof terbit==="function"?terbit().length:0);
   var rub=(db&&db.rubrik&&db.rubrik.length)||0;
   var mat=(db&&db.materi&&db.materi.length)||0;
-  return hkmHead("Tentang Kliping REICHAS",esc(s.tagline||"Menggunting berita, menanam pengetahuan."))+
+  return hkmHead("Tentang Kliping RCS.CBS",esc(s.tagline||"Menggunting berita, menanam pengetahuan."))+
    hkmNav("tentang")+
    '<div class="sec"><h4>Apa ini</h4>'+
-   "<p>Kliping REICHAS adalah ruang baca yang dikelola "+esc(c.org)+", organisasi pencinta alam dan penggiat kegiatan luar ruang di "+esc(c.alamat)+". Kami menggunting pemberitaan tentang kecelakaan pendakian, cuaca ekstrem, regulasi kawasan, dan praktik kegiatan alam bebas, lalu membacanya ulang sebagai bahan belajar.</p>"+
+   "<p>Kliping RCS.CBS adalah ruang baca yang dikelola "+esc(c.org)+", organisasi pencinta alam dan penggiat kegiatan luar ruang di "+esc(c.alamat)+". Kami menggunting pemberitaan tentang kecelakaan pendakian, cuaca ekstrem, regulasi kawasan, dan praktik kegiatan alam bebas, lalu membacanya ulang sebagai bahan belajar.</p>"+
    "<p>Yang kami kerjakan bukan jurnalisme. Kami tidak turun ke lapangan, tidak mewawancarai narasumber, dan tidak memproduksi berita sendiri. Kami membaca apa yang sudah diterbitkan media lain, mengutip secukupnya, lalu menambahkan konteks dan pelajaran yang bisa dipakai anggota di lapangan. Itu sebabnya setiap kliping selalu mencantumkan nama media dan tautan ke sumber aslinya.</p></div>"+
    '<div class="sec"><h4>Kenapa dikerjakan</h4>'+
    "<p>Berita kecelakaan di gunung datang dan pergi dalam hitungan hari. Padahal di dalamnya hampir selalu ada pola yang berulang: berangkat terlalu siang, membaca cuaca dengan harapan, meremehkan jalur turun, membawa perlengkapan yang salah. Kalau potongan-potongan itu dibiarkan hanyut di lini masa, pelajarannya ikut hilang. Kami menjilidnya supaya bisa dibaca lagi tahun depan.</p>"+
@@ -2577,7 +2577,7 @@ function viewTentang(){
    '<div class="sec"><h4>Siapa yang mengelola</h4>'+
    "<p>Portal ini dijalankan Divisi Komunikasi dan Publikasi bersama Divisi Pendidikan dan Edukasi "+esc(c.org)+". Kliping ditulis kurator dari berbagai divisi, ditinjau pengelola, dan disunting bersama.</p></div>"+
    '<div class="note o">'+esc(s.penyangkalan||"Semua materi di sini bersifat edukatif dan bukan pengganti pelatihan langsung.")+"</div>"+
-   '<div class="note">Urusan isi kliping \u2014 koreksi, keberatan, atau usul bahan \u2014 kirim ke <a href="'+hkmSurel("Pertanyaan tentang isi kliping","redaksi")+'">'+esc(hkmSurelRedaksi())+'</a>. Urusan organisasi dan kerja sama ke <a href="'+hkmSurel("Pertanyaan tentang Kliping REICHAS")+'">'+esc(c.email)+'</a>.</div>'+
+   '<div class="note">Urusan isi kliping \u2014 koreksi, keberatan, atau usul bahan \u2014 kirim ke <a href="'+hkmSurel("Pertanyaan tentang isi kliping","redaksi")+'">'+esc(hkmSurelRedaksi())+'</a>. Urusan organisasi dan kerja sama ke <a href="'+hkmSurel("Pertanyaan tentang Kliping RCS.CBS")+'">'+esc(c.email)+'</a>.</div>'+
    "</div>"+foot();
 }
 
@@ -2615,7 +2615,7 @@ function viewPrivasi(){
    "<p>Kami tidak pernah meminta data pribadi dari pembaca berusia berapa pun. Tidak ada pendaftaran, tidak ada formulir, dan tidak ada kolom nama atau umur \u2014 jadi data anak di bawah 13 tahun tidak mungkin sampai ke kami, baik disengaja maupun tidak. Satu-satunya akun di sini adalah akun pengelola, yang dibuatkan untuk anggota dewasa.</p>"+
    '<p>Kalau kamu orang tua atau wali dan tetap menemukan data anakmu tersimpan di sini, kabari kami di <a href="'+hkmSurel("Data anak di bawah umur")+'">'+esc(c.email)+'</a> dan akan segera kami hapus.</p></div>'+
    '<div class="sec"><h4>Perubahan kebijakan</h4><p>Kalau ada perubahan, tanggal berlaku di atas akan diperbarui. Perubahan yang menyangkut data pembaca akan kami sebutkan terang-terangan, bukan diselipkan diam-diam.</p></div>'+
-   '<div class="note">Pertanyaan soal privasi? <a href="'+hkmSurel("Pertanyaan privasi Kliping REICHAS")+'">'+esc(c.email)+'</a></div>'+
+   '<div class="note">Pertanyaan soal privasi? <a href="'+hkmSurel("Pertanyaan privasi Kliping RCS.CBS")+'">'+esc(c.email)+'</a></div>'+
    "</div>"+foot();
 }
 
@@ -2623,8 +2623,8 @@ function viewPrivasi(){
 function viewKontak(){
   var c=hkmKontak();
   var baris=[];
-  if(c.email2)baris.push(["\uD83D\uDCF0","Surel redaksi kliping",'<a href="'+hkmSurel("Halo redaksi Kliping REICHAS","redaksi")+'">'+esc(c.email2)+"</a>","Untuk isi kliping: keberatan media, ralat fakta, dan usul bahan."]);
-  baris.push(["\u2709\uFE0F","Surel organisasi",'<a href="'+hkmSurel("Halo Kliping REICHAS")+'">'+esc(c.email)+"</a>",c.email2?"Untuk urusan di luar isi kliping: kerja sama, sponsor, kelembagaan.":"Jalur utama. Paling cepat dibalas."]);
+  if(c.email2)baris.push(["\uD83D\uDCF0","Surel redaksi kliping",'<a href="'+hkmSurel("Halo redaksi Kliping RCS.CBS","redaksi")+'">'+esc(c.email2)+"</a>","Untuk isi kliping: keberatan media, ralat fakta, dan usul bahan."]);
+  baris.push(["\u2709\uFE0F","Surel organisasi",'<a href="'+hkmSurel("Halo Kliping RCS.CBS")+'">'+esc(c.email)+"</a>",c.email2?"Untuk urusan di luar isi kliping: kerja sama, sponsor, kelembagaan.":"Jalur utama. Paling cepat dibalas."]);
   baris.push(["\uD83D\uDCCD","Sekretariat",esc(c.alamat),"Kunjungan sebaiknya membuat janji lebih dulu lewat surel."]);
   if(c.wa)baris.splice(1,0,["\uD83D\uDCAC","WhatsApp",esc(c.wa),"Untuk hal yang mendesak."]);
   var alasan=[
@@ -2710,7 +2710,7 @@ function kontakSimpan(){
   var _f=foot;
   foot=function(){
     var h=_f.apply(this,arguments);
-    var t='<div class="foot-hkm"><a onclick=\'go({pv:{n:"tentang"}})\'>Tentang</a><a onclick=\'go({pv:{n:"privasi"}})\'>Kebijakan Privasi</a><a onclick=\'go({pv:{n:"kontak"}})\'>Kontak</a><a href="'+hkmSurel("Halo Kliping REICHAS","redaksi")+'">'+esc(hkmSurelRedaksi())+"</a></div>";
+    var t='<div class="foot-hkm"><a onclick=\'go({pv:{n:"tentang"}})\'>Tentang</a><a onclick=\'go({pv:{n:"privasi"}})\'>Kebijakan Privasi</a><a onclick=\'go({pv:{n:"kontak"}})\'>Kontak</a><a href="'+hkmSurel("Halo Kliping RCS.CBS","redaksi")+'">'+esc(hkmSurelRedaksi())+"</a></div>";
     return h.replace("</div></footer>",t+"</div></footer>");
   };
 })();

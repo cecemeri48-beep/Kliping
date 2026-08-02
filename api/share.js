@@ -39,6 +39,7 @@ function potong(s,n){s=String(s==null?'':s).replace(/\s+/g,' ').trim();return s.
 const GAYA='*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#2C2C2B;background:#fff;line-height:1.65}'+
 '.w{max-width:720px;margin:0 auto;padding:28px 22px 60px}'+
 'header.t{border-bottom:1px solid #E6E5E3;background:#F9F8F7}header.t .w{padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}'+
+'header.t .bm{display:flex;align-items:center;gap:10px;text-decoration:none;color:#2C2C2B}header.t .bm img{width:42px;height:42px;border-radius:50%;flex:none}header.t .bm b{display:block;font-size:15px;font-weight:800;letter-spacing:.05em;line-height:1.2}header.t .bm i{display:block;font-size:12px;color:#7D7A75;font-style:italic;font-family:Georgia,serif}'+
 'a{color:#2783DE}h1{font-size:29px;line-height:1.3;margin:14px 0 10px}h2{font-size:19px;margin:32px 0 10px}'+
 '.lead{font-size:18px;color:#4a4845;margin:0 0 20px}'+
 '.meta{font-size:13.5px;color:#7D7A75;border-bottom:1px solid #E6E5E3;padding-bottom:16px;margin-bottom:22px}'+
@@ -59,11 +60,11 @@ function halamanKosong(res,id){
   res.setHeader('Cache-Control','public, max-age=60, s-maxage=120');
   res.status(404).send('<!doctype html><html lang="id"><head><meta charset="utf-8" />'+
    '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />'+
-   '<title>Kliping tidak ditemukan \u2014 Kliping REICHAS</title>'+
+   '<title>Kliping tidak ditemukan \u2014 Kliping RCS.CBS</title>'+
    '<meta name="robots" content="noindex" /><style>'+GAYA+'</style></head><body><div class="w">'+
    '<h1>Kliping ini tidak ditemukan</h1>'+
    '<p class="lead">Mungkin sudah dicabut, masih dalam peninjauan, atau tautannya keliru.</p>'+
-   '<p><a class="cta" href="'+esc(SITE)+'">Buka Kliping REICHAS</a></p>'+
+   '<p><a class="cta" href="'+esc(SITE)+'">Buka Kliping RCS.CBS</a></p>'+
    '<p style="margin-top:18px"><a href="'+esc(go)+'">Coba buka lewat aplikasi</a></p>'+
    '</div></body></html>');
 }
@@ -119,7 +120,7 @@ module.exports = async function (req, res) {
     dateModified: k.tglKliping || undefined,
     mainEntityOfPage:{'@type':'WebPage','@id':kanonik},
     author: kurator?{'@type':'Person',name:kurator}:{'@type':'Organization',name:'REICHAS CHELEBES'},
-    publisher:{'@type':'Organization',name:'Kliping REICHAS',logo:{'@type':'ImageObject',url:SITE+'/icon-512.png'}},
+    publisher:{'@type':'Organization',name:'Kliping RCS.CBS',logo:{'@type':'ImageObject',url:SITE+'/icon-512.png'}},
     articleSection: k.rubrik || undefined,
     keywords: topik.length?topik.join(', '):undefined,
     isBasedOn: k.tautan || undefined,
@@ -131,7 +132,7 @@ module.exports = async function (req, res) {
      (k.rubrik?'<span class="tag">'+esc(k.rubrik)+'</span>':'')+
      topik.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('')+
      '<div style="margin-top:8px">Digunting '+esc(tglID(k.tglKliping))+
-     ' oleh '+esc(kurator||'Redaksi Kliping REICHAS')+
+     ' oleh '+esc(kurator||'Redaksi Kliping RCS.CBS')+
      (peninjau?' \u00b7 ditinjau '+esc(peninjau):'')+
      (lokasi.length?' \u00b7 '+esc(lokasi.join(', ')):'')+
      (k.wilayah?' \u00b7 '+esc(k.wilayah):'')+'</div></div>'+
@@ -145,7 +146,7 @@ module.exports = async function (req, res) {
    (pelajaran.length?'<h2>Pelajaran yang bisa dibawa</h2><ul>'+pelajaran.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'')+
    (k.vonis?'<h2>Vonis</h2><p>'+esc(k.vonis)+'</p>':'')+
    (k.catatan?'<p style="font-size:14px;color:#7D7A75">'+esc(k.catatan)+'</p>':'')+
-   '<div class="box"><b>Catatan kurasi</b><br />Konteks dan pelajaran di atas ditulis oleh pengelola Kliping REICHAS. Kutipan berita dipakai secukupnya untuk keperluan pendidikan, dan hak ciptanya tetap milik '+esc(k.media||'penerbit asli')+'. Keberatan atas kutipan ini bisa dikirim ke <a href="mailto:'+esc(SUREL_REDAKSI)+'">'+esc(SUREL_REDAKSI)+'</a>.</div>'+
+   '<div class="box"><b>Catatan kurasi</b><br />Konteks dan pelajaran di atas ditulis oleh pengelola Kliping RCS.CBS. Kutipan berita dipakai secukupnya untuk keperluan pendidikan, dan hak ciptanya tetap milik '+esc(k.media||'penerbit asli')+'. Keberatan atas kutipan ini bisa dikirim ke <a href="mailto:'+esc(SUREL_REDAKSI)+'">'+esc(SUREL_REDAKSI)+'</a>.</div>'+
    '<p style="margin-top:24px"><a class="cta" href="'+esc(buka)+'">Buka di portal \u2014 lengkap dengan narator, rak baca, dan kliping serupa</a></p>';
 
   res.setHeader('Content-Type','text/html; charset=utf-8');
@@ -153,14 +154,14 @@ module.exports = async function (req, res) {
   res.status(200).send(
     '<!doctype html><html lang="id"><head><meta charset="utf-8" />'+
     '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />'+
-    '<title>'+esc(potong(k.judul,70))+' \u2014 Kliping REICHAS</title>'+
+    '<title>'+esc(potong(k.judul,70))+' \u2014 Kliping RCS.CBS</title>'+
     '<meta name="description" content="'+esc(desc)+'" />'+
     '<link rel="canonical" href="'+esc(kanonik)+'" />'+
     '<link rel="icon" href="/icon-192.png" />'+
-    '<link rel="alternate" type="application/rss+xml" title="Kliping REICHAS" href="/rss.xml" />'+
+    '<link rel="alternate" type="application/rss+xml" title="Kliping RCS.CBS" href="/rss.xml" />'+
     '<meta name="robots" content="index,follow,max-image-preview:large" />'+
     '<meta property="og:type" content="article" />'+
-    '<meta property="og:site_name" content="Kliping REICHAS" />'+
+    '<meta property="og:site_name" content="Kliping RCS.CBS" />'+
     '<meta property="og:title" content="'+esc(k.judul)+'" />'+
     '<meta property="og:description" content="'+esc(desc)+'" />'+
     '<meta property="og:image" content="'+esc(img)+'" />'+
@@ -177,7 +178,7 @@ module.exports = async function (req, res) {
     '<meta name="twitter:image" content="'+esc(img)+'" />'+
     '<script type="application/ld+json">'+JSON.stringify(ld).replace(/</g,'\\u003c')+'<\/script>'+
     '<style>'+GAYA+'</style></head><body>'+
-    '<header class="t"><div class="w"><a href="'+esc(SITE)+'" style="font-weight:800;color:#2C2C2B;text-decoration:none">Kliping REICHAS</a>'+
+    '<header class="t"><div class="w"><a class="bm" href="'+esc(SITE)+'">'+'<img src="'+esc(SITE)+'/icon-192.png" alt="Logo REICHAS CHELEBES" width="42" height="42" />'+'<span><b>KLIPING RCS.CBS</b><i>Propaganda literasi</i></span></a>'+
     '<a href="'+esc(SITE)+'/#materi" style="font-size:14px">Materi belajar</a></div></header>'+
     '<div class="w"><article><h1>'+esc(k.judul)+'</h1>'+
     (k.lead?'<p class="lead">'+esc(k.lead)+'</p>':'')+

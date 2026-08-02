@@ -124,13 +124,13 @@ async function rss(res){
   const now=new Date().toUTCString();
   let x='<?xml version="1.0" encoding="UTF-8"?>\n'+
    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">\n<channel>\n'+
-   '<title>Kliping REICHAS</title>\n'+
+   '<title>Kliping RCS.CBS</title>\n'+
    '<link>'+esc(SITE)+'</link>\n'+
-   '<description>Menggunting berita, menanam pengetahuan. Kliping dan telaah kegiatan alam bebas dari REICHAS CHELEBES, Makassar.</description>\n'+
+   '<description>Propaganda literasi. Kliping dan telaah kegiatan alam bebas dari REICHAS CHELEBES, Makassar.</description>\n'+
    '<language>id-ID</language>\n'+
    '<lastBuildDate>'+now+'</lastBuildDate>\n'+
-   '<generator>Kliping REICHAS</generator>\n'+
-   '<image><url>'+esc(SITE+'/icon-512.png')+'</url><title>Kliping REICHAS</title><link>'+esc(SITE)+'</link></image>\n'+
+   '<generator>Kliping RCS.CBS</generator>\n'+
+   '<image><url>'+esc(SITE+'/icon-512.png')+'</url><title>Kliping RCS.CBS</title><link>'+esc(SITE)+'</link></image>\n'+
    '<atom:link href="'+esc(SITE+'/rss.xml')+'" rel="self" type="application/rss+xml" />\n';
   kl.forEach(function(k){
     const tautan=SITE+'/klip/'+encodeURIComponent(ambilNilai(k,'id'));
