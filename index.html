@@ -841,7 +841,7 @@ function seed(){return{
 /* ================= state ================= */
 let db, S;
 /* ================= data layer (Supabase) ================= */
-function fromKliping(r){return {id:r.id,judul:r.judul,lead:r.lead,rubrik:r.rubrik,media:r.media,tautan:r.tautan,tglBerita:r.tgl_berita,tglKliping:r.tgl_kliping,wilayah:r.wilayah,lokasi:r.lokasi||[],topik:r.topik||[],potongan:r.potongan,konteks:r.konteks,pelajaran:r.pelajaran||[],materi:r.materi||[],status:r.status,kurator:r.kurator,peninjau:r.peninjau||"",kepekaan:r.kepekaan,gambar:r.gambar,gbrKet:r.keterangan_gambar||"",vonis:r.vonis||"",catatan:r.catatan||""};}
+function fromKliping(r){return {id:r.id,judul:r.judul,lead:r.lead,rubrik:r.rubrik,media:r.media,tautan:r.tautan,tglBerita:r.tgl_berita,tglKliping:r.tgl_kliping,wilayah:r.wilayah,lokasi:r.lokasi||[],topik:r.topik||[],potongan:r.potongan,konteks:r.konteks,pelajaran:r.pelajaran||[],materi:r.materi||[],status:r.status,kurator:r.kurator,peninjau:r.peninjau||"",kepekaan:r.kepekaan,gambar:r.gambar,gbrKet:r.keterangan_gambar||"",vonis:r.vonis||"",catatan:r.catatan||"",jenis:r.jenis||"kliping"};}
 function toKliping(d){return {id:d.id,judul:d.judul,lead:d.lead,rubrik:d.rubrik,media:d.media,tautan:d.tautan,tgl_berita:d.tglBerita||null,tgl_kliping:d.tglKliping||null,wilayah:d.wilayah,lokasi:d.lokasi||[],topik:d.topik||[],potongan:d.potongan,konteks:d.konteks,pelajaran:d.pelajaran||[],materi:d.materi||[],status:d.status,kurator:d.kurator||null,peninjau:d.peninjau||null,kepekaan:d.kepekaan,gambar:d.gambar,keterangan_gambar:d.gbrKet||null,vonis:d.vonis||null,catatan:d.catatan||null};}
 function pErr(e,what){if(e){console.error(what,e);toast("Gagal menyimpan "+what+": "+(e.message||e));bootstrap();return true}return false}
 
@@ -906,12 +906,12 @@ function toggleSideMenu(e){try{e.stopPropagation()}catch(_){}var w=document.getE
 document.addEventListener("click",function(e){var w=document.getElementById("sideMenu");if(w&&w.classList.contains("open")&&!(e.target&&w.contains(e.target)))w.classList.remove("open")});
 
 const PERM={
- "Super-Admin":["dasbor","kliping","tinjauan","materi","pengguna","taksonomi","pedoman","iklan","audit","pengaturan"],
- "Admin":["dasbor","kliping","tinjauan","materi","pengguna","pedoman","iklan"],
- "Kurator":["dasbor","kliping"]
+ "Super-Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","taksonomi","pedoman","iklan","audit","pengaturan"],
+ "Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","pedoman","iklan"],
+ "Kurator":["dasbor","kliping","buahpikir"]
 };
-const ICON={dasbor:"\u25F1",kliping:"\u2702",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",audit:"\u2261",iklan:"\u25B1",pengaturan:"\u2699"};
-const LBL={dasbor:"Dasbor",kliping:"Kliping",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs"};
+const ICON={dasbor:"\u25F1",kliping:"\u2702",buahpikir:"\u270D",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",audit:"\u2261",iklan:"\u25B1",pengaturan:"\u2699"};
+const LBL={dasbor:"Dasbor",kliping:"Kliping",buahpikir:"Buah Pikir",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs"};
 const STAG={"Calon":"tag","Ditulis":"tag tag-o","Ditinjau":"tag tag-b","Terbit":"tag tag-g","Diarsipkan":"tag"};
 
 function me(){return db.pengguna.find(u=>u.id===S.me)||null}
@@ -1192,6 +1192,7 @@ function viewAdmin(){
   if(S.draft)body=formKliping();
   else if(S.av==="dasbor")body=pDasbor();
   else if(S.av==="kliping")body=pKliping();
+  else if(S.av==="buahpikir")body=pBuahPikir();
   else if(S.av==="tinjauan")body=pTinjauan();
   else if(S.av==="materi")body=pMateri();
   else if(S.av==="pengguna")body=pPengguna();
@@ -1230,7 +1231,7 @@ function pDasbor(){
 
 function pKliping(){
   const m=me();
-  let list=db.kliping.slice().sort((a,b)=>b.tglKliping.localeCompare(a.tglKliping));
+  let list=db.kliping.filter(k=>!isOpini(k)).sort((a,b)=>b.tglKliping.localeCompare(a.tglKliping));
   if(m.peran==="Kurator")list=list.filter(k=>k.kurator===m.id);
   const rows=list.map(k=>{
     const ok=k.pelajaran.filter(x=>x&&x.trim()).length>=3&&k.materi.length>0&&k.tautan;
@@ -1344,7 +1345,7 @@ function simpanSetting(){const s=db.settings;s.nama=document.getElementById("sNa
 
 /* ================= editor ================= */
 function baru(){S.av="kliping";S.draft={id:"",judul:"",lead:"",rubrik:db.rubrik[0],media:db.media[0],tautan:"",tglBerita:"2026-07-30",tglKliping:"2026-07-30",wilayah:"Sulawesi Selatan",lokasi:[],topik:[],potongan:"",konteks:"",pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",gbrKet:"",vonis:"",catatan:""};S.err=[];go({})}
-function sunting(id){S.av="kliping";const k=db.kliping.find(x=>x.id===id);S.draft=JSON.parse(JSON.stringify(k));while(S.draft.pelajaran.length<3)S.draft.pelajaran.push("");S.err=[];go({})}
+function sunting(id){const _k0=db.kliping.find(x=>x.id===id);S.av=(_k0&&isOpini(_k0))?"buahpikir":"kliping";const k=_k0;S.draft=JSON.parse(JSON.stringify(k));while(S.draft.pelajaran.length<3)S.draft.pelajaran.push("");S.err=[];go({})}
 function hapus(id){var mp=me();if(!mp||(mp.peran!=="Super-Admin"&&mp.peran!=="Admin")){toast("Hanya Admin atau Super-Admin yang dapat menghapus kliping");return}if(!confirm("Hapus kliping ini?"))return;const k=db.kliping.find(x=>x.id===id);db.kliping=db.kliping.filter(x=>x.id!==id);log("Menghapus kliping",k.judul);supa.from("kliping").delete().eq("id",id).then(({error})=>pErr(error,"kliping"));render();toast("Kliping dihapus")}
 
 /* ============ gambar (Supabase Storage) ============ */
@@ -3609,7 +3610,7 @@ viewArsip=function(){
 var OPI_CSS='.tag-opi{background:#fdecea;color:#b23227;border:1px solid #f3c6c0;font-weight:700}'
 +'.opi-note{border:1px solid var(--line);border-left:4px solid var(--red);background:var(--soft);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--ink2);margin:16px 0}'
 +'.opi-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}'
-+'.opi-form{border:1px solid #f3c6c0;background:#fdecea;color:#8f2a20;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:16px}'+'.btn-rasta{position:relative;border:0;color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.45);background:linear-gradient(90deg,#d7262a 0%,#d7262a 33%,#f5c518 33%,#f5c518 66%,#1a9c4b 66%,#1a9c4b 100%)}'+'.btn-rasta:hover{filter:brightness(1.06)}'+'.btn-rasta:active{transform:translateY(1px)}';
++'.opi-form{border:1px solid #f3c6c0;background:#fdecea;color:#8f2a20;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:16px}'+'.btn-rasta{position:relative;border:0;color:#fff;font-weight:600;border-radius:999px;padding:9px 18px;letter-spacing:.2px;text-shadow:0 1px 3px rgba(0,0,0,.32);background:linear-gradient(105deg,#3f9e63 0%,#63b06a 22%,#e9c65a 50%,#e08a55 74%,#cf5b52 100%);background-size:180% 100%;background-position:20% 0;box-shadow:0 2px 10px rgba(207,91,82,.22);transition:background-position .5s ease,box-shadow .3s ease,transform .15s ease}'+'.btn-rasta:hover{background-position:78% 0;box-shadow:0 4px 16px rgba(207,91,82,.3)}'+'.btn-rasta:active{transform:translateY(1px) scale(.985)}';
 (function(){try{var st=document.createElement("style");st.textContent=OPI_CSS;document.head.appendChild(st)}catch(e){}})();
 
 function isOpini(k){return !!k&&String(k.jenis||"").toLowerCase()==="opini"}
@@ -3626,6 +3627,21 @@ toKliping=function(d){
 /* --- draf baru --- */
 var _baruOpiAsli=baru;
 baru=function(){_baruOpiAsli.apply(this,arguments);try{S.draft.jenis="kliping"}catch(e){}};
+function pBuahPikir(){
+  var m=me();
+  var list=db.kliping.filter(function(k){return isOpini(k)});
+  if(m.peran==="Kurator")list=list.filter(function(k){return k.kurator===m.id});
+  list=list.sort(function(a,b){return String(b.tglKliping||"").localeCompare(String(a.tglKliping||""))});
+  var boleh=(m.peran==="Super-Admin"||m.peran==="Admin");
+  var rows=list.map(function(k){
+    var isi=String(k.konteks||"").trim();
+    var kata=isi?isi.split(/\s+/).length:0;
+    var siap=!!k.judul&&!!k.lead&&kata>0;
+    return "<tr><td><b>"+esc(k.judul)+'</b><br /><span style="color:var(--ink2);font-size:13px">'+kata+" kata \u00b7 "+tglID(k.tglKliping)+'</span></td><td><span class="tag">'+esc(k.rubrik)+'</span></td><td><span class="'+STAG[k.status]+'">'+k.status+"</span></td><td>"+esc(nm(k.kurator))+'</td><td>'+(siap?'<span class="tag tag-g">Lengkap</span>':'<span class="tag tag-r">Belum</span>')+'</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="sunting(\''+k.id+'\')">Sunting</button>'+(boleh?' <button class="btn btn-sm btn-d" onclick="hapus(\''+k.id+'\')">Hapus</button>':"")+"</td></tr>";
+  }).join("");
+  return ph("Buah Pikir",m.peran==="Kurator"?"Tulisanmu sendiri, terpisah dari kliping.":"Tulisan sendiri anggota. Terbit tetap lewat persetujuan admin.",'<button class="btn btn-rasta" onclick="tulisOpini()">\u270D Tulis Buah Pikir</button>')+
+   '<div class="tbl tbl-scroll"><table><thead><tr><th>Judul</th><th>Rubrik</th><th>Status</th><th>Penulis</th><th>Anotasi</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">Belum ada Buah Pikir.</td></tr>')+"</tbody></table></div>";
+}
 function _opiRubrik(){
   try{
     var r=db.rubrik||[];
