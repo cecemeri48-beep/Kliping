@@ -1826,7 +1826,7 @@ function render(){
     body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():viewBoard();
   }
   document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
-  pasangEkstra();try{mutuPasang()}catch(e){}
+  pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}
   save();
 }
 
@@ -3165,6 +3165,87 @@ function periksa(d,status){
   }
   return e;
 }
+
+
+/* ================= avatar lapangan (v21) ================= */
+var AVA_CSS='.avat.ava-em{font-size:17px;line-height:1;background:var(--soft2);color:inherit}'
++'.avat-btn.ava-em{font-size:19px}'
++'.ava-ov{position:fixed;inset:0;background:rgba(16,42,67,.45);display:grid;place-items:center;z-index:9999;padding:18px}'
++'.ava-bx{background:var(--canvas,#fff);color:var(--ink);border-radius:16px;max-width:420px;width:100%;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.3)}'
++'.ava-bx h3{margin:0 0 4px;font-size:18px}.ava-bx .hint{margin:0 0 14px}'
++'.ava-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}'
++'.ava-it{border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:12px 6px;cursor:pointer;font-family:inherit;color:var(--ink);display:grid;gap:6px;place-items:center}'
++'.ava-it:hover{border-color:var(--violet)}'
++'.ava-it.on{border-color:var(--violet);box-shadow:0 0 0 2px rgba(115,87,255,.22)}'
++'.ava-it span{font-size:26px;line-height:1}.ava-it small{font-size:12px;color:var(--ink2)}'
++'.ava-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}'
++'@media(max-width:420px){.ava-grid{grid-template-columns:repeat(2,1fr)}}';
+(function(){try{var st=document.createElement("style");st.textContent=AVA_CSS;document.head.appendChild(st)}catch(e){}})();
+
+var AVA_PIL=[["gunung","\ud83c\udfd4\ufe0f","Gunung"],["goa","\ud83d\udd73\ufe0f","Goa"],["tebing","\ud83e\uddd7","Tebing"],["sungai","\ud83c\udfde\ufe0f","Sungai"],["laut","\ud83c\udf0a","Laut"],["angkasa","\ud83c\udf0c","Angkasa"]];
+function avaPeta(){try{return (db.settings&&db.settings.avatar)||{}}catch(e){return {}}}
+function avaKode(id){var p=avaPeta();return (id&&p[id])||""}
+function avaEmoji(id){var k=avaKode(id);if(!k)return "";for(var i=0;i<AVA_PIL.length;i++){if(AVA_PIL[i][0]===k)return AVA_PIL[i][1]}return ""}
+function avaNama(k){for(var i=0;i<AVA_PIL.length;i++){if(AVA_PIL[i][0]===k)return AVA_PIL[i][2]}return "Inisial nama"}
+
+function avaPasang(){
+  try{
+    var m=(typeof me==="function")?me():null;if(!m)return;
+    var em=avaEmoji(m.id);
+    var els=document.querySelectorAll(".avat");
+    for(var i=0;i<els.length;i++){
+      var el=els[i];
+      if(em){el.textContent=em;el.classList.add("ava-em");el.setAttribute("title",avaNama(avaKode(m.id)))}
+      else{el.classList.remove("ava-em")}
+    }
+    var pop=document.querySelector(".akun-pop");
+    if(pop&&!pop.querySelector(".ai-ava")){
+      var b=document.createElement("button");
+      b.className="ai ai-ava";b.setAttribute("role","menuitem");b.type="button";
+      b.innerHTML='<span class="ai-ic">'+(em||"\ud83c\udfd4\ufe0f")+'</span>Pilih avatar';
+      b.onclick=function(){try{tutupAkun()}catch(e){}avaBuka()};
+      var tema=pop.querySelector(".ai-tema");
+      if(tema&&tema.parentNode===pop)pop.insertBefore(b,tema);else pop.appendChild(b);
+    }
+  }catch(e){}
+}
+
+function avaBuka(){
+  try{
+    avaTutup();
+    var m=(typeof me==="function")?me():null;if(!m){toast("Masuk dulu untuk mengubah avatar");return}
+    var kini=avaKode(m.id);
+    var ini=(m.nama||"?").slice(0,2).toUpperCase();
+    var tiles='<button type="button" class="ava-it'+(kini?"":" on")+'" onclick="avaSet(&quot;&quot;)"><span style="font-size:18px;font-weight:700">'+ini+'</span><small>Inisial</small></button>';
+    for(var i=0;i<AVA_PIL.length;i++){
+      var p=AVA_PIL[i];
+      tiles+='<button type="button" class="ava-it'+(kini===p[0]?" on":"")+'" onclick="avaSet(&quot;'+p[0]+'&quot;)"><span>'+p[1]+'</span><small>'+p[2]+'</small></button>';
+    }
+    var ov=document.createElement("div");
+    ov.className="ava-ov";ov.id="avaOv";
+    ov.innerHTML='<div class="ava-bx" role="dialog" aria-modal="true" aria-label="Pilih avatar">'
+      +'<h3>Pilih avatar</h3><p class="hint">Wajah medan yang paling kamu akrabi. Tampil di kepala halaman dan menu akun.</p>'
+      +'<div class="ava-grid">'+tiles+'</div>'
+      +'<div class="ava-foot"><button type="button" class="btn btn-sm" onclick="avaTutup()">Tutup</button></div></div>';
+    ov.addEventListener("click",function(ev){if(ev.target===ov)avaTutup()});
+    document.body.appendChild(ov);
+  }catch(e){}
+}
+function avaTutup(){var o=document.getElementById("avaOv");if(o&&o.parentNode)o.parentNode.removeChild(o)}
+
+function avaSet(k){
+  try{
+    var m=(typeof me==="function")?me():null;if(!m)return;
+    var s=db.settings;if(!s.avatar||typeof s.avatar!=="object")s.avatar={};
+    if(k)s.avatar[m.id]=k;else delete s.avatar[m.id];
+    try{save()}catch(e){}
+    supa.from("app_settings").upsert({id:"situs",data:s}).then(function(r){if(r&&r.error){toast("Avatar tersimpan di perangkat ini saja")}});
+    avaTutup();
+    try{render()}catch(e){}
+    toast(k?("Avatar "+avaNama(k)+" dipakai"):"Kembali memakai inisial nama");
+  }catch(e){}
+}
+
 
 bootstrap();
 </script>
