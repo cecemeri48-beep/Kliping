@@ -1827,7 +1827,7 @@ function render(){
     body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():viewBoard();
   }
   document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
-  pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}try{slugPasang()}catch(e){}
+  pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}try{slugPasang()}catch(e){}try{opiPasang()}catch(e){}
   save();
 }
 
@@ -3602,6 +3602,160 @@ viewArsip=function(){
   h+='</div>';
   return h+foot();
 };
+
+
+
+/* ===== lapis 16: opini anggota (v26) ===== */
+var OPI_CSS='.tag-opi{background:#fdecea;color:#b23227;border:1px solid #f3c6c0;font-weight:700}'
++'.opi-note{border:1px solid var(--line);border-left:4px solid var(--red);background:var(--soft);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--ink2);margin:16px 0}'
++'.opi-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}'
++'.opi-form{border:1px solid #f3c6c0;background:#fdecea;color:#8f2a20;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:16px}';
+(function(){try{var st=document.createElement("style");st.textContent=OPI_CSS;document.head.appendChild(st)}catch(e){}})();
+
+function isOpini(k){return !!k&&String(k.jenis||"").toLowerCase()==="opini"}
+function _opiKlip(id){try{return db.kliping.filter(function(k){return k.id===id})[0]}catch(e){return null}}
+
+/* --- simpan kolom jenis --- */
+var _tkOpiAsli=toKliping;
+toKliping=function(d){
+  var o=_tkOpiAsli(d);
+  o.jenis=isOpini(d)?"opini":"kliping";
+  return o;
+};
+
+/* --- draf baru --- */
+var _baruOpiAsli=baru;
+baru=function(){_baruOpiAsli.apply(this,arguments);try{S.draft.jenis="kliping"}catch(e){}};
+function tulisOpini(){
+  _baruOpiAsli();
+  try{
+    var d=S.draft;
+    d.jenis="opini";
+    d.potongan="";d.tautan="";d.vonis="";
+    d.pelajaran=["","",""];
+    d.materi=[];
+  }catch(e){}
+  go({});
+}
+
+/* --- syarat terbit untuk opini --- */
+var _periksaOpiAsli=periksa;
+periksa=function(d,status){
+  if(!isOpini(d))return _periksaOpiAsli.apply(this,arguments);
+  var e=[];
+  if(!d.judul)e.push("Judul Buah Pikir belum diisi.");
+  if(!d.lead)e.push("Ringkasan satu baris belum diisi.");
+  if(!String(d.konteks||"").trim())e.push("Isi tulisan belum diisi.");
+  if(status==="Terbit"){
+    try{
+      if(typeof mutuTegas==="function"&&mutuTegas()){
+        var A=mutuAmbang(),a=adsKataAsli(mutuObj(d));
+        if(a<A.kata)e.push("Tulisan baru "+a+" kata, kurang "+(A.kata-a)+" kata dari ambang "+A.kata+".");
+      }
+    }catch(x){}
+    try{
+      if(d.gambar&&isImg(d.gambar)&&!String(d.gbrKet||"").trim())e.push("Gambar belum punya keterangan foto.");
+    }catch(x){}
+    if(db.settings.wajibTinjauan&&(db.sensitif||[]).indexOf(d.rubrik)>=0&&!d.peninjau)
+      e.push("Rubrik sensitif wajib punya peninjau sebelum terbit.");
+  }
+  return e;
+};
+
+/* --- penyesuaian formulir --- */
+function _opiSembunyi(id){
+  var el=document.getElementById(id);if(!el)return;
+  var f=el.closest?el.closest(".f"):null;
+  if(f)f.style.display="none";
+}
+function _opiLabel(id,html,wajib){
+  var el=document.getElementById(id);if(!el)return;
+  var f=el.closest?el.closest(".f"):null;if(!f)return;
+  var lb=f.querySelector("label");if(!lb)return;
+  lb.innerHTML=html;
+  if(wajib)lb.classList.add("req");else lb.classList.remove("req");
+}
+function opiPasang(){
+  try{
+    if(S.mode!=="admin")return;
+    /* tombol tulis opini di sebelah tombol kliping baru */
+    var tbl=[].slice.call(document.querySelectorAll("button"));
+    tbl.forEach(function(b){
+      var oc=b.getAttribute("onclick")||"";
+      if(oc.indexOf("baru()")>=0&&!b.getAttribute("data-opi")){
+        b.setAttribute("data-opi","1");
+        var n=document.createElement("button");
+        n.className="btn";
+        n.innerHTML="\u270d Tulis Buah Pikir";
+        n.setAttribute("onclick","tulisOpini()");
+        if(b.parentNode)b.parentNode.insertBefore(n,b.nextSibling);
+      }
+    });
+    var d=S.draft;
+    if(!d||!isOpini(d))return;
+    if(!document.getElementById("fJudul"))return;
+    _opiSembunyi("fTautan");_opiSembunyi("fMedia");_opiSembunyi("fPot");_opiSembunyi("fVonis");
+    _opiLabel("fJudul",'Judul Buah Pikir <span class="hint">satu gagasan, bukan judul berita</span>',true);
+    _opiLabel("fLead",'Ringkasan satu baris <span class="hint">inti pendapatmu dalam satu kalimat</span>',true);
+    _opiLabel("fKon",'Isi tulisan <span class="hint">tulisan utuh dengan kata sendiri, sasaran 300 kata ke atas</span>',true);
+    _opiLabel("fPel0",'Poin penutup <span class="hint">opsional \u2014 kosongkan bila tidak perlu</span>',false);
+    var mat0=document.querySelector(".fMat");
+    if(mat0){
+      var f3=mat0.closest?mat0.closest(".f"):null;
+      if(f3){var lb3=f3.querySelector("label");if(lb3){lb3.classList.remove("req");lb3.innerHTML='Rujukan materi <span class="hint">opsional untuk Buah Pikir</span>'}}
+    }
+    [].slice.call(document.querySelectorAll("h2,h3")).forEach(function(h){
+      var t=(h.textContent||"").trim();
+      if(t==="Kliping baru")h.textContent="Buah Pikir baru";
+      else if(t==="Sunting kliping")h.textContent="Sunting Buah Pikir";
+    });
+    var kartu=document.getElementById("fJudul").closest(".card");
+    if(kartu&&!document.getElementById("opiNota")){
+      var nota=document.createElement("div");
+      nota.id="opiNota";
+      nota.className="opi-form";
+      nota.innerHTML="<b>Mode Buah Pikir.</b> Potongan berita, tautan sumber, dan vonis cek fakta dimatikan karena tulisan ini karanganmu sendiri. Alurnya tetap sama: ajukan tinjauan, lalu admin yang menerbitkan.";
+      kartu.parentNode.insertBefore(nota,kartu);
+    }
+  }catch(e){}
+}
+
+/* --- halaman baca opini --- */
+function viewOpini(k){
+  var pel=(k.pelajaran||[]).filter(function(p){return String(p||"").trim()});
+  var rj=(k.materi||[]).map(function(id){
+    var m=mat(id);
+    return m?'<li><a href="#" onclick=\'go({pv:{n:"materiDetail",id:"'+m.id+'"}});return false\'>'+esc(m.judul)+"</a> \u00b7 "+esc(m.rumpun)+"</li>":"";
+  }).join("");
+  var bar="";try{bar=reaksiBar(k)||""}catch(e){}
+  var isi=String(k.konteks||"").split(/\n+/).filter(function(p){return String(p).trim()})
+    .map(function(p){return "<p>"+esc(p)+"</p>"}).join("");
+  var tts='<div class="tts"><button id="ttsBtn" class="btn btn-sm btn-p" onclick="dengarkan()">\ud83d\udd0a Dengarkan</button> <button class="btn btn-sm" onclick="hentikanTTS()">\u23f9 Stop</button> <select id="ttsVoice" class="tts-sel" onchange="ttsPick(this.value)" title="Pilih suara">'+ttsVoiceOptions()+'</select><span class="tts-hint">Pilih suara ternatural di perangkatmu</span></div>';
+  return '<div class="art"><button class="btn btn-sm" onclick=\'go({pv:{n:"board"}})\'>\u2190 Papan kliping</button>'+
+   '<div class="opi-head"><span class="tag tag-opi">\u270d Buah Pikir</span><span class="tag tag-b">'+esc(k.rubrik)+'</span><span class="tag">'+esc(k.wilayah)+'</span></div>'+
+   "<h2>"+esc(k.judul)+'</h2><p class="lead">'+esc(k.lead)+"</p>"+tts+bar+
+   (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+"</div>":"")+
+   '<div class="sec">'+(isi||"<p>\u2014</p>")+"</div>"+
+   (pel.length?'<div class="sec"><h4>Poin penutup</h4><ol>'+pel.map(function(p){return "<li>"+esc(p)+"</li>"}).join("")+"</ol></div>":"")+
+   (rj?'<div class="sec"><h4>Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+rj+"</ul></div>":"")+
+   '<div class="opi-note"><b>Ini Buah Pikir, bukan laporan.</b> Isinya pandangan pribadi penulis dan tidak mewakili sikap resmi REICHAS CHELEBES. Sanggahan boleh dikirim ke kliping.rcscbs@gmail.com dan akan kami muat bila layak.</div>'+
+   '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Ditulis '+tglID(k.tglKliping)+" oleh "+esc(nm(k.kurator))+(k.peninjau?" \u00b7 disetujui "+esc(nm(k.peninjau)):"")+"</p>"+
+   '<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+"</div></div>"+foot();
+}
+
+(function(){
+  var _vcOpi=viewClip,_kkOpi=kartuKlip;
+  viewClip=function(){
+    var k=_opiKlip(S.pv&&S.pv.id);
+    if(isOpini(k))return viewOpini(k);
+    return _vcOpi.apply(this,arguments);
+  };
+  kartuKlip=function(k){
+    var h=_kkOpi.apply(this,arguments);
+    if(isOpini(k))h=h.replace('<div class="clip-tags">','<div class="clip-tags"><span class="tag tag-opi">\u270d Buah Pikir</span>');
+    return h;
+  };
+})();
 
 
 bootstrap();

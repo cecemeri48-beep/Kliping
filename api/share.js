@@ -128,13 +128,16 @@ module.exports = async function (req, res) {
     image: img
   };
 
+  const opini = String(k.jenis||'').toLowerCase()==='opini';
+
   const badan =
    '<div class="meta">'+
+     (opini?'<span class="tag" style="background:#fdecea;color:#b23227;border-color:#f3c6c0;font-weight:700">\u270d Buah Pikir</span>':'')+
      (k.rubrik?'<span class="tag">'+esc(k.rubrik)+'</span>':'')+
      topik.map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('')+
-     '<div style="margin-top:8px">Digunting '+esc(tglID(k.tglKliping))+
+     '<div style="margin-top:8px">'+(opini?'Ditulis ':'Digunting ')+esc(tglID(k.tglKliping))+
      ' oleh '+esc(kurator||'Redaksi Kliping RCS.CBS')+
-     (peninjau?' \u00b7 ditinjau '+esc(peninjau):'')+
+     (peninjau?(opini?' \u00b7 disetujui ':' \u00b7 ditinjau ')+esc(peninjau):'')+
      (lokasi.length?' \u00b7 '+esc(lokasi.join(', ')):'')+
      (k.wilayah?' \u00b7 '+esc(k.wilayah):'')+'</div></div>'+
    (clipImg?'<img class="img" src="'+esc(clipImg)+'" alt="'+esc(k.gbrKet||k.judul)+'" />'+(k.gbrKet?'<p class="cap">'+esc(k.gbrKet)+'</p>':''):'')+
@@ -143,11 +146,11 @@ module.exports = async function (req, res) {
      (k.tglBerita?', '+esc(tglID(k.tglBerita)):'')+'. '+
      (k.tautan?'<a href="'+esc(k.tautan)+'" rel="nofollow noopener" target="_blank">Baca berita aslinya</a>':'')+
      '</cite></blockquote>':'')+
-   (k.konteks?'<h2>Konteks dari meja kurasi</h2><p>'+esc(k.konteks).replace(/\n+/g,'</p><p>')+'</p>':'')+
-   (pelajaran.length?'<h2>Pelajaran yang bisa dibawa</h2><ul>'+pelajaran.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'')+
+   (k.konteks?'<h2>'+(opini?'Isi tulisan':'Konteks dari meja kurasi')+'</h2><p>'+esc(k.konteks).replace(/\n+/g,'</p><p>')+'</p>':'')+
+   (pelajaran.length?'<h2>'+(opini?'Poin penutup':'Pelajaran yang bisa dibawa')+'</h2><ul>'+pelajaran.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'')+
    (k.vonis?'<h2>Vonis</h2><p>'+esc(k.vonis)+'</p>':'')+
    (k.catatan?'<p style="font-size:14px;color:#7D7A75">'+esc(k.catatan)+'</p>':'')+
-   '<div class="box"><b>Catatan kurasi</b><br />Konteks dan pelajaran di atas ditulis oleh pengelola Kliping RCS.CBS. Kutipan berita dipakai secukupnya untuk keperluan pendidikan, dan hak ciptanya tetap milik '+esc(k.media||'penerbit asli')+'. Keberatan atas kutipan ini bisa dikirim ke <a href="mailto:'+esc(SUREL_REDAKSI)+'">'+esc(SUREL_REDAKSI)+'</a>.</div>'+
+   '<div class="box"><b>'+(opini?'Catatan redaksi':'Catatan kurasi')+'</b><br />'+(opini?'Tulisan ini adalah pandangan pribadi penulis dan tidak mewakili sikap resmi REICHAS CHELEBES. Sanggahan boleh dikirim ke surel redaksi di bawah dan akan kami muat bila layak. ':'')+'Konteks dan pelajaran di atas ditulis oleh pengelola Kliping RCS.CBS. Kutipan berita dipakai secukupnya untuk keperluan pendidikan, dan hak ciptanya tetap milik '+esc(k.media||'penerbit asli')+'. Keberatan atas kutipan ini bisa dikirim ke <a href="mailto:'+esc(SUREL_REDAKSI)+'">'+esc(SUREL_REDAKSI)+'</a>.</div>'+
    '<p style="margin-top:24px"><a class="cta" href="'+esc(buka)+'">Buka di portal \u2014 lengkap dengan narator, rak baca, dan kliping serupa</a></p>';
 
   res.setHeader('Content-Type','text/html; charset=utf-8');
