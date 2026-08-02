@@ -1355,6 +1355,13 @@ async function uploadGambar(file){
     let body=file,ext=((file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,""))||"jpg",ctype=file.type||"image/jpeg";
     const kb=await kompresGambar(file);
     if(kb){body=kb;ext="jpg";ctype="image/jpeg";}
+    else{
+      const amanFormat=/^image\/(jpeg|jpg|png|webp|gif)$/i.test(file.type||"");
+      if(!amanFormat||file.size>900*1024){
+        toast("Gambar ini tidak bisa dikecilkan peramban (kemungkinan format HEIC dari iPhone). Simpan ulang sebagai JPEG, lalu unggah lagi.");
+        return null;
+      }
+    }
     const path="kliping/"+Date.now()+"-"+Math.random().toString(36).slice(2,8)+"."+ext;
     const up=await supa.storage.from("gambar-kliping").upload(path,body,{cacheControl:"3600",upsert:false,contentType:ctype});
     if(up.error){toast("Gagal unggah: "+up.error.message);return null;}
@@ -1376,7 +1383,7 @@ function gbrField(d){
   }
   const opts=["Tanpa gambar","Ilustrasi sendiri","Diagram sendiri","Lisensi bebas","Media lain"];
   const selHtml='<select id="fGbrLabel">'+opts.map(o=>'<option '+(d.gambar===o?"selected":"")+">"+esc(o)+"</option>").join("")+"</select>";
-  return '<div>'+selHtml+'<div class="hint" style="margin-top:6px">atau unggah foto asli:</div>'+file+'</div>';
+  return '<div>'+selHtml+'<div class="hint" style="margin-top:6px">atau unggah foto asli \u2014 JPEG atau PNG, otomatis dikecilkan ke maksimal 1600 piksel:</div>'+file+'</div>';
 }
 function formKliping(){
   const d=S.draft,m=me(),sens=db.sensitif.includes(d.rubrik);
