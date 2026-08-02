@@ -3627,6 +3627,33 @@ toKliping=function(d){
 /* --- draf baru --- */
 var _baruOpiAsli=baru;
 baru=function(){_baruOpiAsli.apply(this,arguments);try{S.draft.jenis="kliping"}catch(e){}};
+var _mutuHitungAsli=mutuHitung;
+mutuHitung=function(d){
+  var h=_mutuHitungAsli.apply(this,arguments);
+  try{
+    if(isOpini(S.draft)){
+      h.syarat=h.syarat.filter(function(x){return !/Tautan berita asli|poin pelajaran|materi belajar|Porsi kutipan/.test(x.t)});
+      h.kurang=h.syarat.filter(function(x){return !x.ok}).length;
+      h.siap=h.kurang===0;
+    }
+  }catch(e){}
+  return h;
+};
+var _mutuIsiAsli=mutuIsi;
+mutuIsi=function(h){
+  var t=_mutuIsiAsli.apply(this,arguments);
+  try{
+    if(isOpini(S.draft)){
+      t=t.replace(">Mutu tulisan",">Mutu Buah Pikir");
+      t=t.replace(/<div class="mtu-c"><b>[^<]*<\/b><span>kata pelajaran<\/span><\/div>/,"");
+      t=t.replace(/<div class="mtu-c"><b>[^<]*<\/b><span>kata kutipan<\/span><\/div>/,"");
+      t=t.replace(/<div class="mtu-c[^"]*"><b>[^<]*<\/b><span>porsi kutipan<\/span><\/div>/,"");
+      t=t.replace("<span>kata konteks</span>","<span>kata isi tulisan</span>");
+      t=t.replace("kliping yang belum memenuhi","tulisan yang belum memenuhi");
+    }
+  }catch(e){}
+  return t;
+};
 function pBuahPikir(){
   var m=me();
   var list=db.kliping.filter(function(k){return isOpini(k)});
@@ -3729,6 +3756,14 @@ function opiPasang(){
       if((pp.textContent||"").trim()==="Empat bagian wajib: potongan, konteks, pelajaran, rujukan.")
         pp.textContent="Tulisan sendiri: judul, ringkasan satu baris, dan isi tulisan. Tetap melewati tinjauan admin sebelum terbit.";
     });
+    var tb=document.getElementById("fTglB");
+    if(tb&&tb.parentNode)tb.parentNode.style.display="none";
+    var tk=document.getElementById("fTglK");
+    if(tk&&tk.parentNode){
+      var lb=tk.parentNode.querySelector("label");
+      if(lb&&/Tanggal kliping/.test(lb.textContent||""))lb.textContent="Tanggal tulisan";
+      tk.parentNode.style.gridColumn="1 / -1";
+    }
     _opiSembunyi("fTautan");_opiSembunyi("fMedia");_opiSembunyi("fPot");_opiSembunyi("fVonis");
     _opiLabel("fJudul",'Judul Buah Pikir <span class="hint">satu gagasan, bukan judul berita</span>',true);
     _opiLabel("fLead",'Ringkasan satu baris <span class="hint">inti pendapatmu dalam satu kalimat</span>',true);
