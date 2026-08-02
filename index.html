@@ -1399,7 +1399,7 @@ function formKliping(){
   '<div class="row2"><div class="f"><label>Peninjau'+(sens?" (wajib)":"")+'</label>'+
    '<select id="fPen"><option value="">— belum ditetapkan —</option>'+db.pengguna.filter(u=>u.peran==="Admin"&&u.aktif).map(u=>'<option value="'+u.id+'" '+(d.peninjau===u.id?"selected":"")+">"+esc(u.nama)+" \u00b7 "+u.peran+"</option>").join("")+"</select></div>"+
    '<div class="f"><label>Tingkat kepekaan</label>'+sel("fKep",d.kepekaan,["Biasa","Sensitif","Sangat sensitif"])+"</div></div>"+'<div class="row2"><div class="f"><label>Vonis cek fakta <span class="hint">tampil sebagai badge di kartu dan artikel</span></label>'+sel("fVonis",d.vonis||"—",["—","Fakta","Sebagian benar","Menyesatkan","Hoaks","Belum diverifikasi"])+'</div><div class="f"></div></div></div>'+
-  '<div class="sticky"><button class="btn" onclick="simpanDraft(\'Ditulis\')">Simpan draf</button>'+
+  mutuKotak()+'<div class="sticky"><button class="btn" onclick="simpanDraft(\'Ditulis\')">Simpan draf</button>'+
    '<button class="btn btn-p" onclick="simpanDraft(\'Ditinjau\')">Ajukan tinjauan</button>'+
    (m.peran==="Kurator"?"":'<button class="btn btn-g" onclick="simpanDraft(\'Terbit\')">Terbitkan</button>')+
    '<button class="btn" onclick=\'go({draft:null,err:[]})\'>Batal</button>'+
@@ -1819,7 +1819,7 @@ function render(){
     body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():viewBoard();
   }
   document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
-  pasangEkstra();
+  pasangEkstra();try{mutuPasang()}catch(e){}
   save();
 }
 
@@ -3013,6 +3013,151 @@ function kartuKesiapan(){
   pIklan=function(){return kartuKesiapan()+_p.apply(this,arguments)};
 })();
 
+
+
+/* ================= alat bantu mutu penulisan (panel kurator) ================= */
+var MUTU_CSS='.mtu{margin-top:16px;border:1px solid var(--line);border-radius:14px;padding:16px}'+
+'.mtu-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-weight:700;font-size:15px;margin-bottom:10px}'+
+'.mtu-st{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}'+
+'.mtu-st.ok{background:rgba(70,161,113,.14);color:var(--green)}'+
+'.mtu-st.no{background:rgba(213,128,59,.14);color:var(--orange)}'+
+'.mtu-bar{height:8px;border-radius:999px;background:var(--soft2);overflow:hidden}'+
+'.mtu-bar i{display:block;height:100%;border-radius:999px;transition:width .25s ease}'+
+'.mtu-n{font-size:13px;color:var(--ink2);margin:8px 0 12px}'+
+'.mtu-n b{color:var(--ink);font-size:15px}'+
+'.mtu-g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}'+
+'@media(max-width:640px){.mtu-g{grid-template-columns:repeat(2,1fr)}}'+
+'.mtu-c{background:var(--soft);border-radius:10px;padding:8px 10px}'+
+'.mtu-c b{display:block;font-size:16px;line-height:1.2}'+
+'.mtu-c span{font-size:11px;color:var(--ink2)}'+
+'.mtu-c.warn b{color:var(--orange)}'+
+'.mtu-l{list-style:none;margin:0;padding:0;display:grid;gap:6px}'+
+'.mtu-l li{font-size:13px;display:flex;gap:8px;align-items:flex-start;color:var(--ink2)}'+
+'.mtu-l li i{font-style:normal;width:16px;flex:none;text-align:center}'+
+'.mtu-l li.ok{color:var(--ink)}'+
+'.mtu-l li.ok i{color:var(--green)}'+
+'.mtu-l li.no i{color:var(--orange)}'+
+'.mtu-t{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--ink2);margin-top:12px;padding-top:12px;border-top:1px solid var(--line);cursor:pointer}'+
+'.mtu-t input{margin-top:2px;flex:none}';
+(function(){try{var s=document.createElement("style");s.textContent=MUTU_CSS;document.head.appendChild(s)}catch(e){}})();
+
+function mutuAmbang(){return {kata:300,rasio:35}}
+function mutuTegas(){return !(typeof db!=="undefined"&&db&&db.settings&&db.settings.mutuTegas===false)}
+function _kataArr(a){var n=0;(a||[]).forEach(function(p){n+=_kata(p)});return n}
+
+function mutuObj(d){
+  d=d||{};
+  return {lead:d.lead,konteks:d.konteks,potongan:d.potongan,vonis:d.vonis,catatan:"",
+    pelajaran:d.pelajaran||[],tautan:d.tautan,materi:d.materi||[],
+    gambar:d.gambar,gbrKet:d.gbrKet,rubrik:d.rubrik,peninjau:d.peninjau};
+}
+
+function mutuDariBorang(){
+  var g=function(id){var e=document.getElementById(id);return e?e.value:""};
+  if(!document.getElementById("fKon"))return null;
+  var d=S.draft||{};
+  var v=g("fVonis");
+  return {lead:g("fLead"),konteks:g("fKon"),potongan:g("fPot"),catatan:"",
+    vonis:(v==="\u2014"?"":v),
+    pelajaran:[0,1,2].map(function(i){return g("fPel"+i)}),
+    tautan:g("fTautan"),
+    materi:[].slice.call(document.querySelectorAll(".fMat")).filter(function(c){return c.checked}).map(function(c){return c.value}),
+    gambar:(document.getElementById("fGbrLabel")?document.getElementById("fGbrLabel").value:(d.gambar||"")),
+    gbrKet:g("fGbrKet"),rubrik:g("fRubrik"),peninjau:g("fPen")};
+}
+
+function mutuHitung(d){
+  var o=mutuObj(d),A=mutuAmbang();
+  var asli=adsKataAsli(o),kutip=adsKataKutip(o),rasio=adsRasio(o);
+  var pel=(o.pelajaran||[]).filter(function(x){return String(x||"").trim()}).length;
+  var syarat=[
+    {ok:!!String(o.tautan||"").trim(),t:"Tautan berita asli terisi"},
+    {ok:pel>=3,t:"Tiga poin pelajaran terisi ("+pel+" dari 3)"},
+    {ok:(o.materi||[]).length>0,t:"Menaut minimal satu materi belajar"},
+    {ok:asli>=A.kata,t:"Tulisan sendiri minimal "+A.kata+" kata"},
+    {ok:rasio<=A.rasio,t:"Porsi kutipan maksimal "+A.rasio+" persen"}
+  ];
+  if(o.gambar)syarat.push({ok:!!String(o.gbrKet||"").trim(),t:"Gambar punya keterangan foto"});
+  if(db.settings.wajibTinjauan&&(db.sensitif||[]).indexOf(o.rubrik)>=0)
+    syarat.push({ok:!!o.peninjau,t:"Rubrik sensitif sudah punya peninjau"});
+  var kurang=syarat.filter(function(s){return !s.ok}).length;
+  return {asli:asli,kutip:kutip,rasio:rasio,konteks:_kata(o.konteks),pelajaran:_kataArr(o.pelajaran),
+    syarat:syarat,kurang:kurang,siap:kurang===0,ambang:A};
+}
+
+function mutuIsi(h){
+  var A=h.ambang;
+  var persen=Math.min(100,Math.round(h.asli/A.kata*100));
+  var warna=h.asli>=A.kata?"var(--green)":h.asli>=A.kata*0.6?"var(--orange)":"var(--red)";
+  var sisa=A.kata-h.asli;
+  return '<div class="mtu-h">Mutu tulisan'+
+    '<span class="mtu-st '+(h.siap?"ok":"no")+'">'+(h.siap?"Siap diterbitkan":h.kurang+" hal belum memenuhi")+'</span></div>'+
+    '<div class="mtu-bar"><i style="width:'+persen+'%;background:'+warna+'"></i></div>'+
+    '<div class="mtu-n"><b>'+h.asli+'</b> kata tulisan sendiri '+
+      (sisa>0?'\u00b7 kurang '+sisa+' kata lagi dari ambang '+A.kata:'\u00b7 sudah melewati ambang '+A.kata)+'</div>'+
+    '<div class="mtu-g">'+
+      '<div class="mtu-c"><b>'+h.konteks+'</b><span>kata konteks</span></div>'+
+      '<div class="mtu-c"><b>'+h.pelajaran+'</b><span>kata pelajaran</span></div>'+
+      '<div class="mtu-c"><b>'+h.kutip+'</b><span>kata kutipan</span></div>'+
+      '<div class="mtu-c'+(h.rasio>A.rasio?" warn":"")+'"><b>'+h.rasio+'%</b><span>porsi kutipan</span></div>'+
+    '</div>'+
+    '<ul class="mtu-l">'+h.syarat.map(function(s){
+      return '<li class="'+(s.ok?"ok":"no")+'"><i>'+(s.ok?"\u2713":"\u25cb")+'</i><span>'+esc(s.t)+'</span></li>';
+    }).join("")+'</ul>'+
+    '<label class="mtu-t"><input type="checkbox" id="mutuTegasCb" '+(mutuTegas()?"checked":"")+' onchange="mutuTegasUbah(this)" />'+
+    '<span>Jadikan ambang ini syarat terbit. Saat aktif, kliping yang belum memenuhi hanya bisa disimpan sebagai draf.</span></label>';
+}
+
+function mutuKotak(){
+  var h=mutuHitung(S.draft||{});
+  return '<div class="card mtu" id="mutuBox">'+mutuIsi(h)+'</div>';
+}
+
+function mutuSegarkan(){
+  var box=document.getElementById("mutuBox");if(!box)return;
+  var d=mutuDariBorang();if(!d)return;
+  box.innerHTML=mutuIsi(mutuHitung(d));
+}
+
+function mutuTegasUbah(el){
+  db.settings.mutuTegas=!!el.checked;
+  try{supa.from("app_settings").upsert({id:"situs",data:db.settings}).then(function(r){pErr(r&&r.error,"pengaturan")})}catch(e){}
+  try{save()}catch(e){}
+  toast(el.checked?"Ambang mutu menjadi syarat terbit":"Ambang mutu kini sekadar penanda");
+}
+
+function mutuPasang(){
+  if(!document.getElementById("mutuBox"))return;
+  var ids=["fLead","fPot","fKon","fPel0","fPel1","fPel2","fTautan","fGbrKet","fVonis","fRubrik","fPen"];
+  ids.forEach(function(id){
+    var e=document.getElementById(id);if(!e||e._mutu)return;
+    e._mutu=1;e.addEventListener("input",mutuSegarkan);e.addEventListener("change",mutuSegarkan);
+  });
+  [].slice.call(document.querySelectorAll(".fMat")).forEach(function(c){
+    if(c._mutu)return;c._mutu=1;c.addEventListener("change",mutuSegarkan);
+  });
+}
+
+/* syarat terbit: pemeriksaan lama ditulis ulang, ditambah ambang mutu */
+function periksa(d,status){
+  var e=[];
+  if(!d.judul)e.push("Judul kliping belum diisi.");
+  if(!d.lead)e.push("Ringkasan satu baris belum diisi.");
+  if(!d.tautan)e.push("Tautan sumber asli wajib diisi.");
+  if(!d.potongan)e.push("Bagian Potongan belum diisi.");
+  if(!d.konteks)e.push("Bagian Konteks belum diisi.");
+  if((d.pelajaran||[]).filter(function(x){return x}).length<3)e.push("Bagian Pelajaran harus berisi tiga poin.");
+  if(!(d.materi||[]).length)e.push("Wajib menaut minimal satu halaman materi.");
+  if(status==="Terbit"&&db.settings.wajibTinjauan&&(db.sensitif||[]).indexOf(d.rubrik)>=0&&!d.peninjau)
+    e.push("Rubrik sensitif wajib punya peninjau sebelum terbit.");
+  if(status==="Terbit"&&mutuTegas()){
+    var A=mutuAmbang(),o=mutuObj(d),a=adsKataAsli(o),r=adsRasio(o);
+    if(a<A.kata)e.push("Tulisan sendiri baru "+a+" kata, kurang "+(A.kata-a)+" kata dari ambang "+A.kata+". Tebalkan konteks atau pelajaran.");
+    if(r>A.rasio)e.push("Porsi kutipan "+r+" persen, melewati batas "+A.rasio+" persen. Perpendek potongan atau perpanjang telaah.");
+    if(d.gambar&&!String(d.gbrKet||"").trim())e.push("Gambar belum punya keterangan foto.");
+  }
+  return e;
+}
 
 bootstrap();
 </script>
