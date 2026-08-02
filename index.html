@@ -1444,7 +1444,7 @@ function simpanDraft(status){
   }
   d.status=status;if(status==="Ditinjau"||status==="Terbit")d.catatan="";S.err=[];
   if(d.id){db.kliping=db.kliping.map(k=>k.id===d.id?d:k);log(status==="Terbit"?"Menerbitkan kliping":"Memperbarui kliping",d.judul)}
-  else{d.id="k"+Date.now();db.kliping.unshift(d);log(status==="Terbit"?"Menerbitkan kliping baru":"Membuat kliping",d.judul)}
+  else{d.id=slugBaruUntuk(d);db.kliping.unshift(d);log(status==="Terbit"?"Menerbitkan kliping baru":"Membuat kliping",d.judul)}
   supa.from("kliping").upsert(toKliping(d)).then(({error})=>{if(!pErr(error,"kliping"))hapusDrafLokal();});
   S.draft=null;go({av:status==="Ditinjau"?"tinjauan":"kliping"});
   toast(status==="Terbit"?"Kliping diterbitkan":status==="Ditinjau"?"Diajukan untuk ditinjau":"Draf disimpan");
@@ -1826,7 +1826,7 @@ function render(){
     body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():viewBoard();
   }
   document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
-  pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}
+  pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}try{slugPasang()}catch(e){}
   save();
 }
 
@@ -3353,6 +3353,98 @@ papanKurator=function(){
       '<div class="pk">'+isi+"</div></div>";
   }catch(e){return _pkAsli.apply(this,arguments)}
 };
+
+
+
+/* ================= alamat halaman terbaca (v23) ================= */
+var SLUG_CSS='.slug-bx{margin:-4px 0 14px;padding:10px 12px;border:1px dashed var(--line);border-radius:10px;background:var(--soft)}'
++'.slug-l{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}'
++'.slug-bx input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:14px;background:var(--canvas,#fff);color:var(--ink)}'
++'.slug-h{margin:6px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.5}'
++'.slug-bx code{font-size:12.5px;background:var(--soft2);padding:2px 6px;border-radius:5px;word-break:break-all}'
++'.slug-v{font-size:14px}';
+(function(){try{var st=document.createElement("style");st.textContent=SLUG_CSS;document.head.appendChild(st)}catch(e){}})();
+
+var SLUG_BUANG={"di":1,"ke":1,"dari":1,"yang":1,"dan":1,"atau":1,"untuk":1,"pada":1,"dengan":1,"itu":1,"ini":1,"adalah":1,"sebagai":1,"para":1,"the":1,"of":1,"a":1,"an":1,"in":1,"is":1};
+
+function slugBersih(t){
+  var s=String(t||"").toLowerCase();
+  try{s=s.normalize("NFD").replace(/[\u0300-\u036f]/g,"")}catch(e){}
+  s=s.replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  return s;
+}
+function slugDariJudul(j){
+  var dasar=slugBersih(j);
+  if(!dasar)return "";
+  var kata=dasar.split("-").filter(function(w){return w&&!SLUG_BUANG[w]});
+  if(!kata.length)kata=dasar.split("-").filter(Boolean);
+  var out=[],n=0;
+  for(var i=0;i<kata.length&&out.length<7;i++){
+    if(n+kata[i].length+1>62)break;
+    out.push(kata[i]);n+=kata[i].length+1;
+  }
+  return out.join("-");
+}
+function slugUnik(dasar){
+  var s=slugBersih(dasar)||("kliping-"+new Date().toISOString().slice(0,10));
+  var ada={};
+  try{(db.kliping||[]).forEach(function(k){ada[k.id]=1})}catch(e){}
+  if(!ada[s])return s;
+  for(var i=2;i<200;i++){if(!ada[s+"-"+i])return s+"-"+i}
+  return s+"-"+Date.now();
+}
+function slugBaruUntuk(d){
+  var pilih=S.slugPilih?slugBersih(S.slugPilih):"";
+  var dasar=pilih||slugDariJudul(d&&d.judul);
+  var id=slugUnik(dasar);
+  S.slugPilih="";
+  return id;
+}
+
+function slugKetik(el){
+  S.slugPilih=el.value;
+  var pv=document.getElementById("slugPv");
+  if(pv)pv.textContent="/klip/"+(slugBersih(el.value)||"\u2026");
+}
+function slugSegarkan(){
+  var box=document.getElementById("slugBox");if(!box)return;
+  var d=S.draft||{};
+  if(d.id){
+    box.innerHTML='<div class="slug-l">Alamat halaman</div>'
+      +'<div class="slug-v"><code>/klip/'+esc(d.id)+'</code></div>'
+      +'<p class="slug-h">Alamat dikunci sejak kliping ini pertama disimpan, supaya tautan yang sudah tersebar tidak mati.</p>';
+    return;
+  }
+  var inp=document.getElementById("slugInp");
+  if(inp&&document.activeElement===inp){
+    var pv=document.getElementById("slugPv");
+    if(pv)pv.textContent="/klip/"+(slugBersih(inp.value)||"\u2026");
+    return;
+  }
+  var j=document.getElementById("fJudul");
+  var val=S.slugPilih||slugDariJudul(j?j.value:"");
+  box.innerHTML='<div class="slug-l">Alamat halaman</div>'
+    +'<input type="text" id="slugInp" value="'+esc(val)+'" placeholder="otomatis dari judul" oninput="slugKetik(this)" />'
+    +'<p class="slug-h">Jadi <code id="slugPv">/klip/'+esc(slugBersih(val)||"\u2026")+'</code> \u2014 disusun dari judul dan masih bisa disunting. Setelah kliping disimpan, alamatnya terkunci.</p>';
+}
+function slugPasang(){
+  try{
+    var j=document.getElementById("fJudul");if(!j)return;
+    if(!document.getElementById("slugBox")){
+      var wrap=(j.closest?j.closest(".f"):null)||j.parentNode;
+      var div=document.createElement("div");div.id="slugBox";div.className="slug-bx";
+      if(wrap&&wrap.parentNode)wrap.parentNode.insertBefore(div,wrap.nextSibling);else return;
+      j.addEventListener("input",function(){if(!S.slugPilih)slugSegarkan()});
+    }
+    slugSegarkan();
+  }catch(e){}
+}
+
+/* draf baru: bersihkan pilihan alamat sebelumnya */
+var _baruAsli=baru;
+baru=function(){S.slugPilih="";return _baruAsli.apply(this,arguments)};
+var _suntingAsli=sunting;
+sunting=function(){S.slugPilih="";return _suntingAsli.apply(this,arguments)};
 
 
 bootstrap();
