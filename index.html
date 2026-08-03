@@ -3739,10 +3739,10 @@ function avaBuka(){
     var m=(typeof me==="function")?me():null;if(!m){toast("Masuk dulu untuk mengubah avatar");return}
     var kini=avaKode(m.id);
     var ini=(m.nama||"?").slice(0,2).toUpperCase();
-    var tiles='<button type="button" class="ava-it'+(kini?"":" on")+'" onclick="avaSet(&quot;&quot;)"><span style="background:linear-gradient(135deg, #667eea, #764ba2);color:#fff;font-size:17px;font-weight:800">'+ini+'</span><small>Inisial</small></button>';
+    var tiles='<button type="button" class="ava-it'+(!kini?" on":"")+'" onclick="avaSet(&quot;&quot;)"><span style="background:linear-gradient(135deg, #667eea, #764ba2);color:#fff;font-size:17px;font-weight:800">'+ini+'</span><small>Inisial</small></button>';
     for(var i=0;i<AVA_PIL.length;i++){
       var p=AVA_PIL[i];
-      tiles+='<button type="button" class="ava-it'+(kini===p[0]?" on")+'" onclick="avaSet(&quot;'+p[0]+'&quot;)"><span>'+p[1]+'</span><small>'+p[2]+'</small></button>';
+      tiles+='<button type="button" class="ava-it'+(kini===p[0]?" on":"")+'" onclick="avaSet(&quot;'+p[0]+'&quot;)"><span>'+p[1]+'</span><small>'+p[2]+'</small></button>';
     }
     var ov=document.createElement("div");
     ov.className="ava-ov";ov.id="avaOv";
