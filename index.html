@@ -986,6 +986,141 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
   }
 }
 
+/* ================= PODCAST PLAYER FLOATING BAR ================= */
+.podcast-bar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  z-index: 190;
+  background: linear-gradient(135deg, rgba(16, 42, 67, 0.96), rgba(115, 87, 255, 0.95));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #ffffff;
+  border-radius: 18px;
+  padding: 10px 14px;
+  box-shadow: 0 16px 40px rgba(16, 42, 67, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: barMasuk 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (min-width: 641px) {
+  .podcast-bar {
+    left: auto;
+    right: 24px;
+    bottom: 24px;
+    width: 420px;
+  }
+}
+
+.podcast-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.podcast-txt {
+  min-width: 0;
+  flex: 1;
+}
+
+.podcast-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.podcast-t {
+  display: block;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffffff;
+}
+
+.podcast-acts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.pc-btn {
+  border: 0;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.pc-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+
+.pc-main {
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  color: #102a43;
+  font-size: 15px;
+}
+
+.pc-main:hover {
+  background: #ffffff;
+  transform: scale(1.1);
+}
+
+.pc-close {
+  background: transparent;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.pc-close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.podcast-wave {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  flex: none;
+}
+
+.podcast-wave i {
+  display: block;
+  flex: 1;
+  background: var(--lime, #b7ea5e);
+  border-radius: 2px;
+  height: 4px;
+}
+
+.podcast-wave.on i:nth-child(1) { animation: wavePulse 0.6s infinite alternate; }
+.podcast-wave.on i:nth-child(2) { animation: wavePulse 0.8s 0.2s infinite alternate; }
+.podcast-wave.on i:nth-child(3) { animation: wavePulse 0.5s 0.4s infinite alternate; }
+
+@keyframes wavePulse {
+  0% { height: 4px; }
+  100% { height: 18px; }
+}
+
 </style>
 </head>
 <body>
@@ -1292,8 +1427,137 @@ function viewBoard(){
   const list=terbit().filter(k=>(S.filter==="Semua"||k.rubrik===S.filter)&&_match(k)).sort((a,b)=>b.tglKliping.localeCompare(a.tglKliping));
   const chips=["Semua"].concat(db.rubrik.filter(r=>terbit().some(k=>k.rubrik===r))).map(r=>'<button class="chip '+(S.filter===r?"on":"")+'" onclick=\'go({filter:"'+r+'"})\'>'+r+"</button>").join("");
   const cards=list.map(k=>'<article class="clip">'+(isImg(k.gambar)?'<img src="'+esc(k.gambar)+'" alt="" style="width:100%;height:150px;object-fit:cover;border-radius:10px;margin-bottom:12px" />':"")+'<span class="tag tag-b">'+esc(k.rubrik)+'</span>'+vonisTag(k)+'<h3>'+esc(k.judul)+'</h3><p class="lead">'+esc(k.lead)+'</p><div class="src"><span>'+esc(k.media)+'</span><span>'+tglID(k.tglBerita)+'</span></div><button class="btn btn-sm open" onclick=\'go({pv:{n:"clip",id:"'+k.id+'"}})\'>Buka kliping ↗</button></article>').join("");
-  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS — menggunting berita, menanam pengetahuan"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p></div></div></section>'+litBanner()+'<div class="wrap"><div class="cari-row"><input id="cari" class="cari-inp" type="search" placeholder="🔎 Cari judul, media, wilayah, atau isi…" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" /></div><div class="filters" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0 22px;margin:0">'+chips+'</div><div class="board">'+(cards||'<p class="empty">Tidak ada kliping yang cocok dengan pencarian/filter ini.</p>')+"</div></div>"+foot();
+  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS — menggunting berita, menanam pengetahuan"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p><button type="button" class="btn btn-sm btn-p" onclick="mulaiPodcast(0)" style="margin-top:14px;display:inline-flex;align-items:center;gap:8px"><span>📻</span> <b>Putar Podcast Literasi (Auto-Play)</b></button></div></div></section>'+litBanner()+'<div class="wrap"><div class="cari-row"><input id="cari" class="cari-inp" type="search" placeholder="🔎 Cari judul, media, wilayah, atau isi…" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" /></div><div class="filters" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0 22px;margin:0">'+chips+'</div><div class="board">'+(cards||'<p class="empty">Tidak ada kliping yang cocok dengan pencarian/filter ini.</p>')+"</div></div>"+foot();
 }
+
+/* ================= PODCAST CONTINUOUS PLAYER ================= */
+let PODCAST = { active: false, queue: [], idx: 0, playing: false, paused: false };
+
+function mulaiPodcast(idx) {
+  if (!("speechSynthesis" in window)) {
+    toast("Peramban tidak mendukung fitur pemutar suara");
+    return;
+  }
+  const list = terbit().sort((a,b) => b.tglKliping.localeCompare(a.tglKliping));
+  if (!list.length) { toast("Belum ada kliping terbit untuk diputar"); return; }
+  
+  PODCAST.queue = list;
+  PODCAST.idx = (typeof idx === "number" && idx >= 0 && idx < list.length) ? idx : 0;
+  PODCAST.active = true;
+  PODCAST.playing = true;
+  PODCAST.paused = false;
+  
+  putarPodcastTrack();
+}
+
+function putarPodcastTrack() {
+  if (!PODCAST.active || !PODCAST.queue.length) return;
+  const k = PODCAST.queue[PODCAST.idx];
+  if (!k) { tutupPodcast(); toast("Podcast selesai diputar!"); return; }
+  
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  
+  const chunks = ttsText(k).match(/[^.!?]+[.!?]*/g) || [ttsText(k)];
+  const voice = ttsBest();
+  let i = 0;
+  
+  PODCAST.playing = true;
+  PODCAST.paused = false;
+  tampilPodcastBar();
+  
+  (function nextChunk() {
+    if (!PODCAST.active || !PODCAST.playing || PODCAST.paused) return;
+    if (i >= chunks.length) {
+      PODCAST.idx++;
+      if (PODCAST.idx < PODCAST.queue.length) {
+        toast("Melanjutkan ke: " + PODCAST.queue[PODCAST.idx].judul);
+        setTimeout(putarPodcastTrack, 1000);
+      } else {
+        tutupPodcast();
+        toast("Semua podcast kliping selesai diputar 🎉");
+      }
+      return;
+    }
+    
+    const u = new SpeechSynthesisUtterance((chunks[i] || "").trim());
+    u.lang = voice ? voice.lang : "id-ID";
+    if (voice) u.voice = voice;
+    u.rate = 0.96;
+    u.pitch = 1.0;
+    u.onend = function() { i++; nextChunk(); };
+    u.onerror = function() { i++; nextChunk(); };
+    synth.speak(u);
+  })();
+}
+
+function podcastTogglePlay() {
+  if (!("speechSynthesis" in window)) return;
+  const synth = window.speechSynthesis;
+  if (PODCAST.paused) {
+    synth.resume();
+    PODCAST.paused = false;
+    PODCAST.playing = true;
+  } else {
+    synth.pause();
+    PODCAST.paused = true;
+    PODCAST.playing = false;
+  }
+  tampilPodcastBar();
+}
+
+function podcastNext() {
+  if (!PODCAST.queue.length) return;
+  PODCAST.idx = (PODCAST.idx + 1) % PODCAST.queue.length;
+  putarPodcastTrack();
+}
+
+function podcastPrev() {
+  if (!PODCAST.queue.length) return;
+  PODCAST.idx = (PODCAST.idx - 1 + PODCAST.queue.length) % PODCAST.queue.length;
+  putarPodcastTrack();
+}
+
+function tutupPodcast() {
+  PODCAST.active = false;
+  PODCAST.playing = false;
+  PODCAST.paused = false;
+  try { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); } catch(e) {}
+  const bar = document.getElementById("podcastBar");
+  if (bar && bar.parentNode) bar.parentNode.removeChild(bar);
+}
+
+function tampilPodcastBar() {
+  if (!PODCAST.active) return;
+  const k = PODCAST.queue[PODCAST.idx];
+  if (!k) return;
+  
+  let bar = document.getElementById("podcastBar");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "podcastBar";
+    bar.className = "podcast-bar";
+    document.body.appendChild(bar);
+  }
+  
+  const statusIcon = PODCAST.paused ? "▶️" : "⏸️";
+  const numStr = (PODCAST.idx + 1) + " / " + PODCAST.queue.length;
+  
+  bar.innerHTML = '<div class="podcast-left">' +
+    '<span class="podcast-wave' + (PODCAST.paused ? "" : " on") + '"><i></i><i></i><i></i></span>' +
+    '<div class="podcast-txt">' +
+      '<div class="podcast-top"><span class="tag tag-b" style="font-size:10px;padding:1px 6px">📻 PODCAST</span> <small style="color:rgba(255,255,255,0.75)">' + numStr + '</small></div>' +
+      '<b class="podcast-t">' + esc(k.judul) + '</b>' +
+    '</div>' +
+  '</div>' +
+  '<div class="podcast-acts">' +
+    '<button type="button" class="pc-btn" onclick="podcastPrev()" title="Sebelumnya">⏮️</button>' +
+    '<button type="button" class="pc-btn pc-main" onclick="podcastTogglePlay()" title="Putar/Jeda">' + statusIcon + '</button>' +
+    '<button type="button" class="pc-btn" onclick="podcastNext()" title="Berikutnya">⏭️</button>' +
+    '<button type="button" class="pc-btn pc-close" onclick="tutupPodcast()" title="Tutup">✕</button>' +
+  '</div>';
+}
+
 var TTS={id:null,on:false,paused:false};
 function ttsText(k){var p=[k.judul+".",k.lead+".","Potongan berita. "+k.potongan,"Konteks. "+k.konteks,"Pelajaran."];k.pelajaran.forEach(function(x,i){if(x&&x.trim())p.push((i+1)+". "+x)});return p.join(" ")}
 function ttsSet(h){var b=document.getElementById("ttsBtn");if(b)b.innerHTML=h}
