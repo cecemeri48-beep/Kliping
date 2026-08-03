@@ -1272,6 +1272,8 @@ async function bootstrap(){
     if(_h&&db.kliping.some(k=>k.id===_h)){S.mode="public";S.pv={n:"clip",id:_h}}
     if(S.me&&!S.draft&&!_h){const _dr=pulihkanDraf();if(_dr){S.draft=_dr;S.av="kliping";S.mode="admin";toast("Draf kliping dipulihkan — lanjutkan mengisi");}}
   }catch(e){console.error(e);toast("Gagal memuat data: "+(e.message||e));if(!db)db=seed()}
+  try{initGA()}catch(e){}
+  try{catatTrafik(S.pv&&S.pv.id)}catch(e){}
   render();
 }
 function save(){}
@@ -1847,6 +1849,93 @@ function pAudit(){
    db.audit.map(a=>'<tr><td class="mono">'+esc(a.ts)+"</td><td>"+esc(nm(a.user))+"</td><td>"+esc(a.aksi)+'</td><td style="color:var(--ink2)">'+esc(a.obj)+"</td></tr>").join("")+"</tbody></table></div>";
 }
 
+/* ================= GOOGLE ANALYTICS & TRAFFIC TRACKER ================= */
+function initGA() {
+  const gaId = (db && db.settings && db.settings.gaId) || "";
+  if (!gaId || document.getElementById("gaScript")) return;
+  
+  const sc = document.createElement("script");
+  sc.id = "gaScript";
+  sc.async = true;
+  sc.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(gaId);
+  document.head.appendChild(sc);
+  
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ window.dataLayer.push(arguments); }
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', gaId, { page_path: location.pathname + location.search });
+}
+
+function catatTrafik(halamanId) {
+  try {
+    const d = new Date().toISOString().slice(0,10);
+    const dev = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ? "HP" : "Desktop";
+    let tr = {};
+    try { tr = JSON.parse(localStorage.getItem("rcs_trafik") || "{}") || {}; } catch(e){}
+    
+    tr[d] = tr[d] || { hits: 0, hp: 0, desktop: 0, pages: {} };
+    tr[d].hits++;
+    if (dev === "HP") tr[d].hp++; else tr[d].desktop++;
+    
+    if (halamanId) {
+      tr[d].pages[halamanId] = (tr[d].pages[halamanId] || 0) + 1;
+    }
+    
+    localStorage.setItem("rcs_trafik", JSON.stringify(tr));
+    
+    if (typeof window.gtag === "function") {
+      const gaId = db && db.settings && db.settings.gaId;
+      if (gaId) window.gtag('event', 'page_view', { page_title: halamanId || "Papan Kliping", page_location: location.href });
+    }
+  } catch(e){}
+}
+
+function kartuAnalitik() {
+  let tr = {};
+  try { tr = JSON.parse(localStorage.getItem("rcs_trafik") || "{}") || {}; } catch(e){}
+  
+  const hariIni = new Date().toISOString().slice(0,10);
+  const dataHariIni = tr[hariIni] || { hits: 0, hp: 0, desktop: 0 };
+  
+  const keys = Object.keys(tr).sort().slice(-7);
+  let totalHits = 0, totalHP = 0, totalDesktop = 0;
+  keys.forEach(k => {
+    totalHits += (tr[k].hits || 0);
+    totalHP += (tr[k].hp || 0);
+    totalDesktop += (tr[k].desktop || 0);
+  });
+  
+  const gaId = (db && db.settings && db.settings.gaId) || "";
+  
+  const barsHtml = keys.map(k => {
+    const h = tr[k].hits || 0;
+    const max = Math.max(10, Math.max(...keys.map(x => tr[x].hits || 0)));
+    const pct = Math.min(100, Math.round((h / max) * 100));
+    return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">' +
+      '<span style="font-size:10px;color:var(--ink2)">' + h + '</span>' +
+      '<div style="width:100%;height:60px;background:var(--soft2,#e2e8f0);border-radius:6px;display:flex;align-items:flex-end;overflow:hidden">' +
+        '<div style="width:100%;height:' + Math.max(8, pct) + '%;background:linear-gradient(180deg,#7357ff,#31c5c2);border-radius:6px"></div>' +
+      '</div>' +
+      '<span style="font-size:10px;color:var(--ink2);white-space:nowrap">' + k.slice(5) + '</span>' +
+    '</div>';
+  }).join("");
+
+  return '<div class="card" style="margin-top:16px"><b style="font-size:15px;display:flex;align-items:center;gap:8px">📈 Analitik Pengunjung &amp; Trafik (Google Analytics)</b>' +
+    '<p style="font-size:13px;color:var(--ink2);margin:4px 0 14px">Pantau jumlah pembaca, rasio perangkat (HP vs Laptop), dan integrasi Google Analytics 4 (GA4).</p>' +
+    '<div class="grid g3" style="gap:10px;margin-bottom:16px">' +
+      '<div style="background:var(--soft,#f8fafc);border-radius:12px;padding:12px 14px;border:1px solid var(--line,#e2e8f0)"><span style="font-size:12px;color:var(--ink2)">Pengunjung Hari Ini</span><b style="display:block;font-size:22px;color:var(--violet,#7357ff)">' + dataHariIni.hits + '</b><small style="font-size:11px;color:var(--ink2)">📱 ' + dataHariIni.hp + ' HP · 💻 ' + dataHariIni.desktop + ' PC</small></div>' +
+      '<div style="background:var(--soft,#f8fafc);border-radius:12px;padding:12px 14px;border:1px solid var(--line,#e2e8f0)"><span style="font-size:12px;color:var(--ink2)">Total Trafik 7 Hari</span><b style="display:block;font-size:22px;color:var(--green,#38ef7d)">' + totalHits + '</b><small style="font-size:11px;color:var(--ink2)">📱 ' + totalHP + ' HP (' + (totalHits ? Math.round(totalHP/totalHits*100) : 0) + '%)</small></div>' +
+      '<div style="background:var(--soft,#f8fafc);border-radius:12px;padding:12px 14px;border:1px solid var(--line,#e2e8f0)"><span style="font-size:12px;color:var(--ink2)">Status Google Analytics</span><b style="display:block;font-size:15px;margin-top:4px;color:' + (gaId ? 'var(--green,#38ef7d)' : 'var(--orange,#f59e0b)') + '">' + (gaId ? '✅ Terhubung (' + esc(gaId) + ')' : '⚠️ Belum Dipasang') + '</b></div>' +
+    '</div>' +
+    (keys.length ? '<div style="margin-bottom:16px"><b style="font-size:13px;display:block;margin-bottom:8px">Grafik Trafik 7 Hari Terakhir:</b><div style="display:flex;gap:8px;align-items:flex-end">' + barsHtml + '</div></div>' : '') +
+    '<div class="f"><label>ID Pengukuran Google Analytics 4 (GA4) <span class="hint">misal: G-XXXXXXXXXX</span></label>' +
+      '<input type="text" id="sGaId" value="' + esc(gaId) + '" placeholder="G-XXXXXXXXXX" style="font-family:monospace" />' +
+      '<div class="hint" style="margin-top:6px">Dapatkan ID ini dari dashboard <a href="https://analytics.google.com/" target="_blank" rel="noopener">Google Analytics</a> (Admin ➔ Data Streams ➔ Measurement ID).</div>' +
+    '</div>' +
+  '</div>';
+}
+
 function pPengaturan(){
   const s=db.settings;
   return ph("Pengaturan Situs","Berlaku untuk seluruh halaman publik.","")+
@@ -1856,9 +1945,25 @@ function pPengaturan(){
    '<div class="f"><label><input type="checkbox" id="sWajib" '+(s.wajibTinjauan?"checked":"")+' /> Wajib tinjauan sebelum terbit untuk rubrik sensitif</label></div>'+
    '<div class="f"><label><input type="checkbox" id="sTipis" '+(s.sinyalTipis?"checked":"")+' /> Aktifkan mode sinyal tipis sebagai bawaan</label></div>'+
    '<button class="btn btn-p" onclick="simpanSetting()">Simpan pengaturan</button></div>'+
+   kartuAnalitik()+
    '<div class="card" style="margin-top:16px"><b style="font-size:14px">Pemeliharaan</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Data utama tersimpan di Supabase. Dua tombol ini untuk mengatasi tampilan yang terasa basi atau macet di perangkatmu \u2014 tidak ada yang menghapus data server.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="reset()">Muat ulang data dari server</button><button class="btn btn-d" onclick="bersihkanTembolok()">Bersihkan tembolok aplikasi</button></div></div>';
 }
-function simpanSetting(){const s=db.settings;s.nama=document.getElementById("sNama").value;s.tagline=document.getElementById("sTag").value;s.penyangkalan=document.getElementById("sDis").value;s.wajibTinjauan=document.getElementById("sWajib").checked;s.sinyalTipis=document.getElementById("sTipis").checked;log("Memperbarui pengaturan situs",s.nama);supa.from("app_settings").upsert({id:"situs",data:s}).then(({error})=>pErr(error,"pengaturan"));render();toast("Pengaturan disimpan")}
+
+function simpanSetting(){
+  const s=db.settings;
+  s.nama=document.getElementById("sNama").value;
+  s.tagline=document.getElementById("sTag").value;
+  s.penyangkalan=document.getElementById("sDis").value;
+  s.wajibTinjauan=document.getElementById("sWajib").checked;
+  s.sinyalTipis=document.getElementById("sTipis").checked;
+  const gaEl=document.getElementById("sGaId");
+  if(gaEl) s.gaId=gaEl.value.trim();
+  log("Memperbarui pengaturan situs",s.nama);
+  supa.from("app_settings").upsert({id:"situs",data:s}).then(({error})=>pErr(error,"pengaturan"));
+  initGA();
+  render();
+  toast("Pengaturan disimpan");
+}
 
 /* ================= editor ================= */
 function baru(){S.av="kliping";S.draft={id:"",judul:"",lead:"",rubrik:db.rubrik[0],media:db.media[0],tautan:"",tglBerita:"2026-07-30",tglKliping:"2026-07-30",wilayah:"Sulawesi Selatan",lokasi:[],topik:[],potongan:"",konteks:"",pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",gbrKet:"",vonis:"",catatan:""};S.err=[];go({})}
