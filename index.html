@@ -2245,7 +2245,7 @@ function reaksiToggle(id,emo){
   try{
     var q=punya
       ? supa.rpc("batal_reaksi",{p_klip:id,p_emo:emo,p_sidik:sidik})
-      : supa.from("reaksi").insert({klip:id,emo:emo,sidik:sidik});
+      : supa.from("reaksi").upsert({klip:id,emo:emo,sidik:sidik},{onConflict:"klip,emo,sidik",ignoreDuplicates:true});
     Promise.resolve(q).then(function(r){
       if(r&&r.error)balik("Tanggapan gagal terkirim: "+r.error.message);
     }).catch(function(e){balik("Tanggapan gagal terkirim")});
