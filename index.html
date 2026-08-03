@@ -640,7 +640,11 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
 .rks-b .rks-n{min-width:26px;text-align:center;font-variant-numeric:tabular-nums;font-weight:700;font-size:17px;color:var(--ink2)}
 .rks-b.on{background:rgba(213,128,59,.10);border-color:var(--orange)}
 .rks-b.on .rks-n{color:var(--orange)}
-.rks-k{margin:10px 0 0;font-size:12.5px;color:var(--ink2)}
+.rks-arti{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.rks-arti li{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.45;color:var(--ink2)}
+.rks-arti-e{font-size:16px;line-height:1.3;flex:none}
+.rks-arti b{color:var(--ink);font-weight:600}
+.rks-k{margin:12px 0 0;font-size:12.5px;color:var(--ink2)}
 .rks-mini{font-variant-numeric:tabular-nums;color:var(--ink2)}
 [data-tema="gelap"] .rks{background:rgba(255,255,255,.03)}
 [data-tema="gelap"] .rks-b{background:rgba(255,255,255,.05);color:var(--ink)}
@@ -2869,9 +2873,18 @@ function reaksiToggle(id,emo){
   try{
     var q=punya
       ? supa.from("reaksi").delete().eq("klip",id).eq("emo",emo).eq("sidik",sidik)
-      : supa.from("reaksi").insert({klip:id,emo:emo,sidik:sidik});
+      : supa.from("reaksi").upsert({klip:id,emo:emo,sidik:sidik},{onConflict:"klip,emo,sidik",ignoreDuplicates:true});
     Promise.resolve(q).then(function(r){
-      if(r&&r.error)balik("Tanggapan gagal terkirim: "+r.error.message);
+      if(r&&r.error){
+        var kode=(r.error.code||""),pesanErr=(r.error.message||"");
+        /* Baris sudah ada di server (perangkat ini pernah menanggapi, tapi catatan lokalnya hilang).
+           Perlakukan sebagai berhasil, cukup samakan hitungan dengan server. */
+        if(!punya&&(kode==="23505"||/duplicate key/i.test(pesanErr))){
+          muatReaksi().then(function(){try{render()}catch(e){}});
+          return;
+        }
+        balik("Tanggapan gagal terkirim: "+pesanErr);
+      }
     }).catch(function(e){balik("Tanggapan gagal terkirim")});
   }catch(e){balik("Tanggapan gagal terkirim")}
 }
@@ -2884,7 +2897,10 @@ function reaksiBar(k){
       '<span class="rks-e">'+RKS_EMO[emo]+'</span><span class="rks-t">'+esc(RKS_LBL[emo])+'</span>'+
       '<span class="rks-n">'+n+'</span></button>';
   }).join("");
-  return '<div class="rks"><span class="rks-h">Tanggapan pembaca</span><div class="rks-row">'+tomb+'</div>'+
+  var arti='<ul class="rks-arti">'+Object.keys(RKS_EMO).map(function(emo){
+    return '<li><span class="rks-arti-e">'+RKS_EMO[emo]+'</span><span><b>'+esc(RKS_LBL[emo])+'</b> \u2014 '+esc(RKS_KET[emo])+'</span></li>';
+  }).join("")+'</ul>';
+  return '<div class="rks"><span class="rks-h">Tanggapan pembaca</span><div class="rks-row">'+tomb+'</div>'+arti+
     '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p></div>';
 }
 function rksMini(k){
