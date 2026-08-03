@@ -1116,9 +1116,42 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
 .podcast-wave.on i:nth-child(2) { animation: wavePulse 0.8s 0.2s infinite alternate; }
 .podcast-wave.on i:nth-child(3) { animation: wavePulse 0.5s 0.4s infinite alternate; }
 
-@keyframes wavePulse {
-  0% { height: 4px; }
-  100% { height: 18px; }
+/* ================= HYPER-REALISTIC 3D AVATAR STYLING ================= */
+.avat {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background: linear-gradient(135deg, #7357ff, #4267e7) !important;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(115, 87, 255, 0.4), 0 8px 18px rgba(16, 42, 67, 0.25) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease !important;
+  display: grid !important;
+  place-items: center !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  flex: none !important;
+}
+
+.avat img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
+.avat:hover {
+  transform: scale(1.1) rotate(4deg) !important;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px rgba(115, 87, 255, 0.65), 0 12px 26px rgba(115, 87, 255, 0.4) !important;
+}
+
+[data-tema="gelap"] .avat {
+  box-shadow: 0 0 0 2px #161b24, 0 0 0 4px rgba(125, 192, 245, 0.45), 0 8px 18px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-tema="gelap"] .avat:hover {
+  box-shadow: 0 0 0 2px #161b24, 0 0 0 5px rgba(125, 192, 245, 0.75), 0 12px 26px rgba(125, 192, 245, 0.4) !important;
 }
 
 </style>
@@ -3646,29 +3679,33 @@ function periksa(d,status){
   if(status==="Terbit"&&mutuTegas()){
     var A=mutuAmbang(),o=mutuObj(d),a=adsKataAsli(o),r=adsRasio(o);
     if(a<A.kata)e.push("Tulisan sendiri baru "+a+" kata, kurang "+(A.kata-a)+" kata dari ambang "+A.kata+". Tebalkan konteks atau pelajaran.");
-    if(r>A.rasio)e.push("Porsi kutipan "+r+" persen, melewati batas "+A.rasio+" persen. Perpendek potongan atau perpanjang telaah.");
     if(d.gambar&&!String(d.gbrKet||"").trim())e.push("Gambar belum punya keterangan foto.");
   }
   return e;
 }
 
-
-/* ================= avatar lapangan (v21) ================= */
-var AVA_CSS='.avat.ava-em{font-size:17px;line-height:1;background:var(--soft2);color:inherit}'
-+'.avat-btn.ava-em{font-size:19px}'
-+'.ava-ov{position:fixed;inset:0;background:rgba(16,42,67,.45);display:grid;place-items:center;z-index:9999;padding:18px}'
-+'.ava-bx{background:var(--canvas,#fff);color:var(--ink);border-radius:16px;max-width:420px;width:100%;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.3)}'
-+'.ava-bx h3{margin:0 0 4px;font-size:18px}.ava-bx .hint{margin:0 0 14px}'
-+'.ava-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}'
-+'.ava-it{border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:12px 6px;cursor:pointer;font-family:inherit;color:var(--ink);display:grid;gap:6px;place-items:center}'
-+'.ava-it:hover{border-color:var(--violet)}'
-+'.ava-it.on{border-color:var(--violet);box-shadow:0 0 0 2px rgba(115,87,255,.22)}'
-+'.ava-it span{font-size:26px;line-height:1}.ava-it small{font-size:12px;color:var(--ink2)}'
-+'.ava-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}'
-+'@media(max-width:420px){.ava-grid{grid-template-columns:repeat(2,1fr)}}';
+/* ================= avatar lapangan (v21 - HYPER REALISTIC 3D OVERHAUL) ================= */
+var AVA_CSS='.avat.ava-em{font-size:19px;line-height:1;color:#fff}'
++'.avat-btn.ava-em{font-size:21px}'
++'.ava-ov{position:fixed;inset:0;background:rgba(16,42,67,.65);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);display:grid;place-items:center;z-index:9999;padding:18px;animation:avaMasuk .3s cubic-bezier(.16,1,.3,1) both}'
++'@keyframes avaMasuk{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}'
++'.ava-bx{background:var(--canvas,#fff);color:var(--ink,#102a43);border-radius:24px;max-width:440px;width:100%;padding:24px;box-shadow:0 24px 60px rgba(16,42,67,.35),0 0 0 1px rgba(255,255,255,.25)}'
++'.ava-bx h3{margin:0 0 4px;font-size:20px;font-weight:800;font-family:var(--display)}'
++'.ava-bx .hint{margin:0 0 18px;font-size:13px;color:var(--ink2)}'
++'.ava-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
++'.ava-it{border:1.5px solid var(--line,#e2e8f0);background:var(--soft,#f8fafc);border-radius:18px;padding:14px 8px;cursor:pointer;font-family:inherit;color:var(--ink,#102a43);display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .22s cubic-bezier(.16,1,.3,1);position:relative}'
++'.ava-it:hover{transform:translateY(-4px) scale(1.03);border-color:var(--violet,#7357ff);box-shadow:0 10px 24px -4px rgba(115,87,255,.25)}'
++'.ava-it:active{transform:scale(.96)}'
++'.ava-it.on{border-color:#7357ff;box-shadow:0 0 0 3px rgba(115,87,255,.35),0 12px 28px -4px rgba(115,87,255,.35);background:rgba(115,87,255,.05);transform:scale(1.03)}'
++'.ava-it span{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:25px;line-height:1;box-shadow:0 8px 18px rgba(16,42,67,.22),inset 0 2px 4px rgba(255,255,255,.4);transition:transform .2s ease}'
++'.ava-it:hover span{transform:scale(1.1) rotate(5deg)}'
++'.ava-it small{font-size:13px;font-weight:600;color:var(--ink2)}'
++'.ava-it.on small{color:var(--ink);font-weight:800}'
++'.ava-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}'
++'@media(max-width:420px){.ava-grid{grid-template-columns:repeat(2,1fr)}.ava-bx{padding:18px}}';
 (function(){try{var st=document.createElement("style");st.textContent=AVA_CSS;document.head.appendChild(st)}catch(e){}})();
 
-var AVA_PIL=[["gunung","\ud83c\udfd4\ufe0f","Gunung"],["goa","\ud83d\udd73\ufe0f","Goa"],["tebing","\ud83e\uddd7","Tebing"],["sungai","\ud83c\udfde\ufe0f","Sungai"],["laut","\ud83c\udf0a","Laut"],["angkasa","\ud83c\udf0c","Angkasa"]];
+var AVA_PIL=[["gunung","🏔️","Gunung"],["goa","🕳️","Goa"],["tebing","🧗","Tebing"],["sungai","🏞️","Sungai"],["laut","🌊","Laut"],["angkasa","🌌","Angkasa"]];
 function avaPeta(){try{return (db.settings&&db.settings.avatar)||{}}catch(e){return {}}}
 function avaKode(id){var p=avaPeta();return (id&&p[id])||""}
 function avaEmoji(id){var k=avaKode(id);if(!k)return "";for(var i=0;i<AVA_PIL.length;i++){if(AVA_PIL[i][0]===k)return AVA_PIL[i][1]}return ""}
@@ -3688,7 +3725,7 @@ function avaPasang(){
     if(pop&&!pop.querySelector(".ai-ava")){
       var b=document.createElement("button");
       b.className="ai ai-ava";b.setAttribute("role","menuitem");b.type="button";
-      b.innerHTML='<span class="ai-ic">'+(em||"\ud83c\udfd4\ufe0f")+'</span>Pilih avatar';
+      b.innerHTML='<span class="ai-ic">'+(em||"🏔️")+'</span>Pilih avatar';
       b.onclick=function(){try{tutupAkun()}catch(e){}avaBuka()};
       var tema=pop.querySelector(".ai-tema");
       if(tema&&tema.parentNode===pop)pop.insertBefore(b,tema);else pop.appendChild(b);
@@ -3702,10 +3739,10 @@ function avaBuka(){
     var m=(typeof me==="function")?me():null;if(!m){toast("Masuk dulu untuk mengubah avatar");return}
     var kini=avaKode(m.id);
     var ini=(m.nama||"?").slice(0,2).toUpperCase();
-    var tiles='<button type="button" class="ava-it'+(kini?"":" on")+'" onclick="avaSet(&quot;&quot;)"><span style="font-size:18px;font-weight:700">'+ini+'</span><small>Inisial</small></button>';
+    var tiles='<button type="button" class="ava-it'+(kini?"":" on")+'" onclick="avaSet(&quot;&quot;)"><span style="background:linear-gradient(135deg, #667eea, #764ba2);color:#fff;font-size:17px;font-weight:800">'+ini+'</span><small>Inisial</small></button>';
     for(var i=0;i<AVA_PIL.length;i++){
       var p=AVA_PIL[i];
-      tiles+='<button type="button" class="ava-it'+(kini===p[0]?" on":"")+'" onclick="avaSet(&quot;'+p[0]+'&quot;)"><span>'+p[1]+'</span><small>'+p[2]+'</small></button>';
+      tiles+='<button type="button" class="ava-it'+(kini===p[0]?" on")+'" onclick="avaSet(&quot;'+p[0]+'&quot;)"><span>'+p[1]+'</span><small>'+p[2]+'</small></button>';
     }
     var ov=document.createElement("div");
     ov.className="ava-ov";ov.id="avaOv";
@@ -3732,25 +3769,23 @@ function avaSet(k){
   }catch(e){}
 }
 
-
-
-/* ================= poles avatar (v22) ================= */
+/* ================= poles avatar hyper-realistis 3D (v22) ================= */
 var AVA_WARNA={
-  gunung:["linear-gradient(145deg,#e9f6ee,#cfeadb)","rgba(70,161,113,.55)"],
-  goa:["linear-gradient(145deg,#f0e9e1,#ddcbb8)","rgba(138,106,75,.55)"],
-  tebing:["linear-gradient(145deg,#fdefe2,#f7d7ba)","rgba(213,128,59,.55)"],
-  sungai:["linear-gradient(145deg,#e4f6f6,#c4ecec)","rgba(49,197,194,.55)"],
-  laut:["linear-gradient(145deg,#e6f0fd,#c8ddf8)","rgba(39,131,222,.55)"],
-  angkasa:["linear-gradient(145deg,#efeaff,#dcd2ff)","rgba(115,87,255,.55)"]
+  gunung:["linear-gradient(135deg, #11998e 0%, #38ef7d 100%)","rgba(56, 239, 125, 0.65)","#ffffff"],
+  goa:["linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)","rgba(76, 161, 175, 0.65)","#ffffff"],
+  tebing:["linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)","rgba(255, 126, 95, 0.65)","#ffffff"],
+  sungai:["linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)","rgba(0, 198, 255, 0.65)","#ffffff"],
+  laut:["linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)","rgba(42, 82, 152, 0.65)","#ffffff"],
+  angkasa:["linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)","rgba(115, 87, 255, 0.75)","#ffffff"]
 };
 var AVA_CSS2='@keyframes avaPop{0%{transform:scale(.6);opacity:.2}60%{transform:scale(1.14)}100%{transform:scale(1);opacity:1}}'
 +'.avat.ava-pop{animation:avaPop .42s cubic-bezier(.2,1.3,.4,1)}'
-+'.avat.ava-em{transition:box-shadow .2s ease,background .2s ease}'
-+'.ava-it{transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}'
-+'.ava-it:hover{transform:translateY(-2px)}'
++'.avat.ava-em{transition:all .25s ease;color:#fff}'
++'.ava-it{transition:transform .2s cubic-bezier(.16,1,.3,1),border-color .2s ease,box-shadow .2s ease}'
++'.ava-it:hover{transform:translateY(-3px) scale(1.03)}'
 +'.ava-it:active{transform:scale(.95)}'
-+'.ava-it span{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--soft2)}'
-+'.ava-it.on small{color:var(--ink);font-weight:700}'
++'.ava-it span{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;box-shadow:0 8px 18px rgba(16,42,67,.22),inset 0 2px 4px rgba(255,255,255,.4)}'
++'.ava-it.on small{color:var(--ink);font-weight:800}'
 +'.pk-av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:700;flex:none;background:var(--soft2);color:#1a5f9e}'
 +'.pk-av.kecil{font-size:12px}'
 +'@media(prefers-reduced-motion:reduce){.avat.ava-pop{animation:none}.ava-it:hover{transform:none}}';
@@ -3759,9 +3794,15 @@ var AVA_CSS2='@keyframes avaPop{0%{transform:scale(.6);opacity:.2}60%{transform:
 function avaGaya(el,kode,ring){
   try{
     var w=AVA_WARNA[kode];
-    if(!w){el.style.background="";el.style.boxShadow="";return}
+    if(!w){
+      el.style.background="linear-gradient(135deg, #7357ff, #4267e7)";
+      el.style.boxShadow="0 0 0 2px #ffffff, 0 0 0 4px rgba(115, 87, 255, 0.4), 0 8px 18px rgba(16, 42, 67, 0.25)";
+      el.style.color="#ffffff";
+      return;
+    }
     el.style.background=w[0];
-    el.style.boxShadow="0 0 0 2px "+w[1]+(ring?",0 2px 8px rgba(16,42,67,.18)":"");
+    el.style.color=w[2]||"#ffffff";
+    el.style.boxShadow="0 0 0 2px #ffffff, 0 0 0 4.5px "+w[1]+(ring?", 0 8px 22px rgba(16,42,67,.28)":"");
   }catch(e){}
 }
 
@@ -3786,8 +3827,14 @@ avaBuka=function(){
     for(var i=1;i<its.length;i++){
       var kode=AVA_PIL[i-1]&&AVA_PIL[i-1][0];
       var sp=its[i].querySelector("span");
-      if(sp&&AVA_WARNA[kode]){sp.style.background=AVA_WARNA[kode][0];}
-      if(its[i].classList.contains("on")&&AVA_WARNA[kode])its[i].style.boxShadow="0 0 0 2px "+AVA_WARNA[kode][1];
+      if(sp&&AVA_WARNA[kode]){
+        sp.style.background=AVA_WARNA[kode][0];
+        sp.style.color="#ffffff";
+      }
+      if(its[i].classList.contains("on")&&AVA_WARNA[kode]) {
+        its[i].style.borderColor=AVA_WARNA[kode][1];
+        its[i].style.boxShadow="0 0 0 3px "+AVA_WARNA[kode][1]+", 0 10px 24px -4px rgba(16,42,67,.25)";
+      }
     }
   }catch(e){}
 };
