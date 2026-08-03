@@ -2281,14 +2281,22 @@ function kartuKlip(k){
 }
 
 /* ---- Penghitung pembaca publik (Supabase, tanpa cookie) ---- */
+/* Penghitung pembaca. Memakai tabel biasa (kunjungan_log), bukan fungsi RPC,
+   karena endpoint /rpc/ tidak tersedia di proyek Supabase ini. Satu baris per
+   sesi browser; jumlah pembaca dibaca lewat count. Gagal diam-diam bila tabel
+   belum dibuat, sehingga tampilan situs tidak terganggu. */
 function catatKunjunganPublik(){
   try{
     var baru = false;
     try{ baru = !sessionStorage.getItem("rcs_kunjung"); if(baru) sessionStorage.setItem("rcs_kunjung","1"); }catch(e){}
-    var awal = baru ? supa.rpc("naik_kunjungan") : Promise.resolve();
-    awal.then(function(){ return supa.rpc("total_kunjungan"); }).then(function(r){
-      if(!r || r.error || r.data==null) return;
-      window.__pembaca = r.data;
+    var awal = baru
+      ? Promise.resolve(supa.from("kunjungan_log").insert({}))
+      : Promise.resolve();
+    awal.then(function(){
+      return supa.from("kunjungan_log").select("*", { count: "exact", head: true });
+    }).then(function(r){
+      if(!r || r.error || r.count==null) return;
+      window.__pembaca = r.count;
       if(typeof render==="function") render();
     }).catch(function(){});
   }catch(e){}
