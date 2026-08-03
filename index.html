@@ -2288,9 +2288,13 @@ function kartuKlip(k){
 function catatKunjunganPublik(){
   try{
     var baru = false;
-    try{ baru = !sessionStorage.getItem("rcs_kunjung"); if(baru) sessionStorage.setItem("rcs_kunjung","1"); }catch(e){}
+    try{ baru = !sessionStorage.getItem("rcs_kunjung"); }catch(e){}
+    /* Sesi baru ditandai HANYA setelah pencatatan berhasil, supaya kegagalan
+       sementara di server tidak membuat kunjungan hilang tak tercatat. */
     var awal = baru
-      ? Promise.resolve(supa.from("kunjungan_log").insert({}))
+      ? Promise.resolve(supa.from("kunjungan_log").insert({})).then(function(r){
+          if(!r || !r.error){ try{ sessionStorage.setItem("rcs_kunjung","1") }catch(e){} }
+        })
       : Promise.resolve();
     awal.then(function(){
       return supa.from("kunjungan_log").select("*", { count: "exact", head: true });
@@ -2307,7 +2311,7 @@ function statStrip(){
   var t=terbit();var bln=new Date().toISOString().slice(0,7);
   var ck=t.filter(function(k){return k.vonis&&k.vonis!=="Belum diverifikasi"}).length;
   var it=[["\ud83d\udcf0",t.length,"kliping terbit"],["\ud83d\udcda",db.materi.length,"materi ilmu"],["\u2705",ck,"sudah divonis"],["\ud83d\uddc2",db.rubrik.length,"rubrik"],["\ud83d\uddd3",t.filter(function(k){return jilid(k.tglKliping)===bln}).length,"bulan ini"]];
-  var pb = (window.__pembaca!=null) ? '<div class="stat-i"><span class="si-ic">\ud83d\udc40</span><b>'+Number(window.__pembaca).toLocaleString("id-ID")+'</b><small>kali dibaca</small></div>' : '';
+  var pb = (window.__pembaca!=null && Number(window.__pembaca)>0) ? '<div class="stat-i"><span class="si-ic">\ud83d\udc40</span><b>'+Number(window.__pembaca).toLocaleString("id-ID")+'</b><small>kali dibaca</small></div>' : '';
   return '<div class="stats">'+it.map(function(i){return '<div class="stat-i"><span class="si-ic">'+i[0]+'</span><b>'+i[1]+'</b><small>'+esc(i[2])+'</small></div>'}).join("")+pb+'</div>';
 }
 
