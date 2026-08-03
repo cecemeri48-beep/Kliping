@@ -8,6 +8,9 @@
 <link rel="canonical" href="https://kliping-reichas.my.id/" />
 <link rel="preconnect" href="https://nfeexstvdjgywonbtxtb.supabase.co" crossorigin />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
 <link rel="dns-prefetch" href="https://nfeexstvdjgywonbtxtb.supabase.co" />
 <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
 <meta name="google-site-verification" content="qNMqPYjzdndI4etjWI23Ee0iSSSOpDBrJYeOiaABXyk" />
@@ -30,10 +33,10 @@
 <meta name="twitter:title" content="Membaca Hari Ini, Melek Fakta Selamanya" />
 <meta name="twitter:description" content="Galeri kliping literasi & cek fakta REICHAS — baca, telaah, dan bagikan." />
 <meta name="twitter:image" content="https://kliping-reichas.my.id/og-image.jpg?v=3" />
-<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="manifest" href="manifest.webmanifest" />
 <meta name="theme-color" content="#102a43" />
-<link rel="apple-touch-icon" href="/icon-192.png" />
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -770,6 +773,219 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
   a[href]:after{content:" (" attr(href) ")";font-size:10px;color:#555}
 }
 
+/* ================= ULTIMATE MODERN VISUAL POLISH (KEKINIAN & ESTETIK) ================= */
+:root {
+  --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --display: 'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  touch-action: manipulation;
+}
+
+h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-tx h3, .modal h3, .lit-inner h2, .stat b, .stat-i b {
+  font-family: var(--display);
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism & Soft Ambient Shadows */
+.clip, .card, .sec, .stat-i, .sorot, .modal, .baca-bar, .rks, .spon, .afl-list a {
+  box-shadow: 0 10px 30px -8px rgba(16, 42, 67, 0.07), 0 4px 12px -2px rgba(16, 42, 67, 0.03) !important;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease !important;
+}
+
+.clip:hover {
+  transform: translateY(-5px) scale(1.008) !important;
+  box-shadow: 0 20px 40px -12px rgba(115, 87, 255, 0.18), 0 8px 18px -4px rgba(16, 42, 67, 0.06) !important;
+}
+
+/* Smooth Image Scale on Card Hover */
+.clip .clip-img {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform;
+}
+.clip:hover .clip-img {
+  transform: scale(1.03) !important;
+}
+
+/* Polished Search Bar with Ambient Glow */
+.cari-inp {
+  font-family: var(--sans) !important;
+  border-radius: 14px !important;
+  border: 1.5px solid var(--line) !important;
+  padding: 12px 18px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px -6px rgba(16, 42, 67, 0.06) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.cari-inp:focus {
+  border-color: var(--violet) !important;
+  box-shadow: 0 10px 28px -6px rgba(115, 87, 255, 0.22), 0 0 0 4px rgba(115, 87, 255, 0.12) !important;
+  background: #ffffff !important;
+}
+
+/* Chips & Tags Polish */
+.chip, .tchip, .tag {
+  font-family: var(--sans) !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.chip:hover, .tchip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px -4px rgba(115, 87, 255, 0.2);
+}
+.chip.on {
+  background: linear-gradient(135deg, var(--navy), #1e3a5f) !important;
+  box-shadow: 0 6px 16px -4px rgba(16, 42, 67, 0.35) !important;
+}
+
+/* Buttons Polish */
+.btn, .sh, .menu-btn {
+  border-radius: 12px !important;
+  font-family: var(--sans) !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.btn-p, .menu-btn {
+  background: linear-gradient(135deg, #7357ff 0%, #4267e7 55%, #31c5c2 100%) !important;
+  background-size: 150% 150% !important;
+  border: 0 !important;
+  box-shadow: 0 8px 20px -4px rgba(115, 87, 255, 0.35) !important;
+}
+.btn-p:hover, .menu-btn:hover {
+  background-position: 100% 0 !important;
+  transform: translateY(-2px) scale(1.01) !important;
+  box-shadow: 0 12px 28px -4px rgba(115, 87, 255, 0.48) !important;
+}
+
+/* Hide jagged SVG pine tree header pattern & fix brand logo */
+.top:before {
+  display: none !important;
+}
+.brand img {
+  width: 44px !important;
+  height: 44px !important;
+  object-fit: contain !important;
+  flex: none !important;
+}
+
+/* Ensure hero section renders background artwork hero.jpg cleanly */
+.paper-hero {
+  min-height: 380px !important;
+  background-size: cover !important;
+  background-position: center !important;
+  position: relative !important;
+}
+
+/* Header & Top Bar Polish */
+.top {
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+/* Dark Mode Premium Aesthetic */
+[data-tema="gelap"] body {
+  background: #0b0f17 !important;
+  background-image: radial-gradient(circle at 15% 10%, #151d2d 0%, transparent 35%), radial-gradient(circle at 85% 30%, #1a1532 0%, transparent 35%) !important;
+}
+[data-tema="gelap"] .top {
+  background: rgba(11, 15, 23, 0.85) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-tema="gelap"] .clip, [data-tema="gelap"] .card, [data-tema="gelap"] .sec, [data-tema="gelap"] .stat-i, [data-tema="gelap"] .sorot, [data-tema="gelap"] .modal, [data-tema="gelap"] .baca-bar, [data-tema="gelap"] .spon, [data-tema="gelap"] .afl-list a {
+  background: #131924 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.45) !important;
+}
+[data-tema="gelap"] .clip:hover {
+  border-color: rgba(125, 192, 245, 0.25) !important;
+  box-shadow: 0 20px 45px -10px rgba(115, 87, 255, 0.25) !important;
+}
+[data-tema="gelap"] .cari-inp {
+  background: #101520 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #e8eaed !important;
+}
+[data-tema="gelap"] .cari-inp:focus {
+  border-color: #7dc0f5 !important;
+  box-shadow: 0 10px 28px -6px rgba(125, 192, 245, 0.25), 0 0 0 4px rgba(125, 192, 245, 0.15) !important;
+}
+
+/* Custom Smooth Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(143, 160, 176, 0.35);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(115, 87, 255, 0.6);
+}
+
+/* ================= ULTIMATE MOBILE UX POLISH & BUG FIXES ================= */
+@media (max-width: 768px) {
+  /* Prevent iOS Safari input auto-zoom by enforcing 16px font size */
+  input[type="text"], input[type="search"], input[type="url"], input[type="date"], select, textarea, .cari-inp {
+    font-size: 16px !important;
+  }
+  
+  /* Fix card image proportions on mobile */
+  .clip img {
+    height: auto !important;
+    aspect-ratio: 16 / 9 !important;
+    border-radius: 14px !important;
+  }
+
+  /* Fix paper hero height & text box on small phone screens */
+  .paper-hero {
+    min-height: 210px !important;
+    height: auto !important;
+    background-size: cover !important;
+    background-position: center !important;
+  }
+
+  .paper-copy > div {
+    border-radius: 14px !important;
+    padding: 14px 16px !important;
+  }
+
+  /* Smooth horizontal scroll behavior for filters without body rubber-banding */
+  .filters, .rubrik-row, .topik-row, .nav {
+    overscroll-behavior-x: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Translucent Bottom Navigation Bar on Mobile */
+  .btabs {
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  }
+
+  /* Raise toast notifications above bottom nav bar & app bar */
+  .toast {
+    z-index: 200 !important;
+    bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+    font-size: 13.5px !important;
+  }
+
+  /* Brand logo size on small phone headers */
+  .brand img {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -793,9 +1009,9 @@ const SUPABASE_URL="https://nfeexstvdjgywonbtxtb.supabase.co";
 const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E";
 const supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
 
-const LOGO="/logo.png";
-const HERO="/hero.jpg";
-const PAPER="/paper.jpg";
+const LOGO="logo.png";
+const HERO="hero.jpg";
+const PAPER="paper.jpg";
 const KEY = "kliping-reichas-v2";
 
 /* ================= seed ================= */
