@@ -1749,6 +1749,7 @@ function pDasbor(){
     '<div class="card stat"><b>'+bulan+'</b><span>Digunting bulan ini</span></div>',
     '<div class="card stat"><b>'+db.materi.length+'</b><span>Halaman materi</span></div>',
     '<div class="card stat"><b>'+q.length+'</b><span>Menunggu tinjauan</span></div>'].join("")+"</div>"+
+   kartuImporMistis()+
    '<div class="grid g2"><div class="card"><b style="font-size:14px">Rasio anotasi lengkap</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 0">Kliping dengan tiga poin pelajaran dan minimal satu rujukan materi. Sasaran 100 persen.</p><div class="bar"><i style="width:'+rasio+'%;background:'+(rasio>=90?"var(--green)":rasio>=70?"var(--orange)":"var(--red)")+'"></i></div><p style="margin:8px 0 0;font-size:13px"><b>'+rasio+"%</b> \u00b7 "+lengkap+" dari "+db.kliping.length+' entri</p></div>'+
    '<div class="card"><b style="font-size:14px">Kepatuhan pedoman</b><ul style="margin:10px 0 0;padding-left:18px;font-size:14px">'+
      '<li>Tautan sumber asli: <b>'+db.kliping.filter(k=>k.tautan).length+"/"+db.kliping.length+'</b></li>'+
@@ -1945,20 +1946,34 @@ function pPengaturan(){
    '<div class="f"><label><input type="checkbox" id="sTipis" '+(s.sinyalTipis?"checked":"")+' /> Aktifkan mode sinyal tipis sebagai bawaan</label></div>'+
    '<button class="btn btn-p" onclick="simpanSetting()">Simpan pengaturan</button></div>'+
    kartuAnalitik()+
-   kartuImporMistis()+
    '<div class="card" style="margin-top:16px"><b style="font-size:14px">Pemeliharaan</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Data utama tersimpan di Supabase. Dua tombol ini untuk mengatasi tampilan yang terasa basi atau macet di perangkatmu \u2014 tidak ada yang menghapus data server.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="reset()">Muat ulang data dari server</button><button class="btn btn-d" onclick="bersihkanTembolok()">Bersihkan tembolok aplikasi</button></div></div>';
 }
 
+/* Hanya akun tertentu yang boleh melihat dan menjalankan tombol impor bahan.
+   Ubah daftar di bawah bila akun cece Meri memakai surel atau nama lain. */
+var IZIN_IMPOR={surel:[],nama:["cece meri","meri"]};
+function bolehImporMistis(){
+  var m=me();
+  if(!m)return false;
+  if(m.peran!=="Super-Admin"&&m.peran!=="Admin")return false;
+  var em=String(m.email||"").trim().toLowerCase();
+  var nm=String(m.nama||"").trim().toLowerCase();
+  if(em&&IZIN_IMPOR.surel.indexOf(em)>=0)return true;
+  if(IZIN_IMPOR.nama.indexOf(nm)>=0)return true;
+  return /(^|[^a-z])meri([^a-z]|$)/.test(nm);
+}
+
 function kartuImporMistis(){
+  if(!bolehImporMistis())return "";
   var ada=(db.kliping||[]).filter(function(k){return k.id==="k12"||k.id==="k13"||k.id==="k14"}).length;
   return '<div class="card" style="margin-top:16px"><b style="font-size:14px">Impor bahan: Fenomena mistis di gunung</b>'+
-   '<p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Menambahkan tiga kliping (Gunung Slamet, Gunung Lawu, dan terjemahan ilmu tentang halusinasi ketinggian) beserta dua halaman materi pendukung ke basis data. Aman ditekan berulang kali karena isi yang sama ditimpa, bukan diganda. Kolom peninjau dibiarkan kosong, silakan tetapkan lewat Antrean Tinjauan.'+(ada?' <b>Catatan: '+ada+' dari 3 kliping ini sudah ada di basis data.</b>':'')+'</p>'+
+   '<p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Menambahkan tiga kliping (Gunung Slamet, Gunung Lawu, dan terjemahan ilmu tentang halusinasi ketinggian) beserta dua halaman materi pendukung ke basis data. Aman ditekan berulang kali karena isi yang sama ditimpa, bukan diganda. Kolom peninjau dibiarkan kosong, silakan tetapkan lewat Antrean Tinjauan. Kartu ini hanya tampil di akunmu, pengelola lain tidak melihatnya.'+(ada?' <b>Catatan: '+ada+' dari 3 kliping ini sudah ada di basis data.</b>':'')+'</p>'+
    '<button class="btn btn-p" onclick="imporBahanMistis()">Impor sekarang</button></div>';
 }
 
 async function imporBahanMistis(){
   var m=me();
-  if(!m||(m.peran!=="Super-Admin"&&m.peran!=="Admin")){toast("Hanya Admin atau Super-Admin yang dapat mengimpor bahan");return}
+  if(!bolehImporMistis()){toast("Tombol impor ini hanya tersedia untuk akun cece Meri");return}
   if(!confirm("Impor 3 kliping dan 2 materi tentang fenomena mistis di gunung ke basis data?"))return;
 
   var MATERI=[
