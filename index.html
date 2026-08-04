@@ -1427,12 +1427,12 @@ function mLepas(){
    (p[2]?'<div class="note o" style="margin-bottom:14px">'+p[2]+'</div>':'')+
    '<div class="end"><button class="btn" onclick="closeModal()">Tutup</button><button class="btn btn-p" onclick="sudahLepas()">Sudah saya lepas</button></div>';
 }
-function shareUrl(id){return location.origin+"/api/share?id="+encodeURIComponent(id)}
+function shareUrl(id){var base=(location.protocol==="http:"||location.protocol==="https:")?location.origin+"/api/share":location.href.split(/[?#]/)[0];return base+"?id="+encodeURIComponent(id)}
 function waLink(text,url){return "https://wa.me/?text="+encodeURIComponent(text+"\n"+url)}
-function fbLink(url){return "https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url)}
-function salinIG(text,url){try{if(navigator.clipboard)navigator.clipboard.writeText(text+"\n"+url)}catch(e){}toast("Teks & tautan disalin — buka Instagram lalu tempel di caption/Stories");window.open("https://www.instagram.com/","_blank")}
-function bagiKlip(cara,id){const k=db.kliping.find(x=>x.id===id);if(!k)return;const url=shareUrl(id);const txt=k.judul+" — "+k.lead;if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url),"_blank");else salinIG(txt,url)}
-function bagiSitus(cara){const url=location.origin+location.pathname;const txt="\ud83d\udcda Gerakan Literasi REICHAS — baca, pahami, dan bagikan pengetahuan pendakian & alam bebas.";if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url),"_blank");else salinIG(txt,url)}
+function fbLink(url,text){return "https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url)+"&quote="+encodeURIComponent(text||"")}
+function salinIG(text,url){var isi=text+"\n"+url;var hp=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);if(hp&&navigator.share){var data={title:"Gerakan Literasi REICHAS",text:isi};if(/^https?:/.test(url)&&(!navigator.canShare||navigator.canShare({url:url})))data.url=url;navigator.share(data).catch(function(){});return}try{if(navigator.clipboard)navigator.clipboard.writeText(isi)}catch(e){}if(hp){toast("Teks disalin — tempel di Story Instagram");window.location.href="instagram://story-camera";setTimeout(function(){window.open("https://www.instagram.com/","_blank")},1200)}else{toast("Teks & tautan disalin — buka Instagram lalu tempel di caption/Stories");window.open("https://www.instagram.com/","_blank")}}
+function bagiKlip(cara,id){const k=db.kliping.find(x=>x.id===id);if(!k)return;const url=shareUrl(id);const txt=k.judul+" — "+k.lead;if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url,txt),"_blank");else salinIG(txt,url)}
+function bagiSitus(cara){const url=location.origin+location.pathname;const txt="\ud83d\udcda Gerakan Literasi REICHAS — baca, pahami, dan bagikan pengetahuan pendakian & alam bebas.";if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url,txt),"_blank");else salinIG(txt,url)}
 function shBtns(kind){const call=c=>kind==="situs"?"bagiSitus('"+c+"')":"bagiKlip('"+c+"','"+kind+"')";return '<button class="sh sh-wa" onclick="'+call("wa")+'">WhatsApp</button><button class="sh sh-ig" onclick="'+call("ig")+'">Instagram</button><button class="sh sh-fb" onclick="'+call("fb")+'">Facebook</button>'}
 function litBanner(){return '<section class="lit-banner"><div class="lit-inner"><span class="lit-badge">\ud83d\udcda Gerakan Literasi REICHAS</span><h2>Baca. Pahami. Bagikan.</h2><p>Satu kliping yang kamu baca hari ini bisa menyelamatkan langkah esok hari. Mari sebarkan budaya membaca — ilmu yang dibagikan tidak pernah habis.</p><div class="lit-share"><span>Sebarkan:</span>'+shBtns("situs")+'</div></div></section>'}
 
@@ -2854,7 +2854,7 @@ function pIklan(){
 
 /* ============ tanggapan pembaca: \ud83d\udd25 api & \u2615 kopi ============ */
 var RKS_EMO={api:"\ud83d\udd25",kopi:"\u2615",roket:"\ud83d\ude80",bom:"\ud83d\udca3"};
-var RKS_LBL={api:"Nyalakan",kopi:"Bahan ngopi",roket:"To The Moon",bom:"Adminya Tidur"};
+var RKS_LBL={api:"Nyalakan",kopi:"Bahan ngopi",roket:"To The Moon",bom:"Bikin Ngantuk"};
 var RKS_KET={api:"Kliping ini penting dan mendesak dibaca",kopi:"Layak dibahas pelan-pelan sambil ngopi",roket:"Tulisan yang inspiratif",bom:"Tulisan kurang menarik"};
 /* Kliping memakai \ud83d\udd25/\u2615, Buah Pikir memakai \ud83d\ude80/\ud83d\udca3 */
 var RKS_SET={kliping:["api","kopi"],opini:["roket","bom"]};
