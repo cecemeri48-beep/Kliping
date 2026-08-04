@@ -1,0 +1,44 @@
+{
+  "materi": [
+    {
+      "id": "m10",
+      "judul": "Manajemen Risiko dan Latihan Bertahap pada Olahraga Ekstrem",
+      "rumpun": "Keselamatan",
+      "tingkat": "Menengah",
+      "acuan": "Liputan persiapan Alex Honnold untuk Skyscraper Live (Netflix, Januari 2026) dan prinsip umum deliberate practice pada olahraga berisiko tinggi",
+      "isi": "Atlet olahraga ekstrem yang tampak tenang menghadapi risiko besar umumnya bukan sedang mengabaikan bahaya, melainkan telah memindahkan sebagian besar ketidakpastian ke sesi latihan jauh sebelum hari aksi. Jalur dipelajari berulang kali, setiap pijakan dihafal, dan skenario darurat dipikirkan lebih dulu, sehingga saat aksi berlangsung yang tersisa hanya eksekusi dari rencana yang sudah matang. Prinsip yang sama berlaku untuk kegiatan alam bebas yang jauh lebih sederhana: pendakian gunung, susur goa, atau arung jeram tetap membutuhkan latihan bertahap, pengenalan medan, dan kesiapan menunda rencana ketika kondisi tidak mendukung, bukan keberanian yang muncul begitu saja di lapangan."
+    }
+  ],
+  "mediaBaru": [],
+  "kliping": [
+    {
+      "id": "k15",
+      "judul": "Tanpa Tali dan Alat Pengaman, Alex Honnold Taklukkan Gedung Setinggi 508 Meter di Taiwan",
+      "lead": "Aksi panjat solo bebas yang disiarkan langsung ke seluruh dunia ini memperlihatkan batas kemampuan manusia, sekaligus persiapan panjang yang tidak terlihat kamera.",
+      "rubrik": "Terjemahan Ilmu",
+      "media": "Detik",
+      "tautan": "https://news.detik.com/foto-news/d-8324083/aksi-nekat-alex-honnold-panjat-taipei-101-tanpa-pengaman",
+      "tglBerita": "2026-01-25",
+      "tglKliping": "2026-08-05",
+      "wilayah": "Internasional",
+      "lokasi": ["Taipei 101"],
+      "topik": ["Panjat Tebing", "Olahraga Ekstrem", "Manajemen Risiko"],
+      "potongan": "Pendaki ekstrem asal Amerika Serikat, Alex Honnold, kembali mencuri perhatian dunia setelah melakukan pendakian solo tanpa tali pengaman di Gedung Pencakar Langit Taipei 101, Taiwan. Aksi berisiko tinggi tersebut dilakukan di salah satu bangunan tertinggi di dunia dan langsung memicu decak kagum sekaligus kekhawatiran publik.",
+      "konteks": "Pendakian ini disiarkan langsung oleh Netflix pada 25 Januari 2026 dan berlangsung sekitar 1 jam 31 menit, setelah jadwal semula sempat ditunda sehari karena cuaca basah membuat permukaan gedung terlalu licin untuk dipanjat dengan tangan kosong. Honnold, yang sebelumnya lebih dikenal sebagai pendaki tebing granit di alam bebas dan menjadi orang pertama yang memanjat dinding El Capitan setinggi sekitar 900 meter tanpa tali pada 2017, tidak melakukan aksi ini secara mendadak. Ia mempelajari setiap pegangan pada permukaan gedung dan berlatih berbulan-bulan sebelum hari penyiaran, serta hanya mengandalkan satu kantong kecil berisi magnesium karbonat untuk menjaga telapak tangannya tetap kering. Ketenangan yang tampak di depan kamera itu adalah hasil akumulasi latihan bertahun-tahun, bukan keberanian tanpa perhitungan, dan itulah yang membedakan olahraga ekstrem yang terlatih dari kenekatan semata.",
+      "pelajaran": [
+        "Kepercayaan diri di medan berisiko tinggi seharusnya lahir dari latihan berulang dan pengenalan medan yang mendalam, bukan dari semangat sesaat. Sebelum mencoba jalur atau aktivitas yang menantang, kenali dulu setiap bagiannya lewat latihan bertahap di tempat yang lebih aman.",
+        "Siapkan rencana cadangan untuk kondisi yang berubah, seperti cuaca atau kondisi fisik yang tidak mendukung. Honnold sendiri menunda pendakiannya sehari demi keselamatan; menunda bukan tanda gagal, melainkan bagian dari perhitungan risiko yang matang.",
+        "Pisahkan kekaguman pada sebuah aksi ekstrem dari keinginan untuk menirunya tanpa persiapan setara. Kemampuan seperti ini dibangun lewat pengawasan tim profesional, pengecekan medan berulang, dan pengalaman bertahun-tahun, sehingga tidak layak ditiru dadakan di jalur pendakian atau tebing mana pun."
+      ],
+      "materi": ["m10"],
+      "status": "Terbit",
+      "kurator": "",
+      "peninjau": "",
+      "kepekaan": "Biasa",
+      "gambar": "Ilustrasi sendiri",
+      "gbrKet": "Ilustrasi sendiri: siluet pendaki di dinding gedung pencakar langit",
+      "vonis": "",
+      "catatan": ""
+    }
+  ]
+}

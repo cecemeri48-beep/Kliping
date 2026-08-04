@@ -4491,6 +4491,7 @@ function pBuahPikir(){
     return "<tr><td><b>"+esc(k.judul)+'</b><br /><span style="color:var(--ink2);font-size:13px">'+kata+" kata \u00b7 "+tglID(k.tglKliping)+'</span></td><td><span class="tag">'+esc(k.rubrik)+'</span></td><td><span class="'+STAG[k.status]+'">'+k.status+"</span></td><td>"+esc(nm(k.kurator))+'</td><td>'+(siap?'<span class="tag tag-g">Lengkap</span>':'<span class="tag tag-r">Belum</span>')+'</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="sunting(\''+k.id+'\')">Sunting</button>'+(boleh?' <button class="btn btn-sm btn-d" onclick="hapus(\''+k.id+'\')">Hapus</button>':"")+"</td></tr>";
   }).join("");
   return ph("Buah Pikir",m.peran==="Kurator"?"Tulisanmu sendiri, terpisah dari kliping.":"Tulisan sendiri anggota. Terbit tetap lewat persetujuan admin.",'<button class="btn btn-rasta" onclick="tulisOpini()">\u270D Tulis Buah Pikir</button>')+
+   kartuImporMistis()+
    '<div class="tbl tbl-scroll"><table><thead><tr><th>Judul</th><th>Rubrik</th><th>Status</th><th>Penulis</th><th>Anotasi</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">Belum ada Buah Pikir.</td></tr>')+"</tbody></table></div>";
 }
 function _opiRubrik(){
