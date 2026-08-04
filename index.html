@@ -2226,6 +2226,7 @@ function _daftarPapan(){
     if(s==="lama")return String(a.tglKliping).localeCompare(String(b.tglKliping));
     if(s==="judul")return String(a.judul).localeCompare(String(b.judul),"id");
     if(s==="singkat")return menitBaca(a)-menitBaca(b);
+    if(s==="menyala"){var ra=rksJumlah(a,"api")+rksJumlah(a,"kopi"),rb=rksJumlah(b,"api")+rksJumlah(b,"kopi");if(rb!==ra)return rb-ra}
     return String(b.tglKliping).localeCompare(String(a.tglKliping));
   });
   return list;
@@ -2339,7 +2340,7 @@ function viewBoard(){
   var alat='<div class="alat">'+
     '<input id="cari" class="cari-inp" type="search" placeholder="\ud83d\udd0e Cari judul, media, topik, wilayah, isi\u2026" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" aria-label="Cari kliping" />'+
     '<select aria-label="Urutkan" onchange="urutkan(this.value)">'+
-      ['baru|Terbaru dulu','lama|Terlama dulu','judul|Judul A\u2013Z','singkat|Paling singkat'].map(function(o){var p=o.split("|");return '<option value="'+p[0]+'"'+(s===p[0]?" selected":"")+'>'+p[1]+'</option>'}).join("")+
+      ['baru|Terbaru dulu','menyala|\ud83d\udd25 Paling menyala','lama|Terlama dulu','judul|Judul A\u2013Z','singkat|Paling singkat'].map(function(o){var p=o.split("|");return '<option value="'+p[0]+'"'+(s===p[0]?" selected":"")+'>'+p[1]+'</option>'}).join("")+
     '</select>'+
     '<button class="btn btn-sm" onclick="go({pv:{n:\'rak\'}})">\ud83d\udd16 Rak Baca ('+rakList().length+')</button>'+
     ((S.q||S.topik||(S.filter&&S.filter!=="Semua"))?'<button class="btn btn-sm" onclick="bersihkanSaring()">\u2715 Bersihkan saringan</button>':'')+
