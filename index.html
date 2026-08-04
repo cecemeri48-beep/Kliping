@@ -1949,18 +1949,15 @@ function pPengaturan(){
    '<div class="card" style="margin-top:16px"><b style="font-size:14px">Pemeliharaan</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Data utama tersimpan di Supabase. Dua tombol ini untuk mengatasi tampilan yang terasa basi atau macet di perangkatmu \u2014 tidak ada yang menghapus data server.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="reset()">Muat ulang data dari server</button><button class="btn btn-d" onclick="bersihkanTembolok()">Bersihkan tembolok aplikasi</button></div></div>';
 }
 
-/* Hanya akun tertentu yang boleh melihat dan menjalankan tombol impor bahan.
-   Ubah daftar di bawah bila akun cece Meri memakai surel atau nama lain. */
-var IZIN_IMPOR={surel:[],nama:["cece meri","meri"]};
+/* Tombol impor bahan hanya untuk surel yang terdaftar di sini.
+   Nama profil dan peran tidak dipakai sebagai penentu, hanya surel. */
+var IZIN_IMPOR={surel:["cecemeri48@gmail.com"]};
 function bolehImporMistis(){
   var m=me();
   if(!m)return false;
-  if(m.peran!=="Super-Admin"&&m.peran!=="Admin")return false;
   var em=String(m.email||"").trim().toLowerCase();
-  var nm=String(m.nama||"").trim().toLowerCase();
-  if(em&&IZIN_IMPOR.surel.indexOf(em)>=0)return true;
-  if(IZIN_IMPOR.nama.indexOf(nm)>=0)return true;
-  return /(^|[^a-z])meri([^a-z]|$)/.test(nm);
+  if(!em)return false;
+  return IZIN_IMPOR.surel.indexOf(em)>=0;
 }
 
 function kartuImporMistis(){
