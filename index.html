@@ -2768,26 +2768,50 @@ function viewRak(){
   return body+'</div>'+foot();
 }
 
+var USF_CSS='.usf-head{background:linear-gradient(120deg,#102a43 0%,#1c466b 55%,#2b6a8f 100%);border-radius:18px;color:#fff;padding:26px 24px 22px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 12px 28px rgba(16,42,67,.22)}'
++'.usf-head:after{content:"\2709";position:absolute;right:16px;top:50%;transform:translateY(-50%) rotate(8deg);font-size:88px;opacity:.14;pointer-events:none}'
++'.usf-head h2{margin:0 0 6px;font-size:clamp(22px,4vw,28px);letter-spacing:-.02em}'
++'.usf-head p{margin:0;color:rgba(255,255,255,.85);font-size:14px;line-height:1.55;max-width:470px}'
++'.usf-step{border:1px solid var(--line);border-radius:14px;background:var(--soft,#fff);padding:16px 18px 6px;margin-bottom:14px}'
++'.usf-step>b{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:12px;color:var(--ink)}'
++'.usf-step>b .no{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:var(--violet,#7357ff);color:#fff;font-size:12px;flex:none}'
++'.usf-step>b small{font-weight:400;color:var(--ink2)}'
++'.usf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}'
++'.usf-izin{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink2);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;background:var(--soft2,#f7f6f4)}'
++'.usf-izin input{margin-top:2px}'
++'.usf-actions{position:sticky;bottom:0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--canvas,#fff);padding:14px 0;border-top:1px solid var(--line)}'
++'[data-tema="gelap"] .usf-head{background:linear-gradient(120deg,#1c466b,#2b6a8f)}'
++'@media(max-width:560px){.usf-row{grid-template-columns:1fr}.usf-head:after{font-size:64px}}';
+(function(){try{var st=document.createElement("style");st.textContent=USF_CSS;document.head.appendChild(st)}catch(e){}})();
 var US_JENIS=["Penampakan/Sosok Misterius","Suara atau Cahaya Aneh","Kecelakaan atau Kejadian SAR","Mitos dan Pantangan Lokal","Tips Keselamatan","Lainnya"];
 function viewUsulan(){
   var opsJenis=US_JENIS.map(function(j){return '<option value="'+esc(j)+'">'+esc(j)+'</option>'}).join("");
   var body='<div class="wrap" style="padding:28px 24px 56px;max-width:640px">'+
-    '<h2 style="margin:0 0 6px;font-size:26px">Kirim Cerita ke Redaksi</h2>'+
-    '<p style="color:var(--ink2);margin:0 0 22px">Tahu fenomena, kejadian, atau cerita menarik seputar gunung dan alam bebas? Ceritakan di sini. Tanpa akun, tanpa nama wajib — redaksi akan menelusuri dan menuliskannya dengan cek fakta.</p>'+
-    '<div class="f"><label>Judul singkat</label><input type="text" id="usJudul" maxlength="140" placeholder="Contoh: Suara aneh di jalur pendakian X" /></div>'+
-    '<div class="f"><label>Jenis fenomena</label><select id="usJenis">'+opsJenis+'</select></div>'+
-    '<div class="f"><label>Ceritanya</label><textarea id="usCerita" rows="6" maxlength="4000" placeholder="Ceritakan apa yang terjadi, kapan, dan di mana"></textarea></div>'+
-    '<div class="f"><label>Tanggal kejadian (opsional)</label><input type="date" id="usTgl" /></div>'+
-    '<div class="f"><label>Lokasi (opsional)</label><input type="text" id="usLokasi" maxlength="140" placeholder="Contoh: Gunung Semeru" /></div>'+
-    '<div class="f"><label>Tautan sumber/berita pendukung (opsional)</label><input type="url" id="usTautan" maxlength="500" placeholder="https://..." /></div>'+
-    '<div class="f"><label>Nama samaran/tampilan (opsional)</label><input type="text" id="usNama" maxlength="80" placeholder="Kosongkan untuk anonim total" /></div>'+
-    '<div class="f"><label>Kontak (opsional, kalau mau dihubungi redaksi — tidak dipublikasikan)</label><input type="text" id="usKontak" maxlength="200" placeholder="Email atau nomor WhatsApp" /></div>'+
-    '<label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink2);margin-top:6px"><input type="checkbox" id="usIzin" style="margin-top:3px" />Saya mengizinkan cerita ini disunting dan diterbitkan redaksi dengan nama samaran/anonim.</label>'+
-    '<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">'+
-      '<button class="btn btn-p" onclick="kirimUsulan()">Kirim ke redaksi</button>'+
-      '<button class="btn" onclick=\'go({pv:{n:"board"}})\'>Batal</button>'+
+    '<div class="usf-head"><h2>Kirim Cerita ke Redaksi</h2><p>Seperti "Surat Pembaca" di media konvensional: kamu bercerita, redaksi yang menelusuri dan menuliskannya dengan cek fakta. Tanpa akun, tanpa nama wajib.</p></div>'+
+    '<div class="usf-step"><b><span class="no">1</span> Ceritamu <small>bagian yang wajib diisi</small></b>'+
+      '<div class="f"><label>Judul singkat</label><input type="text" id="usJudul" maxlength="140" placeholder="Contoh: Suara aneh di jalur pendakian X" /></div>'+
+      '<div class="f"><label>Jenis fenomena</label><select id="usJenis">'+opsJenis+'</select></div>'+
+      '<div class="f"><label>Ceritanya <span class="hint">maksimal 4000 karakter</span></label><textarea id="usCerita" rows="7" maxlength="4000" placeholder="Ceritakan apa yang terjadi, kapan, dan di mana"></textarea></div>'+
     '</div>'+
-    '<p style="font-size:12px;color:var(--ink2);margin-top:16px">Kiriman ditinjau redaksi sebelum ditindaklanjuti. Satu kiriman per perangkat per hari.</p>'+
+    '<div class="usf-step"><b><span class="no">2</span> Detail kejadian <small>opsional, tapi sangat membantu</small></b>'+
+      '<div class="usf-row">'+
+        '<div class="f"><label>Tanggal kejadian</label><input type="date" id="usTgl" /></div>'+
+        '<div class="f"><label>Lokasi</label><input type="text" id="usLokasi" maxlength="140" placeholder="Contoh: Gunung Semeru" /></div>'+
+      '</div>'+
+      '<div class="f"><label>Tautan berita/sumber pendukung <span class="hint">bila ada</span></label><input type="url" id="usTautan" maxlength="500" placeholder="https://..." /></div>'+
+    '</div>'+
+    '<div class="usf-step"><b><span class="no">3</span> Tentang kamu <small>semuanya opsional</small></b>'+
+      '<div class="usf-row">'+
+        '<div class="f"><label>Nama samaran/tampilan</label><input type="text" id="usNama" maxlength="80" placeholder="Kosongkan untuk anonim total" /></div>'+
+        '<div class="f"><label>Kontak <span class="hint">tidak dipublikasikan</span></label><input type="text" id="usKontak" maxlength="200" placeholder="Email atau nomor WhatsApp" /></div>'+
+      '</div>'+
+      '<label class="usf-izin"><input type="checkbox" id="usIzin" />Saya mengizinkan cerita ini disunting dan diterbitkan redaksi dengan nama samaran/anonim.</label>'+
+    '</div>'+
+    '<div class="usf-actions">'+
+      '<button class="btn btn-p" onclick="kirimUsulan()">\u2709 Kirim ke redaksi</button>'+
+      '<button class="btn" onclick=\'go({pv:{n:"board"}})\'>Batal</button>'+
+      '<span style="font-size:12px;color:var(--ink2)">Ditinjau redaksi dulu \u00b7 satu kiriman per perangkat per hari.</span>'+
+    '</div>'+
   '</div>'+foot();
   return body;
 }
