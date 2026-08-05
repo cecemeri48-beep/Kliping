@@ -1244,11 +1244,12 @@ function pErr(e,what){if(e){console.error(what,e);toast("Gagal menyimpan "+what+
 
 async function fetchAll(){
   const q=t=>supa.from(t).select("*");
-  const [rk,rm,rr,rmd,rp,rs,rpr,ra]=await Promise.all([
+  const [rk,rm,rr,rmd,rp,rs,rpr,ra,ru]=await Promise.all([
     q("kliping"),q("materi"),q("rubrik"),q("media"),
     supa.from("pedoman").select("*").eq("id","utama").maybeSingle(),
     supa.from("app_settings").select("*").eq("id","situs").maybeSingle(),
-    q("profiles"),supa.from("audit").select("*").order("id",{ascending:false})
+    q("profiles"),supa.from("audit").select("*").order("id",{ascending:false}),
+    q("usulan")
   ]);
   db={
     kliping:(rk.data||[]).map(fromKliping),
@@ -1259,7 +1260,8 @@ async function fetchAll(){
     pedoman:(rp.data&&rp.data.isi)||"",
     settings:(rs.data&&rs.data.data)||{nama:"Kliping RCS.CBS",tagline:"Menggunting berita, menanam pengetahuan",wajibTinjauan:true,sinyalTipis:false,penyangkalan:""},
     pengguna:(rpr.data||[]),
-    audit:(ra.data||[]).map(a=>({ts:a.ts,user:a.aktor,aksi:a.aksi,obj:a.obj}))
+    audit:(ra.data||[]).map(a=>({ts:a.ts,user:a.aktor,aksi:a.aksi,obj:a.obj})),
+    usulan:(ru.data||[])
   };
 }
 function setMeFromSession(session){
@@ -1306,12 +1308,12 @@ function toggleSideMenu(e){try{e.stopPropagation()}catch(_){}var w=document.getE
 document.addEventListener("click",function(e){var w=document.getElementById("sideMenu");if(w&&w.classList.contains("open")&&!(e.target&&w.contains(e.target)))w.classList.remove("open")});
 
 const PERM={
- "Super-Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","taksonomi","pedoman","iklan","audit","pengaturan"],
- "Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","pedoman","iklan"],
- "Kurator":["dasbor","kliping","buahpikir"]
+ "Super-Admin":["dasbor","kliping","buahpikir","usulan","tinjauan","materi","pengguna","taksonomi","pedoman","iklan","audit","pengaturan"],
+ "Admin":["dasbor","kliping","buahpikir","usulan","tinjauan","materi","pengguna","pedoman","iklan"],
+ "Kurator":["dasbor","kliping","buahpikir","usulan"]
 };
-const ICON={dasbor:"\u25F1",kliping:"\u2702",buahpikir:"\u270D",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",audit:"\u2261",iklan:"\u25B1",pengaturan:"\u2699"};
-const LBL={dasbor:"Dasbor",kliping:"Kliping",buahpikir:"Buah Pikir",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs"};
+const ICON={dasbor:"\u25F1",kliping:"\u2702",buahpikir:"\u270D",usulan:"\u2709",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",audit:"\u2261",iklan:"\u25B1",pengaturan:"\u2699"};
+const LBL={dasbor:"Dasbor",kliping:"Kliping",buahpikir:"Buah Pikir",usulan:"Usulan Pembaca",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs"};
 const STAG={"Calon":"tag","Ditulis":"tag tag-o","Ditinjau":"tag tag-b","Terbit":"tag tag-g","Diarsipkan":"tag"};
 
 function me(){return db.pengguna.find(u=>u.id===S.me)||null}
@@ -1420,8 +1422,8 @@ function litBanner(){return '<section class="lit-banner"><div class="lit-inner">
 
 /* ================= header ================= */
 function header(){
-  const m=me(); const pub=[["board","Papan Kliping"],["materi","Materi"],["arsip","Arsip"],["pedoman","Pedoman"]];
-  const ICO={board:"\ud83d\udcf0",materi:"\ud83d\udcda",arsip:"\ud83d\udcc1",pedoman:"\ud83d\udcd6"};
+  const m=me(); const pub=[["board","Papan Kliping"],["materi","Materi"],["arsip","Arsip"],["pedoman","Pedoman"],["usulan","Kirim Cerita"]];
+  const ICO={board:"\ud83d\udcf0",materi:"\ud83d\udcda",arsip:"\ud83d\udcc1",pedoman:"\ud83d\udcd6",usulan:"\ud83d\udce9"};
   const _on=p=>(S.pv.n===p||(p==="board"&&S.pv.n==="clip")||(p==="materi"&&S.pv.n==="materiDetail"));
   let nav="";
   if(S.mode==="public"){
@@ -1715,7 +1717,7 @@ async function masukGoogle(){
 function viewAdmin(){
   const m=me();if(!m)return viewLogin();
   const keys=PERM[m.peran];
-  const tabBtn=(k,cls)=>'<button class="'+cls+(S.av===k?" on":"")+'" onclick=\'go({av:"'+k+'",draft:null,err:[]})\'><i class="ic">'+ICON[k]+"</i>"+LBL[k]+(k==="tinjauan"&&db.kliping.filter(x=>x.status==="Ditinjau").length?' <span class="tag tag-b" style="margin-left:auto">'+db.kliping.filter(x=>x.split===undefined&&x.status==="Ditinjau").length+"</span>":"")+"</button>";
+  const tabBtn=(k,cls)=>'<button class="'+cls+(S.av===k?" on":"")+'" onclick=\'go({av:"'+k+'",draft:null,err:[]})\'><i class="ic">'+ICON[k]+"</i>"+LBL[k]+(k==="tinjauan"&&db.kliping.filter(x=>x.status==="Ditinjau").length?' <span class="tag tag-b" style="margin-left:auto">'+db.kliping.filter(x=>x.split===undefined&&x.status==="Ditinjau").length+"</span>":"")+(k==="usulan"&&(db.usulan||[]).filter(x=>x.status==="Baru").length?' <span class="tag tag-b" style="margin-left:auto">'+(db.usulan||[]).filter(x=>x.status==="Baru").length+"</span>":"")+"</button>";
   const side='<aside class="side"><div class="lbl">Panel '+esc(m.peran)+"</div>"+keys.map(k=>tabBtn(k,"")).join("")+"</aside>";
   const smenu='<div class="smenu" id="sideMenu"><button type="button" class="smenu-btn" onclick="toggleSideMenu(event)"><span>'+(ICON[S.av]||"")+" "+esc(LBL[S.av]||"Menu")+'</span><span class="smenu-caret">\u25BE</span></button><div class="smenu-pop">'+keys.map(k=>tabBtn(k,"smi")).join("")+"</div></div>";
   let body;
@@ -1723,6 +1725,7 @@ function viewAdmin(){
   else if(S.av==="dasbor")body=pDasbor();
   else if(S.av==="kliping")body=pKliping();
   else if(S.av==="buahpikir")body=pBuahPikir();
+  else if(S.av==="usulan")body=pUsulan();
   else if(S.av==="tinjauan")body=pTinjauan();
   else if(S.av==="materi")body=pMateri();
   else if(S.av==="pengguna")body=pPengguna();
@@ -2518,6 +2521,50 @@ function viewRak(){
   return body+'</div>'+foot();
 }
 
+function viewUsulan(){
+  var body='<div class="wrap" style="padding:28px 24px 56px;max-width:640px">'+
+    '<h2 style="margin:0 0 6px;font-size:26px">Kirim Cerita ke Redaksi</h2>'+
+    '<p style="color:var(--ink2);margin:0 0 22px">Tahu fenomena, kejadian, atau cerita menarik seputar gunung dan alam bebas? Ceritakan di sini. Tanpa akun, tanpa nama wajib — redaksi akan menelusuri dan menuliskannya dengan cek fakta.</p>'+
+    '<div class="f"><label>Judul singkat</label><input type="text" id="usJudul" maxlength="140" placeholder="Contoh: Suara aneh di jalur pendakian X" /></div>'+
+    '<div class="f"><label>Ceritanya</label><textarea id="usCerita" rows="6" maxlength="4000" placeholder="Ceritakan apa yang terjadi, kapan, dan di mana"></textarea></div>'+
+    '<div class="f"><label>Lokasi (opsional)</label><input type="text" id="usLokasi" maxlength="140" placeholder="Contoh: Gunung Semeru" /></div>'+
+    '<div class="f"><label>Tautan sumber/berita pendukung (opsional)</label><input type="url" id="usTautan" maxlength="500" placeholder="https://..." /></div>'+
+    '<div class="f"><label>Kontak (opsional, kalau mau dihubungi redaksi)</label><input type="text" id="usKontak" maxlength="200" placeholder="Email atau nomor WhatsApp" /></div>'+
+    '<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">'+
+      '<button class="btn btn-p" onclick="kirimUsulan()">Kirim ke redaksi</button>'+
+      '<button class="btn" onclick=\'go({pv:{n:"board"}})\'>Batal</button>'+
+    '</div>'+
+    '<p style="font-size:12px;color:var(--ink2);margin-top:16px">Kiriman ditinjau redaksi sebelum ditindaklanjuti. Satu kiriman per perangkat per hari.</p>'+
+  '</div>'+foot();
+  return body;
+}
+function kirimUsulan(){
+  var elJ=document.getElementById("usJudul"),elC=document.getElementById("usCerita"),elL=document.getElementById("usLokasi"),elT=document.getElementById("usTautan"),elK=document.getElementById("usKontak");
+  var judul=elJ?elJ.value.trim():"";
+  var cerita=elC?elC.value.trim():"";
+  var lokasi=elL?elL.value.trim():"";
+  var tautan=elT?elT.value.trim():"";
+  var kontak=elK?elK.value.trim():"";
+  if(!judul){toast("Judul singkat belum diisi");return}
+  if(!cerita){toast("Ceritanya belum diisi");return}
+  var kunci="rcs_usulan_terakhir";
+  try{
+    var t=localStorage.getItem(kunci);
+    if(t&&(Date.now()-parseInt(t,10))<24*60*60*1000){toast("Kamu sudah mengirim usulan hari ini. Coba lagi besok ya.");return}
+  }catch(e){}
+  var rec={judul:judul,cerita:cerita,lokasi:lokasi||null,tautan:tautan||null,kontak:kontak||null,status:"Baru",sidik:_rksSidik(),hari:new Date().toISOString().slice(0,10)};
+  Promise.resolve(supa.from("usulan").insert(rec)).then(function(r){
+    if(r&&r.error){
+      var kode=(r.error.code||""),pesan=(r.error.message||"");
+      if(kode==="23505"||/duplicate key/i.test(pesan)){toast("Kamu sudah mengirim usulan hari ini. Coba lagi besok ya.");try{localStorage.setItem(kunci,String(Date.now()))}catch(e){}return}
+      toast("Gagal mengirim: "+pesan);return;
+    }
+    try{localStorage.setItem(kunci,String(Date.now()))}catch(e){}
+    toast("Terima kasih! Cerita kamu sudah dikirim ke redaksi.");
+    go({pv:{n:"board"}});
+  }).catch(function(e){toast("Gagal mengirim: "+(e&&e.message||"tidak diketahui"))});
+}
+
 /* ---- Navigasi bawah (5 tab) ---- */
 function goTab(i){var n=["board","materi","rak","arsip","pedoman"][i];if(n)go({pv:{n:n}})}
 function bottomNav(){
@@ -2577,7 +2624,7 @@ function render(){
   else if(S.mode==="admin")body=viewAdmin();
   else{
     var n=S.pv.n;
-    body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():viewBoard();
+    body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():n==="usulan"?viewUsulan():viewBoard();
   }
   document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
   pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}try{slugPasang()}catch(e){}try{opiPasang()}catch(e){}
@@ -3022,7 +3069,8 @@ function reaksiBar(k){
     return '<li><span class="rks-arti-e">'+RKS_EMO[emo]+'</span><span><b>'+esc(RKS_LBL[emo])+'</b> \u2014 '+esc(RKS_KET[emo])+'</span></li>';
   }).join("")+'</ul>';
   return '<div class="rks"><span class="rks-h">Tanggapan pembaca</span><div class="rks-row">'+tomb+'</div>'+arti+
-    '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p></div>';
+    '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p>'+
+    '<p class="rks-k">Tahu cerita atau fenomena menarik lain di gunung/alam bebas? <a href="#" onclick=\'go({pv:{n:"usulan"}});return false\'>Kirim ke redaksi →</a></p></div>';
 }
 function rksMini(k){
   var a=rksJumlah(k.id,"api"),b=rksJumlah(k.id,"kopi");
@@ -4494,6 +4542,61 @@ function pBuahPikir(){
   return ph("Buah Pikir",m.peran==="Kurator"?"Tulisanmu sendiri, terpisah dari kliping.":"Tulisan sendiri anggota. Terbit tetap lewat persetujuan admin.",'<button class="btn btn-rasta" onclick="tulisOpini()">\u270D Tulis Buah Pikir</button>')+
    kartuImporMistis()+
    '<div class="tbl tbl-scroll"><table><thead><tr><th>Judul</th><th>Rubrik</th><th>Status</th><th>Penulis</th><th>Anotasi</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">Belum ada Buah Pikir.</td></tr>')+"</tbody></table></div>";
+}
+function pUsulan(){
+  var m=me();
+  var list=(db.usulan||[]).slice().sort(function(a,b){return String(b.created_at||"").localeCompare(String(a.created_at||""))});
+  var F=S.usulanF||"Baru";
+  var tabs=["Baru","Ditindak","Diabaikan","Semua"];
+  var filtered=F==="Semua"?list:list.filter(function(u){return u.status===F});
+  var boleh=(m.peran==="Super-Admin"||m.peran==="Admin");
+  var tabHtml='<div class="chips" style="margin-bottom:14px">'+tabs.map(function(t){
+    var n=t==="Semua"?list.length:list.filter(function(u){return u.status===t}).length;
+    return '<button class="chip'+(F===t?" on":"")+'" onclick=\'go({usulanF:"'+t+'"})\'>'+t+' ('+n+')</button>';
+  }).join("")+'</div>';
+  var kartu=filtered.map(function(u){
+    var tgl=u.created_at?tglID(String(u.created_at).slice(0,10)):"—";
+    return '<div class="card" style="margin-bottom:12px">'+
+      '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">'+
+        '<b style="font-size:15px">'+esc(u.judul||"(tanpa judul)")+'</b>'+
+        '<span class="tag'+(u.status==="Baru"?" tag-b":u.status==="Ditindak"?" tag-g":"")+'">'+esc(u.status)+'</span>'+
+      '</div>'+
+      '<p style="font-size:13px;color:var(--ink2);margin:4px 0 10px">'+esc(tgl)+(u.lokasi?" · "+esc(u.lokasi):"")+'</p>'+
+      '<p style="font-size:14px;white-space:pre-wrap;margin:0 0 10px">'+esc(u.cerita||"")+'</p>'+
+      (u.tautan?'<p style="font-size:13px;margin:0 0 10px"><a href="'+esc(u.tautan)+'" target="_blank" rel="noopener">'+esc(u.tautan)+'</a></p>':"")+
+      (u.kontak?'<p style="font-size:13px;color:var(--ink2);margin:0 0 10px">Kontak: '+esc(u.kontak)+'</p>':"")+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+        '<button class="btn btn-sm btn-p" onclick=\'usulanKeDraft("'+u.id+'")\'>Jadikan bahan kliping</button>'+
+        (u.status!=="Ditindak"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Ditindak")\'>Tandai ditindak</button>':"")+
+        (u.status!=="Diabaikan"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Diabaikan")\'>Abaikan</button>':"")+
+        (u.status!=="Baru"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Baru")\'>Tandai baru lagi</button>':"")+
+        (boleh?'<button class="btn btn-sm btn-d" onclick=\'usulanHapus("'+u.id+'")\'>Hapus</button>':"")+
+      '</div></div>';
+  }).join("");
+  return ph("Usulan Pembaca","Cerita dan tips fenomena yang dikirim langsung oleh pembaca, tanpa akun.","")+
+    tabHtml+
+    (filtered.length?kartu:'<p class="empty">Belum ada usulan pada status ini.</p>');
+}
+function usulanUbahStatus(id,status){
+  var u=(db.usulan||[]).find(function(x){return x.id===id});if(!u)return;
+  u.status=status;render();
+  supa.from("usulan").update({status:status}).eq("id",id).then(function(r){if(r&&r.error)toast("Gagal menyimpan status: "+r.error.message)});
+}
+function usulanHapus(id){
+  var mp=me();if(!mp||(mp.peran!=="Super-Admin"&&mp.peran!=="Admin")){toast("Hanya Admin atau Super-Admin yang dapat menghapus usulan");return}
+  if(!confirm("Hapus usulan ini?"))return;
+  db.usulan=(db.usulan||[]).filter(function(x){return x.id!==id});render();
+  supa.from("usulan").delete().eq("id",id).then(function(r){if(r&&r.error)toast("Gagal menghapus: "+r.error.message)});
+  toast("Usulan dihapus");
+}
+function usulanKeDraft(id){
+  var u=(db.usulan||[]).find(function(x){return x.id===id});if(!u)return;
+  S.av="kliping";
+  S.draft={id:"",judul:u.judul||"",lead:"",rubrik:db.rubrik[0],media:db.media[0],tautan:u.tautan||"",tglBerita:new Date().toISOString().slice(0,10),tglKliping:new Date().toISOString().slice(0,10),wilayah:"Sulawesi Selatan",lokasi:u.lokasi?[u.lokasi]:[],topik:[],potongan:u.cerita||"",konteks:"",pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",gbrKet:"",vonis:"",catatan:""};
+  S.err=[];
+  usulanUbahStatus(id,"Ditindak");
+  go({});
+  toast("Draf kliping dibuat dari usulan pembaca");
 }
 function _opiRubrik(){
   try{
