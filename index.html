@@ -3079,7 +3079,8 @@ function reaksiBar(k){
     return '<li><span class="rks-arti-e">'+RKS_EMO[emo]+'</span><span><b>'+esc(RKS_LBL[emo])+'</b> \u2014 '+esc(RKS_KET[emo])+'</span></li>';
   }).join("")+'</ul>';
   return '<div class="rks"><span class="rks-h">Tanggapan pembaca</span><div class="rks-row">'+tomb+'</div>'+arti+
-    '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p></div>';
+    '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p>'+
+    '<p class="rks-k">Tahu cerita atau fenomena menarik lain di gunung/alam bebas? <a href="#" onclick=\'go({pv:{n:"usulan"}});return false\'>Kirim ke redaksi →</a></p></div>';
 }
 function rksMini(k){
   var a=rksJumlah(k.id,"api"),b=rksJumlah(k.id,"kopi");
