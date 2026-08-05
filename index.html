@@ -346,6 +346,7 @@ body{background:#f6f3ed;background-image:radial-gradient(circle at 10% 8%,#fff 0
 .sh-wa{background:#25D366}
 .sh-fb{background:#1877F2}
 .sh-x{background:#000}
+.sh-tt{background:#000;background-image:linear-gradient(135deg,#25F4EE 0%,#050505 42%,#FE2C55 100%)}
 @media(max-width:640px){.lit-inner{padding:24px}.lit-inner h2{font-size:24px}}
 
 /* ================= Mobile-first refresh (kekinian) ================= */
@@ -624,6 +625,10 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
   .dukung .btn{margin-left:0;width:100%;text-align:center}
 }
 .sh-lain{background:var(--soft2);color:var(--ink);border:1px solid var(--line)}
+.kartuig-fmt{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.kartuig-wrap{display:flex;justify-content:center;background:#0c1420;border-radius:14px;padding:14px;overflow:auto;max-height:60vh}
+.kartuig-cv{max-width:100%;height:auto;border-radius:10px;display:block}
+.kartuig-hint{font-size:12.5px;color:var(--ink2);margin:10px 2px 0}
 .ik-aju{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px;background:var(--soft)}
 .ik-aju-t{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .ik-aju p{margin:6px 0 0;font-size:13px;color:var(--ink2)}
@@ -1443,10 +1448,113 @@ function waLink(text,url){return "https://wa.me/?text="+encodeURIComponent(text+
 function fbLink(url){return "https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url)}
 function xLink(text,url){return "https://twitter.com/intent/tweet?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(url)}
 function bukaTab(url){location.href=url}
-function bagiKlip(cara,id){const k=db.kliping.find(x=>x.id===id);if(!k)return;const url=shareUrl(id);const txt=k.judul+" — "+k.lead;if(cara==="fb"&&navigator.share){navigator.share({title:k.judul,text:txt,url:url}).catch(function(){});return}if(cara==="wa")bukaTab(waLink(txt,url));else if(cara==="fb")bukaTab(fbLink(url));else if(cara==="x")bukaTab(xLink(txt,url))}
-function bagiSitus(cara){const url=location.origin+location.pathname;const txt="\ud83d\udcda Gerakan Literasi REICHAS — baca, pahami, dan bagikan pengetahuan pendakian & alam bebas.";if(cara==="fb"&&navigator.share){navigator.share({title:"Kliping RCS.CBS",text:txt,url:url}).catch(function(){});return}if(cara==="wa")bukaTab(waLink(txt,url));else if(cara==="fb")bukaTab(fbLink(url));else if(cara==="x")bukaTab(xLink(txt,url))}
-function shBtns(kind){const call=c=>kind==="situs"?"bagiSitus('"+c+"')":"bagiKlip('"+c+"','"+kind+"')";return '<button class="sh sh-wa" onclick="'+call("wa")+'">WhatsApp</button><button class="sh sh-x" onclick="'+call("x")+'">X</button><button class="sh sh-fb" onclick="'+call("fb")+'">Facebook</button>'}
+function bagiKlip(cara,id){const k=db.kliping.find(x=>x.id===id);if(!k)return;const url=shareUrl(id);const txt=k.judul+" — "+k.lead;if(cara==="fb"&&navigator.share){navigator.share({title:k.judul,text:txt,url:url}).catch(function(){});return}if(cara==="wa")bukaTab(waLink(txt,url));else if(cara==="fb")bukaTab(fbLink(url));else if(cara==="x")bukaTab(xLink(txt,url));else if(cara==="tt")bagiTikTok(txt,url)}
+function bagiSitus(cara){const url=location.origin+location.pathname;const txt="\ud83d\udcda Gerakan Literasi REICHAS — baca, pahami, dan bagikan pengetahuan pendakian & alam bebas.";if(cara==="fb"&&navigator.share){navigator.share({title:"Kliping RCS.CBS",text:txt,url:url}).catch(function(){});return}if(cara==="wa")bukaTab(waLink(txt,url));else if(cara==="fb")bukaTab(fbLink(url));else if(cara==="x")bukaTab(xLink(txt,url));else if(cara==="tt")bagiTikTok(txt,url)}
+function bagiTikTok(txt,url){salinTeks(txt+"\n"+url,"Teks & tautan disalin — tempel jadi keterangan saat mengunggah di TikTok");setTimeout(function(){try{window.open("https://www.tiktok.com/upload?lang=id","_blank")}catch(e){}},700)}
+function shBtns(kind){const call=c=>kind==="situs"?"bagiSitus('"+c+"')":"bagiKlip('"+c+"','"+kind+"')";return '<button class="sh sh-wa" onclick="'+call("wa")+'">WhatsApp</button><button class="sh sh-x" onclick="'+call("x")+'">X</button><button class="sh sh-fb" onclick="'+call("fb")+'">Facebook</button><button class="sh sh-tt" onclick="'+call("tt")+'">TikTok</button>'}
 function litBanner(){return '<section class="lit-banner"><div class="lit-inner"><span class="lit-badge">\ud83d\udcda Gerakan Literasi REICHAS</span><h2>Baca. Pahami. Bagikan.</h2><p>Satu kliping yang kamu baca hari ini bisa menyelamatkan langkah esok hari. Mari sebarkan budaya membaca — ilmu yang dibagikan tidak pernah habis.</p><div class="lit-share"><span>Sebarkan:</span>'+shBtns("situs")+'</div></div></section>'}
+
+/* ================= kartu IG/Story/TikTok ================= */
+function mKartuIG(){
+  var id=S.modal.id;var k=db.kliping.find(function(x){return x.id===id});
+  if(!k)return mHead("Kartu tidak tersedia","Kliping ini tidak ditemukan.")+'<div class="end"><button class="btn" onclick="closeModal()">Tutup</button></div>';
+  var fmt=S.modal.fmt||"kotak";
+  var opts=[["kotak","Feed IG (1:1)"],["story","Story/Reels (9:16)"],["tiktok","TikTok (9:16)"]];
+  var btns=opts.map(function(o){return '<button class="btn btn-sm'+(fmt===o[0]?" btn-p":"")+'" onclick=\'kartuIGFmt("'+o[0]+'")\'>'+o[1]+'</button>'}).join("");
+  return mHead("Kartu untuk IG / Story / TikTok","Dibuat otomatis dari judul & ringkasan kliping ini. Pilih format lalu unduh sebagai gambar.")+
+   '<div class="kartuig-fmt">'+btns+'</div>'+
+   '<div class="kartuig-wrap"><canvas id="kartuCv"></canvas></div>'+
+   '<p class="kartuig-hint">Format TikTok diberi ruang aman di bagian bawah & kanan supaya judul tidak tertutup ikon/keterangan bawaan TikTok.</p>'+
+   '<div class="end"><button class="btn" onclick="closeModal()">Tutup</button><button class="btn btn-p" onclick="kartuIGUnduh()">\u2b07\ufe0f Unduh PNG</button></div>';
+}
+function kartuIGFmt(f){if(!S.modal)return;S.modal.fmt=f;render()}
+function kartuIGPasang(){
+  try{
+    if(!S.modal||S.modal.type!=="kartuIG")return;
+    var can=document.getElementById("kartuCv");if(!can)return;
+    kartuIGGambar();
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){try{kartuIGGambar()}catch(e){}});
+  }catch(e){}
+}
+function _kigWrap(ctx,text,maxW){
+  var words=String(text||"").split(/\s+/).filter(Boolean);var lines=[];var cur="";
+  for(var i=0;i<words.length;i++){
+    var test=cur?cur+" "+words[i]:words[i];
+    if(ctx.measureText(test).width>maxW&&cur){lines.push(cur);cur=words[i]}else cur=test;
+  }
+  if(cur)lines.push(cur);
+  return lines;
+}
+function _kigRound(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+function kartuIGGambar(){
+  var can=document.getElementById("kartuCv");if(!can)return;
+  var id=S.modal&&S.modal.id;var k=db.kliping.find(function(x){return x.id===id});if(!k)return;
+  var fmt=(S.modal&&S.modal.fmt)||"kotak";
+  var W=1080,H=fmt==="kotak"?1080:1920;
+  can.width=W;can.height=H;
+  var ctx=can.getContext("2d");
+  var g=ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,"#102a43");g.addColorStop(1,"#1b1330");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="rgba(255,255,255,0.06)";
+  ctx.beginPath();ctx.arc(W*0.86,H*0.1,W*0.34,0,Math.PI*2);ctx.fill();
+  ctx.textBaseline="top";
+  var padX=Math.round(W*0.09);
+  var safeBottom=fmt==="tiktok"?Math.round(H*0.24):Math.round(H*0.09);
+  var y=Math.round(H*0.07);
+  ctx.fillStyle="#fff";ctx.font="700 34px Outfit, sans-serif";
+  ctx.fillText("KLIPING RCS.CBS",padX,y);
+  y+=58;
+  var tagLbl=isOpini(k)?"\u270d Buah Pikir":(k.rubrik||"");
+  if(tagLbl){
+    ctx.font="600 25px Outfit, sans-serif";
+    var tw=ctx.measureText(tagLbl).width;var pillW=tw+42,pillH=48;
+    ctx.fillStyle="rgba(255,255,255,0.16)";_kigRound(ctx,padX,y,pillW,pillH,24);ctx.fill();
+    ctx.fillStyle="#fff";ctx.fillText(tagLbl,padX+21,y+11);
+    y+=pillH+16;
+  }
+  if(k.vonis&&k.vonis!=="\u2014"){
+    var vc={"Fakta":"#3fae72","Sebagian benar":"#d5803b","Menyesatkan":"#d5803b","Hoaks":"#e0554b","Belum diverifikasi":"#7c8896"}[k.vonis]||"#7c8896";
+    ctx.font="700 24px Outfit, sans-serif";
+    var vt="\u2696 "+k.vonis;var vw=ctx.measureText(vt).width;var vpw=vw+36,vph=44;
+    ctx.fillStyle=vc;_kigRound(ctx,padX,y,vpw,vph,22);ctx.fill();
+    ctx.fillStyle="#fff";ctx.fillText(vt,padX+18,y+10);
+    y+=vph+26;
+  }else y+=18;
+  var maxW=W-padX*2;
+  var judulSize=fmt==="kotak"?58:64;
+  ctx.font="800 "+judulSize+"px Georgia, serif";ctx.fillStyle="#fff";
+  var lines=_kigWrap(ctx,k.judul,maxW).slice(0,6);
+  lines.forEach(function(ln){ctx.fillText(ln,padX,y);y+=Math.round(judulSize*1.16)});
+  y+=16;
+  if(k.lead){
+    ctx.font="400 29px 'Plus Jakarta Sans', sans-serif";ctx.fillStyle="rgba(255,255,255,0.82)";
+    var maxLeadY=H-safeBottom-90;
+    var leadLines=_kigWrap(ctx,k.lead,maxW);
+    for(var i=0;i<leadLines.length&&y<maxLeadY;i++){ctx.fillText(leadLines[i],padX,y);y+=40}
+  }
+  var fy=H-safeBottom;
+  ctx.strokeStyle="rgba(255,255,255,0.28)";ctx.beginPath();ctx.moveTo(padX,fy-28);ctx.lineTo(W-padX,fy-28);ctx.stroke();
+  ctx.font="700 27px Outfit, sans-serif";ctx.fillStyle="#fff";
+  ctx.fillText("kliping-reichas.my.id",padX,fy);
+  ctx.font="400 23px 'Plus Jakarta Sans', sans-serif";ctx.fillStyle="rgba(255,255,255,0.72)";
+  ctx.fillText("Baca selengkapnya \u2014 tautan lengkap di bio/keterangan",padX,fy+38);
+}
+function kartuIGUnduh(){
+  var can=document.getElementById("kartuCv");if(!can){toast("Kartu belum siap");return}
+  var id=S.modal&&S.modal.id;var k=db.kliping.find(function(x){return x.id===id});
+  var fmt=(S.modal&&S.modal.fmt)||"kotak";
+  try{
+    var url=can.toDataURL("image/png");
+    var a=document.createElement("a");
+    a.href=url;a.download="kliping-"+(k?slugBersih(k.judul):"kartu")+"-"+fmt+".png";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    toast("Kartu diunduh \u2014 tinggal unggah ke IG/Story/TikTok");
+  }catch(e){toast("Gagal mengunduh kartu")}
+}
+
 
 /* ================= header ================= */
 function header(){
@@ -2264,7 +2372,8 @@ function mFormTolak(){
 function modalView(){
   if(!S.modal)return "";
   let inner="";const t=S.modal.type;
-  if(t==="materi")inner=mFormMateri();
+  if(t==="kartuIG")inner=mKartuIG();
+  else if(t==="materi")inner=mFormMateri();
   else if(t==="rubrik")inner=mFormRubrik();
   else if(t==="media")inner=mFormMedia();
   else if(t==="pengguna")inner=mFormPengguna();
@@ -2595,7 +2704,7 @@ function viewClip(){
     (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+'</p>':'')+'</div>':'')+
     (rel.length?'<div class="sec"><h4>Kliping serupa</h4><div class="rel">'+rel.map(function(x){return '<a href="#" onclick=\'go({pv:{n:"clip",id:"'+x.id+'"}});return false\'><b>'+esc(x.judul)+'</b><small>'+esc(x.rubrik)+' \u00b7 \u23f1 '+menitBaca(x)+' menit</small></a>'}).join("")+'</div></div>':'')+
     '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Digunting '+tglID(k.tglKliping)+' oleh '+esc(nm(k.kurator))+lencanaHTML(rksTotalKurator(k.kurator).total)+(k.peninjau?' \u00b7 ditinjau '+esc(nm(k.peninjau)):'')+'</p>'+
-    '<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'<button class="sh sh-lain" onclick=\'bagikanAsli("'+k.id+'")\'>Lainnya\u2026</button></div>'+
+    '<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'<button class="sh sh-lain" onclick=\'bagikanAsli("'+k.id+'")\'>Lainnya\u2026</button><button class="sh sh-lain" onclick=\'openModal("kartuIG","'+k.id+'\")\'>\ud83d\udcf8 Kartu IG/Story/TikTok</button></div>'+
     '<div class="pn">'+
       (prev?'<button class="btn" onclick=\'go({pv:{n:"clip",id:"'+prev.id+'"}})\'>\u2190 '+esc(prev.judul.slice(0,42))+(prev.judul.length>42?"\u2026":"")+'</button>':'')+
       (next?'<button class="btn" onclick=\'go({pv:{n:"clip",id:"'+next.id+'"}})\' style="text-align:right">'+esc(next.judul.slice(0,42))+(next.judul.length>42?"\u2026":"")+' \u2192</button>':'')+
@@ -2734,7 +2843,7 @@ function render(){
     body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="vonis"?viewVonisIndeks():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():n==="usulan"?viewUsulan():viewBoard();
   }
   document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
-  pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}try{slugPasang()}catch(e){}try{opiPasang()}catch(e){}
+  pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}try{slugPasang()}catch(e){}try{opiPasang()}catch(e){}try{kartuIGPasang()}catch(e){}
   save();
 }
 
@@ -4869,7 +4978,7 @@ function viewOpini(k){
    (rj?'<div class="sec"><h4>Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+rj+"</ul></div>":"")+
    '<div class="opi-note"><b>Ini Buah Pikir, bukan laporan.</b> Isinya pandangan pribadi penulis dan tidak mewakili sikap resmi REICHAS CHELEBES. Sanggahan boleh dikirim ke kliping.rcscbs@gmail.com dan akan kami muat bila layak.</div>'+
    '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Ditulis '+tglID(k.tglKliping)+" oleh "+esc(nm(k.kurator))+(k.peninjau?" \u00b7 disetujui "+esc(nm(k.peninjau)):"")+"</p>"+
-   '<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+"</div></div>"+foot();
+   '<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'<button class="sh sh-lain" onclick=\'openModal("kartuIG","'+k.id+'\")\'>\ud83d\udcf8 Kartu IG/Story/TikTok</button>'+"</div></div>"+foot();
 }
 
 (function(){
