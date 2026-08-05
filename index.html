@@ -1558,8 +1558,8 @@ function kartuIGUnduh(){
 
 /* ================= header ================= */
 function header(){
-  const m=me(); const pub=[["board","Papan Kliping"],["materi","Materi"],["vonis","Indeks Cek Fakta"],["arsip","Arsip"],["pedoman","Pedoman"],["usulan","Kirim Cerita"]];
-  const ICO={board:"\ud83d\udcf0",materi:"\ud83d\udcda",vonis:"\u2696\ufe0f",arsip:"\ud83d\udcc1",pedoman:"\ud83d\udcd6",usulan:"\ud83d\udce9"};
+  const m=me(); const pub=[["board","Papan Kliping"],["materi","Materi"],["kampanye","Kartu IG & TikTok"],["vonis","Indeks Cek Fakta"],["arsip","Arsip"],["pedoman","Pedoman"],["usulan","Kirim Cerita"]];
+  const ICO={board:"📰",materi:"📚",kampanye:"📱",vonis:"⚖️",arsip:"📁",pedoman:"📖",usulan:"📩"};
   const _on=p=>(S.pv.n===p||(p==="board"&&S.pv.n==="clip")||(p==="materi"&&S.pv.n==="materiDetail"));
   let nav="";
   if(S.mode==="public"){
@@ -1611,7 +1611,7 @@ function viewBoard(){
   const list=terbit().filter(k=>(S.filter==="Semua"||k.rubrik===S.filter)&&_match(k)).sort((a,b)=>b.tglKliping.localeCompare(a.tglKliping));
   const chips=["Semua"].concat(db.rubrik.filter(r=>terbit().some(k=>k.rubrik===r))).map(r=>'<button class="chip '+(S.filter===r?"on":"")+'" onclick=\'go({filter:"'+r+'"})\'>'+r+"</button>").join("");
   const cards=list.map(k=>'<article class="clip">'+(isImg(k.gambar)?'<img src="'+esc(k.gambar)+'" alt="" style="width:100%;height:150px;object-fit:cover;border-radius:10px;margin-bottom:12px" />':"")+'<span class="tag tag-b">'+esc(k.rubrik)+'</span>'+vonisTag(k)+'<h3>'+esc(k.judul)+'</h3><p class="lead">'+esc(k.lead)+'</p><div class="src"><span>'+esc(k.media)+'</span><span>'+tglID(k.tglBerita)+'</span></div><button class="btn btn-sm open" onclick=\'go({pv:{n:"clip",id:"'+k.id+'"}})\'>Buka kliping ↗</button></article>').join("");
-  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS — menggunting berita, menanam pengetahuan"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p><button type="button" class="btn btn-sm btn-p" onclick="mulaiPodcast(0)" style="margin-top:14px;display:inline-flex;align-items:center;gap:8px"><span>📻</span> <b>Putar Podcast Literasi (Auto-Play)</b></button></div></div></section>'+litBanner()+'<div class="wrap"><div class="cari-row"><input id="cari" class="cari-inp" type="search" placeholder="🔎 Cari judul, media, wilayah, atau isi…" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" /></div><div class="filters" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0 22px;margin:0">'+chips+'</div><div class="board">'+(cards||'<p class="empty">Tidak ada kliping yang cocok dengan pencarian/filter ini.</p>')+"</div></div>"+foot();
+  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS — menggunting berita, menanam pengetahuan"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button type="button" class="btn btn-sm btn-p" onclick="mulaiPodcast(0)" style="display:inline-flex;align-items:center;gap:8px"><span>📻</span> <b>Putar Podcast Literasi</b></button><button type="button" class="btn btn-sm btn-g" onclick="go({pv:{n:\'kampanye\'}})" style="display:inline-flex;align-items:center;gap:8px;background:var(--lime,#b7ea5e);color:#193234"><span>📱</span> <b>Studio Kartu IG &amp; TikTok (Baca, Pahami, Bagikan)</b></button></div></div></div></section>'+litBanner()+'<div class="wrap"><div class="cari-row"><input id="cari" class="cari-inp" type="search" placeholder="🔎 Cari judul, media, wilayah, atau isi…" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" /></div><div class="filters" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0 22px;margin:0">'+chips+'</div><div class="board">'+(cards||'<p class="empty">Tidak ada kliping yang cocok dengan pencarian/filter ini.</p>')+"</div></div>"+foot();
 }
 
 /* ================= PODCAST CONTINUOUS PLAYER ================= */
@@ -2832,6 +2832,138 @@ try{document.addEventListener("keydown",function(e){
   if(e.key==="Escape"){var m=document.querySelector(".modal-bg");if(m)closeModal()}
 });}catch(e){}
 
+var _K_TDATA = [
+  { t: "TERJEBAK MITOS ATAU PEKA FAKTA?", s: '"Laporan misteri di lereng Gunung Latimojong tahun 1994 kembali heboh. Tapi benarkah kejadian aslinya seperti itu?"', d: "Jangan cuma geser feed. Kliping REICHAS membongkar fakta historis & verifikasi ilmiah di balik cerita mistis Sulawesi.", b: "SLIDE 1: HOOK", img: "reichas_ig_card_hero.png" },
+  { t: "1. BACA: TANYAKAN SUMBER ASLINYA", s: '"Banyak informasi beredar hanya potongan screenshot tanpa tanggal, tanpa penulis, dan tanpa pembanding."', d: "Langkah pertama literasi REICHAS: telusuri dokumen koran lama, verifikasi arsip, dan pastikan data bukan karangan.", b: "SLIDE 2: BACA", img: "reichas_factcheck_card.png" },
+  { t: "2. PAHAMI: DEKONSTRUKSI LOGIKA", s: '"Mengapa narasi ini mendadak viral? Siapa yang diuntungkan dari kepanikan dan hoaks masyarakat?"', d: "Pahami konteks sosial dan bias informasi. Kebenaran tidak diukur dari seberapa ramai netizen berkomentar.", b: "SLIDE 3: PAHAMI", img: "reichas_ig_card_hero.png" },
+  { t: "3. BAGIKAN: JADI BENTENG LITERASI", s: '"Menyebarkan kebenaran adalah bentuk kepedulian digital. Hentikan rantai hoaks di jemari Anda."', d: "Sebelum menekan tombol share, pastikan tulisan sudah dibaca utuh dan dipahami faktanya.", b: "SLIDE 4: BAGIKAN", img: "tiktok_vertical_card_reichas.png" },
+  { t: "MELEK FAKTA BERSAMA REICHAS CELEBES", s: '"Membaca Hari Ini, Melek Fakta Selamanya. Galeri kliping literasi & cek fakta Sulawesi."', d: "Kunjungi kliping-reichas.my.id untuk membaca ratusan analisis kliping & verifikasi fakta lengkap.", b: "SLIDE 5: REICHAS CORE", img: "reichas_factcheck_card.png" }
+];
+
+function setStudioFmt(fmt){
+  var w=document.getElementById("stWrap");if(!w)return;
+  var bIg=document.getElementById("btnFmtIg"),bTt=document.getElementById("btnFmtTt");
+  if(fmt==="ig"){
+    w.style.width="340px";w.style.height="425px";
+    if(bIg){bIg.className="btn btn-sm btn-p"}
+    if(bTt){bTt.className="btn btn-sm"}
+  }else{
+    w.style.width="280px";w.style.height="490px";
+    if(bIg){bIg.className="btn btn-sm"}
+    if(bTt){bTt.className="btn btn-sm btn-p"}
+  }
+}
+
+function ubahKStudio(){
+  var sel=document.getElementById("kSelTema");if(!sel)return;
+  var idx=parseInt(sel.value,10)||0;
+  var data=_K_TDATA[idx]||_K_TDATA[0];
+  var ij=document.getElementById("kInpJudul"),is=document.getElementById("kInpSnippet"),id=document.getElementById("kInpDesc");
+  if(ij)ij.value=data.t;if(is)is.value=data.s;if(id)id.value=data.d;
+  updateKStudioText(data.b,data.img);
+}
+
+function updateKStudioText(badge,img){
+  var ij=document.getElementById("kInpJudul"),is=document.getElementById("kInpSnippet"),id=document.getElementById("kInpDesc");
+  var stTitle=document.getElementById("stTitle"),stSnippet=document.getElementById("stSnippet"),stDesc=document.getElementById("stDesc");
+  var stBadge=document.getElementById("stBadge"),stWrap=document.getElementById("stWrap");
+  if(ij&&stTitle)stTitle.textContent=ij.value;
+  if(is&&stSnippet)stSnippet.textContent=is.value;
+  if(id&&stDesc)stDesc.textContent=id.value;
+  if(badge&&stBadge)stBadge.textContent=badge;
+  if(img&&stWrap)stWrap.style.backgroundImage="linear-gradient(to bottom, rgba(15,20,29,0.7), rgba(9,13,20,0.95)), url('"+img+"')";
+}
+
+function salinKontenKampanye(){
+  var t="🚀 KAMPANYE LITERASI REICHAS CELEBES: BACA, PAHAMI, BAGIKAN\n\n"+
+    "Kalian pernah denger cerita viral tapi pas dicari sumber aslinya ternyata cuma karangan? 🤯\n\n"+
+    "Mari terapkan gerakan 3B dari Kliping REICHAS:\n"+
+    "📖 BACA — Telusuri fakta dari arsip & data resmi.\n"+
+    "🧠 PAHAMI — Dekonstruksi logikanya, uji apakah narasi masuk akal.\n"+
+    "📤 BAGIKAN — Hentikan rantai hoaks. Bagikan hanya kebenaran!\n\n"+
+    "Membaca hari ini, melek fakta selamanya.\n"+
+    "🔗 kliping-reichas.my.id\n\n"+
+    "#KlipingReichas #LiterasiDigital #BacaPahamiBagikan #CekFakta #Celebes #Sulawesi";
+  salinTeks(t,"Teks & Caption Kampanye disalin! Siap ditempel di Instagram / TikTok");
+}
+
+function viewKampanyeKartu(){
+  return '<div class="wrap" style="padding:28px 24px 56px">'+
+    '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">'+
+      '<h2 style="margin:0;font-size:26px;color:var(--navy)">Studio Kartu IG &amp; TikTok Literasi</h2>'+
+      '<span class="tag tag-g" style="font-weight:800;letter-spacing:0.06em">BACA · PAHAMI · BAGIKAN</span>'+
+    '</div>'+
+    '<p style="color:var(--ink2);max-width:720px;margin:0 0 24px">Kampanye Literasi Digital REICHAS CELEBES: ubah rasa penasaran mitos &amp; koran lama menjadi daya kritis. Pilih format, sunting teks, dan bagikan kartu visual hyper-realistic ke Instagram &amp; TikTok!</p>'+
+    
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;align-items:start">'+
+      
+      '<!-- Left Form Control -->'+
+      '<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:16px">'+
+        '<b style="font-size:15px;color:var(--navy)">⚙️ Editor Kartu Studio</b>'+
+        '<div class="f"><label style="font-size:12px;font-weight:700">FORMAT MEDIA SOSIAL</label>'+
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">'+
+            '<button type="button" class="btn btn-sm btn-p" id="btnFmtIg" onclick="setStudioFmt(\'ig\')">📱 IG (4:5)</button>'+
+            '<button type="button" class="btn btn-sm" id="btnFmtTt" onclick="setStudioFmt(\'tiktok\')">🎬 TikTok (9:16)</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="f"><label style="font-size:12px;font-weight:700">TEMA SLIDE KAMPANYE</label>'+
+          '<select id="kSelTema" onchange="ubahKStudio()" style="margin-top:4px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);width:100%">'+
+            _K_TDATA.map(function(d,i){return '<option value="'+i+'">'+d.b+': '+d.t.slice(0,30)+'…</option>'}).join("")+
+          '</select>'+
+        '</div>'+
+        '<div class="f"><label style="font-size:12px;font-weight:700">JUDUL HEADLINE</label><input type="text" id="kInpJudul" value="'+esc(_K_TDATA[0].t)+'" oninput="updateKStudioText()" style="width:100%;margin-top:4px;padding:8px;border-radius:8px;border:1px solid var(--line)" /></div>'+
+        '<div class="f"><label style="font-size:12px;font-weight:700">KUTIPAN KLIPING KORAN</label><textarea id="kInpSnippet" rows="3" oninput="updateKStudioText()" style="width:100%;margin-top:4px;padding:8px;border-radius:8px;border:1px solid var(--line)">'+esc(_K_TDATA[0].s)+'</textarea></div>'+
+        '<div class="f"><label style="font-size:12px;font-weight:700">PESAN LITERASI (DESKRIPSI)</label><textarea id="kInpDesc" rows="3" oninput="updateKStudioText()" style="width:100%;margin-top:4px;padding:8px;border-radius:8px;border:1px solid var(--line)">'+esc(_K_TDATA[0].d)+'</textarea></div>'+
+        '<button type="button" class="btn btn-g" onclick="salinKontenKampanye()" style="font-weight:800;margin-top:4px">✨ Salin Teks &amp; Caption Post</button>'+
+      '</div>'+
+
+      '<!-- Right Card Preview -->'+
+      '<div style="display:flex;flex-direction:column;align-items:center;gap:18px">'+
+        '<div id="stWrap" style="width:340px;height:425px;border-radius:20px;box-shadow:0 20px 40px rgba(16,42,67,0.25);overflow:hidden;position:relative;background:#0d131d center/cover no-repeat;transition:all 0.3s ease;padding:24px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;border:1px solid rgba(255,255,255,0.15)">'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;z-index:2">'+
+            '<span style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:var(--lime,#b7ea5e)">● REICHAS CELEBES</span>'+
+            '<span id="stBadge" class="tag tag-b" style="font-size:10px;font-weight:800">'+_K_TDATA[0].b+'</span>'+
+          '</div>'+
+          '<div style="z-index:2;display:flex;flex-direction:column;gap:12px;margin:auto 0">'+
+            '<div id="stSnippet" style="background:rgba(246,243,237,0.94);color:#1a202c;padding:12px;border-radius:10px;border-left:4px solid var(--coral,#ff6b5d);font-family:Georgia,serif;font-size:12px;line-height:1.4;box-shadow:0 6px 16px rgba(0,0,0,0.3)">'+esc(_K_TDATA[0].s)+'</div>'+
+            '<h3 id="stTitle" style="margin:0;font-size:20px;line-height:1.2;font-weight:800;color:#fff;text-shadow:0 3px 10px rgba(0,0,0,0.7)">'+esc(_K_TDATA[0].t)+'</h3>'+
+            '<p id="stDesc" style="margin:0;font-size:12px;line-height:1.45;color:rgba(255,255,255,0.88)">'+esc(_K_TDATA[0].d)+'</p>'+
+          '</div>'+
+          '<div style="z-index:2;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">'+
+            '<span style="font-size:10px;font-weight:800;color:var(--lime,#b7ea5e)">BACA · PAHAMI · BAGIKAN</span>'+
+            '<span style="font-size:11px;font-weight:800;background:#fff;color:#102a43;padding:4px 10px;border-radius:99px">Buka Kliping →</span>'+
+          '</div>'+
+        '</div>'+
+        '<p style="font-size:12px;color:var(--ink2)">*Pratinjau kartu hyper-realistic live. Klik tombol salin untuk menggunakan materi caption.</p>'+
+      '</div>'+
+
+    '</div>'+
+
+    '<!-- Visual Assets Showcase -->'+
+    '<div style="margin-top:40px">'+
+      '<h3 style="font-size:19px;color:var(--navy);margin-bottom:14px">Aset Hyper-Realistis Tergenerasi (HD Ready)</h3>'+
+      '<div class="grid g3">'+
+        '<div class="card" style="padding:12px">'+
+          '<img src="reichas_ig_card_hero.png" alt="Aset IG Hero" style="width:100%;height:200px;object-fit:cover;border-radius:10px" />'+
+          '<h4 style="margin:10px 0 4px;font-size:14px">Aset 1: Hero Carousel IG</h4>'+
+          '<p style="margin:0;font-size:12px;color:var(--ink2)">Tekstur koran klasik 1994, mahoni, dan pendar digital cek fakta.</p>'+
+        '</div>'+
+        '<div class="card" style="padding:12px">'+
+          '<img src="tiktok_vertical_card_reichas.png" alt="Aset TikTok Vertical" style="width:100%;height:200px;object-fit:cover;border-radius:10px" />'+
+          '<h4 style="margin:10px 0 4px;font-size:14px">Aset 2: TikTok 9:16 Vertical Card</h4>'+
+          '<p style="margin:0;font-size:12px;color:var(--ink2)">Layout vertical story 9:16 untuk penghenti scroll TikTok 3 detik.</p>'+
+        '</div>'+
+        '<div class="card" style="padding:12px">'+
+          '<img src="reichas_factcheck_card.png" alt="Aset Fact Check" style="width:100%;height:200px;object-fit:cover;border-radius:10px" />'+
+          '<h4 style="margin:10px 0 4px;font-size:14px">Aset 3: Glassmorphism Fact-Check</h4>'+
+          '<p style="margin:0;font-size:12px;color:var(--ink2)">Stempel "FAKTA VERIFIKASI" transparan di atas kliping koran.</p>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+  '</div>'+foot();
+}
+
 /* ---- Render ---- */
 function render(){
   document.body.className=db.settings.sinyalTipis?"thin":"";
@@ -2840,7 +2972,7 @@ function render(){
   else if(S.mode==="admin")body=viewAdmin();
   else{
     var n=S.pv.n;
-    body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="vonis"?viewVonisIndeks():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():n==="usulan"?viewUsulan():viewBoard();
+    body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="vonis"?viewVonisIndeks():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():n==="usulan"?viewUsulan():n==="kampanye"?viewKampanyeKartu():viewBoard();
   }
   document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
   pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}try{slugPasang()}catch(e){}try{opiPasang()}catch(e){}try{kartuIGPasang()}catch(e){}
