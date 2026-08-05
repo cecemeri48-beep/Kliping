@@ -1422,7 +1422,7 @@ function litBanner(){return '<section class="lit-banner"><div class="lit-inner">
 
 /* ================= header ================= */
 function header(){
-  const m=me(); const pub=[["board","Papan Kliping"],["materi","Materi"],["arsip","Arsip"],["pedoman","Pedoman"],["usulan","Kirim Cerita"]];
+  const m=me(); const pub=[["board","Papan Kliping"],["materi","Materi"],["vonis","Indeks Cek Fakta"],["arsip","Arsip"],["pedoman","Pedoman"],["usulan","Kirim Cerita"]];
   const ICO={board:"\ud83d\udcf0",materi:"\ud83d\udcda",arsip:"\ud83d\udcc1",pedoman:"\ud83d\udcd6",usulan:"\ud83d\udce9"};
   const _on=p=>(S.pv.n===p||(p==="board"&&S.pv.n==="clip")||(p==="materi"&&S.pv.n==="materiDetail"));
   let nav="";
@@ -1667,12 +1667,24 @@ function viewClip(){
    (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+'</div>':"")+
    '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Digunting '+tglID(k.tglKliping)+" oleh "+esc(nm(k.kurator))+(k.peninjau?" \u00b7 ditinjau "+esc(nm(k.peninjau)):"")+" \u00b7 gambar: "+(isImg(k.gambar)?"foto":esc(k.gambar))+"</p>"+'<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'</div></div>'+foot();
 }
+function _matchMateri(m){var q=String(S.mq||"").trim().toLowerCase();if(!q)return true;var t=[m.judul,m.isi,m.acuan,m.rumpun,m.tingkat].join(" ").toLowerCase();return q.split(/\s+/).every(function(w){return t.indexOf(w)>=0})}
+function cariMateri(v){S.mq=v;render();var el=document.getElementById("cariMateri");if(el){el.focus();try{var n=el.value.length;el.setSelectionRange(n,n)}catch(e){}}}
 function viewMateri(){
   const rum=[...new Set(db.materi.map(m=>m.rumpun))];
+  const terfilter=db.materi.filter(_matchMateri);
+  const cariBox='<div class="cari-row"><input id="cariMateri" class="cari-inp" type="search" placeholder="🔎 Cari materi: judul, isi, sumber acuan…" value="'+esc(S.mq||"")+'" oninput="cariMateri(this.value)" autocomplete="off" /></div>';
+  const hasil=S.mq?'<p class="hasil" style="margin:14px 0 0">Menampilkan <b>'+terfilter.length+'</b> dari '+db.materi.length+' materi</p>':"";
+  const isi=rum.map(r=>{
+    const byR=terfilter.filter(m=>m.rumpun===r);
+    if(!byR.length)return "";
+    return '<h3 style="font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin:24px 0 10px">'+esc(r)+'</h3><div class="grid g3">'+
+     byR.map(m=>'<div class="card"><span class="tag tag-g">'+esc(m.tingkat)+'</span><h4 style="margin:10px 0 6px;font-size:16px">'+esc(m.judul)+'</h4><p style="margin:0 0 12px;font-size:14px;color:var(--ink2)">'+esc(m.isi.slice(0,88))+'…</p><button class="btn btn-sm" onclick=\'go({pv:{n:"materiDetail",id:"'+m.id+'"})\'>Buka</button></div>').join("")+"</div>";
+  }).join("");
   return '<div class="wrap" style="padding:32px 24px 56px"><h2 style="margin:0 0 6px;font-size:26px">Materi</h2>'+
-   '<p style="color:var(--ink2);max-width:680px;margin:0 0 24px">Halaman ilmu yang tidak kedaluwarsa. Setiap kliping wajib menaut ke sini, sehingga berita menjadi pintu masuk dan materi menjadi isi rumah.</p>'+
-   rum.map(r=>'<h3 style="font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin:24px 0 10px">'+esc(r)+'</h3><div class="grid g3">'+
-     db.materi.filter(m=>m.rumpun===r).map(m=>'<div class="card"><span class="tag tag-g">'+esc(m.tingkat)+'</span><h4 style="margin:10px 0 6px;font-size:16px">'+esc(m.judul)+'</h4><p style="margin:0 0 12px;font-size:14px;color:var(--ink2)">'+esc(m.isi.slice(0,88))+'\u2026</p><button class="btn btn-sm" onclick=\'go({pv:{n:"materiDetail",id:"'+m.id+'"}})\'>Buka</button></div>').join("")+"</div>").join("")+"</div>"+foot();
+   '<p style="color:var(--ink2);max-width:680px;margin:0 0 18px">Halaman ilmu yang tidak kedaluwarsa. Setiap kliping wajib menaut ke sini, sehingga berita menjadi pintu masuk dan materi menjadi isi rumah.</p>'+
+   cariBox+hasil+isi+
+   (!terfilter.length?'<p class="empty" style="margin-top:20px">Tidak ada materi yang cocok dengan pencarian ini.</p>':"")+
+   "</div>"+foot();
 }
 function viewMateriDetail(){
   const m=mat(S.pv.id);if(!m)return '<p class="empty">Tidak ditemukan.</p>';
@@ -1683,6 +1695,27 @@ function viewMateriDetail(){
    '<div class="sec" style="margin-top:16px"><h4>Kliping yang menaut ke materi ini</h4><ul style="margin:0;padding-left:20px">'+
    (kl.map(k=>'<li><a href="#" onclick=\'go({pv:{n:"clip",id:"'+k.id+'"}});return false\'>'+esc(k.judul)+"</a></li>").join("")||"<li>Belum ada.</li>")+"</ul></div>"+
    '<div class="note o" style="margin-top:16px">'+esc(db.settings.penyangkalan)+"</div></div>"+foot();
+}
+function viewVonisIndeks(){
+  var URUT=["Hoaks","Menyesatkan","Sebagian benar","Fakta","Belum diverifikasi"];
+  var semua=terbit().filter(function(k){return k.vonis&&k.vonis!=="—"});
+  var F=S.vonisF||"Semua";
+  var ada=URUT.filter(function(v){return semua.some(function(k){return k.vonis===v})});
+  var tabs=["Semua"].concat(ada);
+  var tabHtml=tabs.map(function(v){
+    var jml=v==="Semua"?semua.length:semua.filter(function(k){return k.vonis===v}).length;
+    return '<button class="chip'+(F===v?" on":"")+'" onclick=\'go({vonisF:"'+v+'"})\'>'+esc(v)+' ('+jml+')</button>';
+  }).join("");
+  var filtered=(F==="Semua"?semua:semua.filter(function(k){return k.vonis===F})).slice().sort(function(a,b){return String(b.tglKliping).localeCompare(String(a.tglKliping))});
+  var kartu=filtered.map(function(k){
+    return '<article class="clip">'+vonisTag(k)+'<h3 style="margin-top:8px">'+esc(k.judul)+'</h3><p class="lead">'+esc(k.lead)+'</p><div class="src"><span>'+esc(k.media)+'</span><span>'+tglID(k.tglBerita)+'</span></div><button class="btn btn-sm open" onclick=\'go({pv:{n:"clip",id:"'+k.id+'"}})\'>Buka kliping ↗</button></article>';
+  }).join("");
+  return '<div class="wrap" style="padding:32px 24px 56px"><h2 style="margin:0 0 6px;font-size:26px">Indeks Cek Fakta</h2>'+
+   '<p style="color:var(--ink2);max-width:680px;margin:0 0 20px">Rekap vonis semua kliping yang sudah diperiksa redaksi, supaya mudah ditelusuri mana yang terbukti dan mana yang hoaks.</p>'+
+   '<div class="chips" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px">'+tabHtml+'</div>'+
+   '<p class="hasil">Menampilkan <b>'+filtered.length+'</b> dari '+semua.length+' kliping bervonis</p>'+
+   '<div class="board">'+(kartu||'<p class="empty">Belum ada kliping dengan vonis pada kategori ini.</p>')+'</div>'+
+   "</div>"+foot();
 }
 function viewArsip(){
   const g={};terbit().forEach(k=>{const j=jilid(k.tglKliping);(g[j]=g[j]||[]).push(k)});
@@ -2634,7 +2667,7 @@ function render(){
   else if(S.mode==="admin")body=viewAdmin();
   else{
     var n=S.pv.n;
-    body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():n==="usulan"?viewUsulan():viewBoard();
+    body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="vonis"?viewVonisIndeks():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():n==="rak"?viewRak():n==="usulan"?viewUsulan():viewBoard();
   }
   document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
   pasangEkstra();try{mutuPasang()}catch(e){}try{avaPasang()}catch(e){}try{slugPasang()}catch(e){}try{opiPasang()}catch(e){}
