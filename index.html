@@ -1492,55 +1492,191 @@ function kartuIGGambar(){
   var can=document.getElementById("kartuCv");if(!can)return;
   var id=S.modal&&S.modal.id;var k=db.kliping.find(function(x){return x.id===id});if(!k)return;
   var fmt=(S.modal&&S.modal.fmt)||"kotak";
-  var W=1080,H=fmt==="kotak"?1080:1920;
+  var W=1080, H=(fmt==="story"||fmt==="tiktok")?1920:1350;
   can.width=W;can.height=H;
   var ctx=can.getContext("2d");
-  var g=ctx.createLinearGradient(0,0,W,H);
-  g.addColorStop(0,"#102a43");g.addColorStop(1,"#1b1330");
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  ctx.fillStyle="rgba(255,255,255,0.06)";
-  ctx.beginPath();ctx.arc(W*0.86,H*0.1,W*0.34,0,Math.PI*2);ctx.fill();
+  
+  // 1. Hyper-realistic dark ambient background
+  var bgG=ctx.createRadialGradient(W*0.3, H*0.2, 100, W*0.5, H*0.5, W*1.2);
+  bgG.addColorStop(0, "#162032");
+  bgG.addColorStop(0.5, "#0b101a");
+  bgG.addColorStop(1, "#05070c");
+  ctx.fillStyle=bgG;
+  ctx.fillRect(0,0,W,H);
+
+  // Glow ambient lighting effects
+  var glowV=ctx.createRadialGradient(W*0.85, H*0.15, 10, W*0.85, H*0.15, 450);
+  glowV.addColorStop(0, "rgba(115, 87, 255, 0.22)");
+  glowV.addColorStop(1, "transparent");
+  ctx.fillStyle=glowV;
+  ctx.fillRect(0,0,W,H);
+
+  var glowL=ctx.createRadialGradient(W*0.15, H*0.85, 10, W*0.15, H*0.85, 450);
+  glowL.addColorStop(0, "rgba(183, 234, 94, 0.15)");
+  glowL.addColorStop(1, "transparent");
+  ctx.fillStyle=glowL;
+  ctx.fillRect(0,0,W,H);
+
+  // Subtle paper grain background texture
+  ctx.fillStyle="rgba(255,255,255,0.02)";
+  for(var i=0;i<H;i+=6){
+    ctx.fillRect(0,i,W,2);
+  }
+
+  var padX=Math.round(W*0.08);
+  var isVertical=(fmt==="story"||fmt==="tiktok");
+  var safeBottom=fmt==="tiktok"?Math.round(H*0.20):Math.round(H*0.08);
+  var y=Math.round(H*0.05);
+
+  // 2. Top Header Bar: Brand Logo & Kampanye Pill
   ctx.textBaseline="top";
-  var padX=Math.round(W*0.09);
-  var safeBottom=fmt==="tiktok"?Math.round(H*0.24):Math.round(H*0.09);
-  var y=Math.round(H*0.07);
-  ctx.fillStyle="#fff";ctx.font="700 34px Outfit, sans-serif";
-  ctx.fillText("KLIPING RCS.CBS",padX,y);
-  y+=58;
-  var tagLbl=isOpini(k)?"\u270d Buah Pikir":(k.rubrik||"");
+  ctx.fillStyle="#b7ea5e";
+  ctx.font="800 32px Outfit, sans-serif";
+  ctx.fillText("● REICHAS CELEBES", padX, y);
+
+  // Kampanye Literasi Pill Badge (Glassmorphism effect)
+  var campLbl="BACA · PAHAMI · BAGIKAN";
+  ctx.font="800 22px Outfit, sans-serif";
+  var clW=ctx.measureText(campLbl).width+36;
+  var clX=W-padX-clW;
+  ctx.fillStyle="rgba(255, 255, 255, 0.1)";
+  _kigRound(ctx, clX, y-4, clW, 46, 23);
+  ctx.fill();
+  ctx.strokeStyle="rgba(183, 234, 94, 0.4)";
+  ctx.lineWidth=2;
+  ctx.stroke();
+  ctx.fillStyle="#fff";
+  ctx.fillText(campLbl, clX+18, y+7);
+
+  y+=74;
+
+  // 3. Vonis / Rubrik Tag
+  var tagLbl=isOpini(k)?"✍️ Buah Pikir":(k.rubrik||"");
+  var tw=0;
   if(tagLbl){
-    ctx.font="600 25px Outfit, sans-serif";
-    var tw=ctx.measureText(tagLbl).width;var pillW=tw+42,pillH=48;
-    ctx.fillStyle="rgba(255,255,255,0.16)";_kigRound(ctx,padX,y,pillW,pillH,24);ctx.fill();
-    ctx.fillStyle="#fff";ctx.fillText(tagLbl,padX+21,y+11);
-    y+=pillH+16;
-  }
-  if(k.vonis&&k.vonis!=="\u2014"){
-    var vc={"Fakta":"#3fae72","Sebagian benar":"#d5803b","Menyesatkan":"#d5803b","Hoaks":"#e0554b","Belum diverifikasi":"#7c8896"}[k.vonis]||"#7c8896";
     ctx.font="700 24px Outfit, sans-serif";
-    var vt="\u2696 "+k.vonis;var vw=ctx.measureText(vt).width;var vpw=vw+36,vph=44;
-    ctx.fillStyle=vc;_kigRound(ctx,padX,y,vpw,vph,22);ctx.fill();
-    ctx.fillStyle="#fff";ctx.fillText(vt,padX+18,y+10);
-    y+=vph+26;
-  }else y+=18;
-  var maxW=W-padX*2;
-  var judulSize=fmt==="kotak"?58:64;
-  ctx.font="800 "+judulSize+"px Georgia, serif";ctx.fillStyle="#fff";
-  var lines=_kigWrap(ctx,k.judul,maxW).slice(0,6);
-  lines.forEach(function(ln){ctx.fillText(ln,padX,y);y+=Math.round(judulSize*1.16)});
-  y+=16;
-  if(k.lead){
-    ctx.font="400 29px 'Plus Jakarta Sans', sans-serif";ctx.fillStyle="rgba(255,255,255,0.82)";
-    var maxLeadY=H-safeBottom-90;
-    var leadLines=_kigWrap(ctx,k.lead,maxW);
-    for(var i=0;i<leadLines.length&&y<maxLeadY;i++){ctx.fillText(leadLines[i],padX,y);y+=40}
+    tw=ctx.measureText(tagLbl).width+36;
+    ctx.fillStyle="rgba(115, 87, 255, 0.3)";
+    _kigRound(ctx, padX, y, tw, 44, 12);
+    ctx.fill();
+    ctx.fillStyle="#c3b7ff";
+    ctx.fillText(tagLbl, padX+18, y+9);
   }
+
+  if(k.vonis&&k.vonis!=="—"){
+    var vc={"Fakta":"#3fae72","Sebagian benar":"#d5803b","Menyesatkan":"#d5803b","Hoaks":"#e0554b","Belum diverifikasi":"#7c8896"}[k.vonis]||"#7c8896";
+    ctx.font="800 24px Outfit, sans-serif";
+    var vt="⚖️ FAKTA VERIFIKASI: "+k.vonis.toUpperCase();
+    var vw=ctx.measureText(vt).width+38;
+    var vx=padX+(tagLbl?(tw+16):0);
+    ctx.fillStyle=vc;
+    _kigRound(ctx, vx, y, vw, 44, 12);
+    ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.fillText(vt, vx+19, y+9);
+  }
+  y+=68;
+
+  // 4. Newspaper Cutout Box (Potongan Berita Klasik 3D)
+  if(k.potongan){
+    var boxW=W-padX*2;
+    var snippetText='"'+k.potongan.trim()+'"';
+    ctx.font="600 26px Georgia, serif";
+    var sLines=_kigWrap(ctx, snippetText, boxW-48).slice(0, 4);
+    var boxH=sLines.length*38 + 54;
+
+    // Deep Dropshadow
+    ctx.save();
+    ctx.shadowColor="rgba(0, 0, 0, 0.65)";
+    ctx.shadowBlur=35;
+    ctx.shadowOffsetY=18;
+    ctx.fillStyle="rgba(246, 243, 237, 0.96)";
+    _kigRound(ctx, padX, y, boxW, boxH, 16);
+    ctx.fill();
+    ctx.restore();
+
+    // Accent left border
+    ctx.fillStyle="#ff6b5d";
+    _kigRound(ctx, padX, y, 8, boxH, 4);
+    ctx.fill();
+
+    // Text inside paper box
+    ctx.fillStyle="#1a202c";
+    ctx.font="600 25px Georgia, serif";
+    var sy=y+20;
+    sLines.forEach(function(ln){
+      ctx.fillText(ln, padX+28, sy);
+      sy+=38;
+    });
+
+    // Newspaper stamp watermark
+    ctx.fillStyle="#718096";
+    ctx.font="800 16px Outfit, sans-serif";
+    ctx.fillText("POESTAKA CELEBES ARSIP", padX+boxW-240, y+boxH-28);
+
+    y+=boxH+36;
+  }
+
+  // 5. Main Title (High Impact 3D Shadow Typography)
+  var maxW=W-padX*2;
+  var judulSize=isVertical?54:48;
+  ctx.font="800 "+judulSize+"px Outfit, sans-serif";
+  
+  ctx.save();
+  ctx.shadowColor="rgba(0,0,0,0.85)";
+  ctx.shadowBlur=20;
+  ctx.shadowOffsetY=6;
+  ctx.fillStyle="#ffffff";
+
+  var lines=_kigWrap(ctx, k.judul, maxW).slice(0, 5);
+  lines.forEach(function(ln){
+    ctx.fillText(ln, padX, y);
+    y+=Math.round(judulSize*1.18);
+  });
+  ctx.restore();
+
+  y+=24;
+
+  // 6. Lead Description
+  if(k.lead){
+    ctx.font="400 27px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillStyle="rgba(255,255,255,0.86)";
+    var maxLeadY=H-safeBottom-120;
+    var leadLines=_kigWrap(ctx, k.lead, maxW);
+    for(var i=0;i<leadLines.length&&y<maxLeadY;i++){
+      ctx.fillText(leadLines[i], padX, y);
+      y+=38;
+    }
+  }
+
+  // 7. Footer Bar & Call to Action (Safe Area Zone)
   var fy=H-safeBottom;
-  ctx.strokeStyle="rgba(255,255,255,0.28)";ctx.beginPath();ctx.moveTo(padX,fy-28);ctx.lineTo(W-padX,fy-28);ctx.stroke();
-  ctx.font="700 27px Outfit, sans-serif";ctx.fillStyle="#fff";
-  ctx.fillText("kliping-reichas.my.id",padX,fy);
-  ctx.font="400 23px 'Plus Jakarta Sans', sans-serif";ctx.fillStyle="rgba(255,255,255,0.72)";
-  ctx.fillText("Baca selengkapnya \u2014 tautan lengkap di bio/keterangan",padX,fy+38);
+  ctx.strokeStyle="rgba(255,255,255,0.2)";
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(padX, fy-30);
+  ctx.lineTo(W-padX, fy-30);
+  ctx.stroke();
+
+  // Branding Left
+  ctx.font="800 28px Outfit, sans-serif";
+  ctx.fillStyle="#b7ea5e";
+  ctx.fillText("kliping-reichas.my.id", padX, fy);
+
+  ctx.font="400 22px 'Plus Jakarta Sans', sans-serif";
+  ctx.fillStyle="rgba(255,255,255,0.75)";
+  ctx.fillText("Membaca Hari Ini, Melek Fakta Selamanya", padX, fy+38);
+
+  // Button Right
+  var btnTxt="Buka Kliping →";
+  ctx.font="800 22px Outfit, sans-serif";
+  var btnW=ctx.measureText(btnTxt).width+36;
+  var btnX=W-padX-btnW;
+  ctx.fillStyle="#ffffff";
+  _kigRound(ctx, btnX, fy, btnW, 52, 26);
+  ctx.fill();
+  ctx.fillStyle="#090d14";
+  ctx.fillText(btnTxt, btnX+18, fy+13);
 }
 function kartuIGUnduh(){
   var can=document.getElementById("kartuCv");if(!can){toast("Kartu belum siap");return}
