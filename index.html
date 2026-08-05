@@ -2942,7 +2942,11 @@ function pasangEkstra(){
 }
 try{window.addEventListener("online",_luring);window.addEventListener("offline",_luring);}catch(e){}
 try{document.addEventListener("keydown",function(e){
-  if(e.key==="/"&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.targevar _K_TDATA = [
+  if(e.key==="/"&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||""))){var c=document.getElementById("cari");if(c){e.preventDefault();c.focus()}}
+  if(e.key==="Escape"){var m=document.querySelector(".modal-bg");if(m)closeModal()}
+});}catch(e){}
+
+var _K_TDATA = [
   { t: "TERJEBAK MITOS ATAU PEKA FAKTA?", s: '"Laporan misteri di lereng Gunung Latimojong tahun 1994 kembali heboh. Tapi benarkah kejadian aslinya seperti itu?"', d: "Jangan cuma geser feed. Kliping RCS.CBS membongkar fakta historis & verifikasi ilmiah di balik cerita mistis Sulawesi.", b: "SLIDE 1: HOOK", img: "reichas_ig_card_hero.png" },
   { t: "1. BACA: TANYAKAN SUMBER ASLINYA", s: '"Banyak informasi beredar hanya potongan screenshot tanpa tanggal, tanpa penulis, dan tanpa pembanding."', d: "Langkah pertama literasi Kliping RCS.CBS: telusuri dokumen koran lama, verifikasi arsip, dan pastikan data bukan karangan.", b: "SLIDE 2: BACA", img: "reichas_factcheck_card.png" },
   { t: "2. PAHAMI: DEKONSTRUKSI LOGIKA", s: '"Mengapa narasi ini mendadak viral? Siapa yang diuntungkan dari kepanikan dan hoaks masyarakat?"', d: "Pahami konteks sosial dan bias informasi. Kebenaran tidak diukur dari seberapa ramai netizen berkomentar.", b: "SLIDE 3: PAHAMI", img: "reichas_ig_card_hero.png" },
