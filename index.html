@@ -1412,7 +1412,7 @@ function shareUrl(id){return location.origin+"/klip/"+encodeURIComponent(id)}
 function waLink(text,url){return "https://wa.me/?text="+encodeURIComponent(text+"\n"+url)}
 function fbLink(url){return "https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url)}
 function xLink(text,url){return "https://twitter.com/intent/tweet?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(url)}
-function bukaTab(url){try{var a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.style.display="none";document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a)},0)}catch(e){location.href=url}}
+function bukaTab(url){location.href=url}
 function bagiKlip(cara,id){const k=db.kliping.find(x=>x.id===id);if(!k)return;const url=shareUrl(id);const txt=k.judul+" — "+k.lead;if(cara==="wa")bukaTab(waLink(txt,url));else if(cara==="fb")bukaTab(fbLink(url));else if(cara==="x")bukaTab(xLink(txt,url))}
 function bagiSitus(cara){const url=location.origin+location.pathname;const txt="\ud83d\udcda Gerakan Literasi REICHAS — baca, pahami, dan bagikan pengetahuan pendakian & alam bebas.";if(cara==="wa")bukaTab(waLink(txt,url));else if(cara==="fb")bukaTab(fbLink(url));else if(cara==="x")bukaTab(xLink(txt,url))}
 function shBtns(kind){const call=c=>kind==="situs"?"bagiSitus('"+c+"')":"bagiKlip('"+c+"','"+kind+"')";return '<button class="sh sh-wa" onclick="'+call("wa")+'">WhatsApp</button><button class="sh sh-x" onclick="'+call("x")+'">X</button><button class="sh sh-fb" onclick="'+call("fb")+'">Facebook</button>'}
