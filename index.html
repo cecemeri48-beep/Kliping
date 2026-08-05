@@ -4953,6 +4953,9 @@ function pUsulan(){
     var tgl=u.created_at?tglID(String(u.created_at).slice(0,10)):"—";
     var tglKej=u.tgl_kejadian?tglID(u.tgl_kejadian):"";
     var kredit=u.nama_tampilan?esc(u.nama_tampilan):"Tim Redaksi (laporan pembaca)";
+    var kr=(m.peran==="Kurator");
+    var lblT=kr?"✍ Siapkan & ajukan tinjauan":"✂ Terbitkan langsung";
+    var lblD=kr?"✉ Buka draf untuk dilengkapi":"✉ Jadikan bahan redaksi";
     return '<div class="card" style="margin-bottom:12px">'+
       '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">'+
         '<b style="font-size:15px">'+esc(u.judul||"(tanpa judul)")+'</b>'+
@@ -4963,10 +4966,11 @@ function pUsulan(){
       (u.tautan?'<p style="font-size:13px;margin:0 0 10px"><a href="'+esc(u.tautan)+'" target="_blank" rel="noopener">'+esc(u.tautan)+'</a></p>':"")+
       (u.kontak?'<p style="font-size:13px;color:var(--ink2);margin:0 0 10px">Kontak (internal): '+esc(u.kontak)+'</p>':"")+
       '<p style="font-size:12px;margin:0 0 10px">'+(u.izin_anonim?'<span class="tag tag-g">Ada izin publikasi · kredit: '+kredit+'</span>':'<span class="tag">Belum ada izin publikasi</span>')+'</p>'+
-      '<div class="f" style="max-width:220px;margin:0 0 10px"><label style="font-size:12px;color:var(--ink2);display:block;margin-bottom:4px">Jadikan format</label><select id="usFmt-'+u.id+'" class="inp"><option value="kliping">Kliping</option><option value="opini">Buah Pikir</option></select></div>'+
+      '<div class="f" style="max-width:220px;margin:0 0 10px"><label style="font-size:12px;color:var(--ink2);display:block;margin-bottom:4px">Jadikan format</label><select id="usFmt-'+u.id+'" class="inp"><option value="kliping">✂ Kliping — berita yang digunting & diberi konteks</option><option value="opini">✍ Buah Pikir — tulisan/opini dari laporan pembaca</option></select></div>'+
+      (kr?'<p style="font-size:12px;color:var(--ink2);margin:0 0 10px">Sebagai Kurator, draf yang kamu siapkan tetap menunggu persetujuan Admin sebelum terbit.</p>':"")+
       '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-        (u.izin_anonim?'<button class="btn btn-sm btn-p" onclick=\'usulanTerbitkan("'+u.id+'",usFmt("'+u.id+'"))\'>Terbitkan langsung</button>':"")+
-        '<button class="btn btn-sm'+(u.izin_anonim?"":" btn-p")+'" onclick=\'usulanKeDraft("'+u.id+'",usFmt("'+u.id+'"))\'>Jadikan bahan redaksi</button>'+
+        (u.izin_anonim?'<button class="btn btn-sm btn-p" onclick=\'usulanTerbitkan("'+u.id+'",usFmt("'+u.id+'"))\'>'+lblT+'</button>':"")+
+        '<button class="btn btn-sm'+(u.izin_anonim?"":" btn-p")+'" onclick=\'usulanKeDraft("'+u.id+'",usFmt("'+u.id+'"))\'>'+lblD+'</button>'+
         (u.status!=="Ditindak"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Ditindak")\'>Tandai ditindak</button>':"")+
         (u.status!=="Diabaikan"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Diabaikan")\'>Abaikan</button>':"")+
         (u.status!=="Baru"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Baru")\'>Tandai baru lagi</button>':"")+
