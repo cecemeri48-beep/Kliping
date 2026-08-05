@@ -2878,7 +2878,7 @@ var _K_TDATA = [
   { t: "1. BACA: TANYAKAN SUMBER ASLINYA", s: '"Banyak informasi beredar hanya potongan screenshot tanpa tanggal, tanpa penulis, dan tanpa pembanding."', d: "Langkah pertama literasi REICHAS: telusuri dokumen koran lama, verifikasi arsip, dan pastikan data bukan karangan.", b: "SLIDE 2: BACA", img: "reichas_factcheck_card.png" },
   { t: "2. PAHAMI: DEKONSTRUKSI LOGIKA", s: '"Mengapa narasi ini mendadak viral? Siapa yang diuntungkan dari kepanikan dan hoaks masyarakat?"', d: "Pahami konteks sosial dan bias informasi. Kebenaran tidak diukur dari seberapa ramai netizen berkomentar.", b: "SLIDE 3: PAHAMI", img: "reichas_ig_card_hero.png" },
   { t: "3. BAGIKAN: JADI BENTENG LITERASI", s: '"Menyebarkan kebenaran adalah bentuk kepedulian digital. Hentikan rantai hoaks di jemari Anda."', d: "Sebelum menekan tombol share, pastikan tulisan sudah dibaca utuh dan dipahami faktanya.", b: "SLIDE 4: BAGIKAN", img: "tiktok_vertical_card_reichas.png" },
-  { t: "MELEK FAKTA BERSAMA REICHAS CELEBES", s: '"Membaca Hari Ini, Melek Fakta Selamanya. Galeri kliping literasi & cek fakta Sulawesi."', d: "Kunjungi kliping-reichas.my.id untuk membaca ratusan analisis kliping & verifikasi fakta lengkap.", b: "SLIDE 5: REICHAS CORE", img: "reichas_factcheck_card.png" }
+  { t: "MELEK FAKTA BERSAMA REICHAS CHELEBES", s: '"Membaca Hari Ini, Melek Fakta Selamanya. Galeri kliping literasi & cek fakta Sulawesi."', d: "Kunjungi kliping-reichas.my.id untuk membaca ratusan analisis kliping & verifikasi fakta lengkap.", b: "SLIDE 5: REICHAS CORE", img: "reichas_factcheck_card.png" }
 ];
 
 function setStudioFmt(fmt){
@@ -2916,7 +2916,7 @@ function updateKStudioText(badge,img){
 }
 
 function salinKontenKampanye(){
-  var t="🚀 KAMPANYE LITERASI REICHAS CELEBES: BACA, PAHAMI, BAGIKAN\n\n"+
+  var t="🚀 KAMPANYE LITERASI REICHAS CHELEBES: BACA, PAHAMI, BAGIKAN\n\n"+
     "Kalian pernah denger cerita viral tapi pas dicari sumber aslinya ternyata cuma karangan? 🤯\n\n"+
     "Mari terapkan gerakan 3B dari Kliping REICHAS:\n"+
     "📖 BACA — Telusuri fakta dari arsip & data resmi.\n"+
@@ -2924,7 +2924,7 @@ function salinKontenKampanye(){
     "📤 BAGIKAN — Hentikan rantai hoaks. Bagikan hanya kebenaran!\n\n"+
     "Membaca hari ini, melek fakta selamanya.\n"+
     "🔗 kliping-reichas.my.id\n\n"+
-    "#KlipingReichas #LiterasiDigital #BacaPahamiBagikan #CekFakta #Celebes #Sulawesi";
+    "#KlipingReichas #LiterasiDigital #BacaPahamiBagikan #CekFakta #Chelebes #Sulawesi";
   salinTeks(t,"Teks & Caption Kampanye disalin! Siap ditempel di Instagram / TikTok");
 }
 
@@ -2934,7 +2934,7 @@ function viewKampanyeKartu(){
       '<h2 style="margin:0;font-size:26px;color:var(--navy)">Studio Kartu IG &amp; TikTok Literasi</h2>'+
       '<span class="tag tag-g" style="font-weight:800;letter-spacing:0.06em">BACA · PAHAMI · BAGIKAN</span>'+
     '</div>'+
-    '<p style="color:var(--ink2);max-width:720px;margin:0 0 24px">Kampanye Literasi Digital REICHAS CELEBES: ubah rasa penasaran mitos &amp; koran lama menjadi daya kritis. Pilih format, sunting teks, dan bagikan kartu visual hyper-realistic ke Instagram &amp; TikTok!</p>'+
+    '<p style="color:var(--ink2);max-width:720px;margin:0 0 24px">Kampanye Literasi Digital REICHAS CHELEBES: ubah rasa penasaran mitos &amp; koran lama menjadi daya kritis. Pilih format, sunting teks, dan bagikan kartu visual hyper-realistic ke Instagram &amp; TikTok!</p>'+
     
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;align-items:start">'+
       
@@ -2962,7 +2962,7 @@ function viewKampanyeKartu(){
       '<div style="display:flex;flex-direction:column;align-items:center;gap:18px">'+
         '<div id="stWrap" style="width:340px;height:425px;border-radius:20px;box-shadow:0 20px 40px rgba(16,42,67,0.25);overflow:hidden;position:relative;background:#0d131d center/cover no-repeat;transition:all 0.3s ease;padding:24px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;border:1px solid rgba(255,255,255,0.15)">'+
           '<div style="display:flex;justify-content:space-between;align-items:center;z-index:2">'+
-            '<span style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:var(--lime,#b7ea5e)">● REICHAS CELEBES</span>'+
+            '<span style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:var(--lime,#b7ea5e)">● REICHAS CHELEBES</span>'+
             '<span id="stBadge" class="tag tag-b" style="font-size:10px;font-weight:800">'+_K_TDATA[0].b+'</span>'+
           '</div>'+
           '<div style="z-index:2;display:flex;flex-direction:column;gap:12px;margin:auto 0">'+
@@ -4963,16 +4963,17 @@ function pUsulan(){
       (u.tautan?'<p style="font-size:13px;margin:0 0 10px"><a href="'+esc(u.tautan)+'" target="_blank" rel="noopener">'+esc(u.tautan)+'</a></p>':"")+
       (u.kontak?'<p style="font-size:13px;color:var(--ink2);margin:0 0 10px">Kontak (internal): '+esc(u.kontak)+'</p>':"")+
       '<p style="font-size:12px;margin:0 0 10px">'+(u.izin_anonim?'<span class="tag tag-g">Ada izin publikasi · kredit: '+kredit+'</span>':'<span class="tag">Belum ada izin publikasi</span>')+'</p>'+
+      '<div class="f" style="max-width:220px;margin:0 0 10px"><label style="font-size:12px;color:var(--ink2);display:block;margin-bottom:4px">Jadikan format</label><select id="usFmt-'+u.id+'" class="inp"><option value="kliping">Kliping</option><option value="opini">Buah Pikir</option></select></div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-        (u.izin_anonim?'<button class="btn btn-sm btn-p" onclick=\'usulanTerbitkan("'+u.id+'")\'>Terbitkan langsung</button>':"")+
-        '<button class="btn btn-sm'+(u.izin_anonim?"":" btn-p")+'" onclick=\'usulanKeDraft("'+u.id+'")\'>Jadikan bahan kliping</button>'+
+        (u.izin_anonim?'<button class="btn btn-sm btn-p" onclick=\'usulanTerbitkan("'+u.id+'",usFmt("'+u.id+'"))\'>Terbitkan langsung</button>':"")+
+        '<button class="btn btn-sm'+(u.izin_anonim?"":" btn-p")+'" onclick=\'usulanKeDraft("'+u.id+'",usFmt("'+u.id+'"))\'>Jadikan bahan redaksi</button>'+
         (u.status!=="Ditindak"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Ditindak")\'>Tandai ditindak</button>':"")+
         (u.status!=="Diabaikan"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Diabaikan")\'>Abaikan</button>':"")+
         (u.status!=="Baru"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Baru")\'>Tandai baru lagi</button>':"")+
         (boleh?'<button class="btn btn-sm btn-d" onclick=\'usulanHapus("'+u.id+'")\'>Hapus</button>':"")+
       '</div></div>';
   }).join("");
-  return ph("Usulan Pembaca","Cerita dan tips fenomena yang dikirim langsung oleh pembaca, tanpa akun.","")+
+  return ph("Usulan Pembaca","Setara “Surat Pembaca” pada media konvensional — dikirim pembaca tanpa akun, terlihat oleh Admin dan Kurator, dan keduanya punya akses yang sama untuk merespons serta memilih menjadikannya Kliping atau Buah Pikir.","")+
     tabHtml+
     (filtered.length?kartu:'<p class="empty">Belum ada usulan pada status ini.</p>');
 }
@@ -4988,27 +4989,32 @@ function usulanHapus(id){
   supa.from("usulan").delete().eq("id",id).then(function(r){if(r&&r.error)toast("Gagal menghapus: "+r.error.message)});
   toast("Usulan dihapus");
 }
-function usulanKeDraft(id){
+function usFmt(id){var el=document.getElementById("usFmt-"+id);return el?el.value:"kliping"}
+function usulanKeDraft(id,jenis){
   var u=(db.usulan||[]).find(function(x){return x.id===id});if(!u)return;
-  S.av="kliping";
-  S.draft={id:"",judul:u.judul||"",lead:"",rubrik:db.rubrik[0],media:db.media[0],tautan:u.tautan||"",tglBerita:new Date().toISOString().slice(0,10),tglKliping:new Date().toISOString().slice(0,10),wilayah:"Sulawesi Selatan",lokasi:u.lokasi?[u.lokasi]:[],topik:[],potongan:u.cerita||"",konteks:"",pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",gbrKet:"",vonis:"",catatan:""};
+  jenis=(jenis==="opini")?"opini":"kliping";
+  var opi=jenis==="opini";
+  S.av=opi?"buahpikir":"kliping";
+  S.draft={id:"",judul:u.judul||"",lead:"",rubrik:opi?_opiRubrik():db.rubrik[0],media:opi?"":db.media[0],tautan:opi?"":(u.tautan||""),tglBerita:new Date().toISOString().slice(0,10),tglKliping:new Date().toISOString().slice(0,10),wilayah:"Sulawesi Selatan",lokasi:u.lokasi?[u.lokasi]:[],topik:[],potongan:opi?"":(u.cerita||""),konteks:opi?(u.cerita||""):"",pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",gbrKet:"",vonis:"",catatan:"",jenis:jenis};
   S.err=[];
   usulanUbahStatus(id,"Ditindak");
   go({});
-  toast("Draf kliping dibuat dari usulan pembaca");
+  toast(opi?"Draf Buah Pikir dibuat dari usulan pembaca":"Draf kliping dibuat dari usulan pembaca");
 }
-function usulanTerbitkan(id){
+function usulanTerbitkan(id,jenis){
   var u=(db.usulan||[]).find(function(x){return x.id===id});if(!u)return;
   if(!u.izin_anonim){toast("Usulan ini belum ada izin publikasi dari pengirim");return}
+  jenis=(jenis==="opini")?"opini":"kliping";
+  var opi=jenis==="opini";
   var kredit=u.nama_tampilan?u.nama_tampilan:"Tim Redaksi (laporan pembaca)";
   var infoKej=u.tgl_kejadian?(" pada "+tglID(u.tgl_kejadian)):"";
-  var konteksAwal="Laporan ini disampaikan oleh "+kredit+" melalui formulir Kirim Cerita"+infoKej+(u.lokasi?(" di "+u.lokasi):"")+". Redaksi menelusuri dan melengkapi konteks berikut sebelum diterbitkan:\n\n";
-  S.av="kliping";
-  S.draft={id:"",judul:u.judul||"",lead:"",rubrik:db.rubrik[0],media:db.media[0],tautan:u.tautan||"",tglBerita:u.tgl_kejadian||new Date().toISOString().slice(0,10),tglKliping:new Date().toISOString().slice(0,10),wilayah:"Sulawesi Selatan",lokasi:u.lokasi?[u.lokasi]:[],topik:u.jenis?[u.jenis]:[],potongan:u.cerita||"",konteks:konteksAwal,pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",gbrKet:"",vonis:"",catatan:"Kredit publik: "+kredit+(u.kontak?(" · kontak internal: "+u.kontak):"")};
+  var konteksAwal="Laporan ini disampaikan oleh "+kredit+" melalui formulir Kirim Cerita"+infoKej+(u.lokasi?(" di "+u.lokasi):"")+". Redaksi menelusuri dan melengkapi konteks berikut sebelum diterbitkan:\n\n"+(opi?(u.cerita||""):"");
+  S.av=opi?"buahpikir":"kliping";
+  S.draft={id:"",judul:u.judul||"",lead:"",rubrik:opi?_opiRubrik():db.rubrik[0],media:opi?"":db.media[0],tautan:opi?"":(u.tautan||""),tglBerita:u.tgl_kejadian||new Date().toISOString().slice(0,10),tglKliping:new Date().toISOString().slice(0,10),wilayah:"Sulawesi Selatan",lokasi:u.lokasi?[u.lokasi]:[],topik:u.jenis?[u.jenis]:[],potongan:opi?"":(u.cerita||""),konteks:konteksAwal,pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",gbrKet:"",vonis:"",catatan:"Kredit publik: "+kredit+(u.kontak?(" · kontak internal: "+u.kontak):""),jenis:jenis};
   S.err=[];
   usulanUbahStatus(id,"Ditindak");
   go({});
-  toast("Draf siap terbit dibuat. Lengkapi Konteks & 3 Pelajaran sebelum menekan Terbitkan.");
+  toast(opi?"Draf Buah Pikir siap terbit dibuat. Lengkapi isi tulisan sebelum menekan Terbitkan.":"Draf siap terbit dibuat. Lengkapi Konteks & 3 Pelajaran sebelum menekan Terbitkan.");
 }
 function _opiRubrik(){
   try{
