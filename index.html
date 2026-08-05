@@ -649,6 +649,30 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
 [data-tema="gelap"] .rks{background:rgba(255,255,255,.03)}
 [data-tema="gelap"] .rks-b{background:rgba(255,255,255,.05);color:var(--ink)}
 @media(max-width:520px){.rks{padding:16px}.rks-b{flex:1 1 auto;justify-content:center;padding:13px 16px}}
+/* --- ikon tanggapan yang hidup --- */
+.rks-b .rks-e{display:inline-block;transform-origin:50% 75%;will-change:transform}
+@keyframes rksKedip{0%,100%{transform:scale(1) rotate(-2deg)}30%{transform:scale(1.1) rotate(3deg)}62%{transform:scale(.96) rotate(-4deg)}}
+@keyframes rksUap{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-4deg)}}
+@keyframes rksApung{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-5px) rotate(0deg)}}
+@keyframes rksGoyang{0%,84%,100%{transform:rotate(0) scale(1)}88%{transform:rotate(-12deg) scale(1.04)}93%{transform:rotate(9deg) scale(1.02)}97%{transform:rotate(-4deg) scale(1)}}
+.rks-e-api{animation:rksKedip 1.7s ease-in-out infinite}
+.rks-e-kopi{animation:rksUap 3s ease-in-out infinite}
+.rks-e-roket{animation:rksApung 2.6s ease-in-out infinite}
+.rks-e-bom{animation:rksGoyang 3.6s ease-in-out infinite}
+@media(hover:hover){.rks-b:hover .rks-e{animation-duration:.85s}.rks-b:hover{box-shadow:0 4px 14px rgba(0,0,0,.08)}}
+.rks-b:active .rks-e{animation-duration:.85s}
+@keyframes rksNyala{0%{transform:scale(1)}35%{transform:scale(1.34) rotate(-8deg)}62%{transform:scale(.94) rotate(5deg)}100%{transform:scale(1)}}
+@keyframes rksLuncur{0%{transform:translateY(0) rotate(-6deg)}38%{transform:translateY(-14px) scale(1.24) rotate(10deg)}100%{transform:translateY(0) rotate(-6deg)}}
+@keyframes rksLedak{0%{transform:scale(1)}28%{transform:scale(1.32) rotate(-14deg)}52%{transform:scale(.9) rotate(9deg)}100%{transform:scale(1)}}
+.rks-b.on .rks-e-api{animation:rksNyala .6s cubic-bezier(.2,.8,.2,1),rksKedip 1.2s ease-in-out .6s infinite}
+.rks-b.on .rks-e-kopi{animation:rksNyala .6s cubic-bezier(.2,.8,.2,1),rksUap 2.2s ease-in-out .6s infinite}
+.rks-b.on .rks-e-roket{animation:rksLuncur .85s cubic-bezier(.2,.8,.2,1),rksApung 2.2s ease-in-out .85s infinite}
+.rks-b.on .rks-e-bom{animation:rksLedak .7s ease-out,rksGoyang 2.8s ease-in-out .7s infinite}
+@keyframes rksAngka{0%{transform:translateY(6px) scale(.7);opacity:.3}60%{transform:translateY(-2px) scale(1.14)}100%{transform:translateY(0) scale(1);opacity:1}}
+.rks-b.on .rks-n{display:inline-block;animation:rksAngka .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes rksDenyut{0%{box-shadow:0 0 0 0 rgba(213,128,59,.42)}70%{box-shadow:0 0 0 12px rgba(213,128,59,0)}100%{box-shadow:0 0 0 0 rgba(213,128,59,0)}}
+.rks-b.on{animation:rksDenyut .75s ease-out}
+@media(prefers-reduced-motion:reduce){.rks-b,.rks-b .rks-e,.rks-b .rks-n{animation:none!important}}
 .lcn{display:inline-block;margin-left:5px;font-size:14px;letter-spacing:2px;line-height:1;vertical-align:middle}
 .lcn-wrap{margin-top:3px}
 .lcn-wrap:empty{display:none}
@@ -3028,9 +3052,12 @@ function pIklan(){
 
 
 /* ============ tanggapan pembaca: \ud83d\udd25 api & \u2615 kopi ============ */
-var RKS_EMO={api:"\ud83d\udd25",kopi:"\u2615"};
-var RKS_LBL={api:"Nyalakan",kopi:"Bahan ngopi"};
-var RKS_KET={api:"Kliping ini penting dan mendesak dibaca",kopi:"Layak dibahas pelan-pelan sambil ngopi"};
+var RKS_EMO={api:"\ud83d\udd25",kopi:"\u2615",roket:"\ud83d\ude80",bom:"\ud83d\udca3"};
+var RKS_LBL={api:"Nyalakan",kopi:"Bahan ngopi",roket:"To The Moon",bom:"Ngantuk Nih Min!"};
+var RKS_KET={api:"Kliping ini penting dan mendesak dibaca",kopi:"Layak dibahas pelan-pelan sambil ngopi",roket:"Tulisan yang inspiratif",bom:"Tulisan kurang menarik"};
+/* Kliping memakai \ud83d\udd25/\u2615, Buah Pikir memakai \ud83d\ude80/\ud83d\udca3 */
+var RKS_SET={kliping:["api","kopi"],opini:["roket","bom"]};
+function rksKunci(k){var op=false;try{op=(typeof isOpini==="function")&&isOpini(k)}catch(e){}return op?RKS_SET.opini:RKS_SET.kliping}
 var RKS_HITUNG={};
 var RKS_LURING=false;
 
@@ -3050,7 +3077,7 @@ function _rksSimpanSaya(m){try{localStorage.setItem("rcs_reaksi",JSON.stringify(
 function rksSayaPunya(id,emo){var m=_rksSaya();return !!(m[id]&&m[id][emo])}
 function rksJumlah(id,emo){var h=RKS_HITUNG[id];return (h&&h[emo])||0}
 function _rksUbah(id,emo,d){
-  if(!RKS_HITUNG[id])RKS_HITUNG[id]={api:0,kopi:0};
+  if(!RKS_HITUNG[id])RKS_HITUNG[id]={api:0,kopi:0,roket:0,bom:0};
   RKS_HITUNG[id][emo]=Math.max(0,(RKS_HITUNG[id][emo]||0)+d);
 }
 function muatReaksi(){
@@ -3060,7 +3087,7 @@ function muatReaksi(){
       var h={};
       (r&&r.data||[]).forEach(function(x){
         if(!x||!x.klip||!RKS_EMO[x.emo])return;
-        if(!h[x.klip])h[x.klip]={api:0,kopi:0};
+        if(!h[x.klip])h[x.klip]={api:0,kopi:0,roket:0,bom:0};
         h[x.klip][x.emo]++;
       });
       RKS_HITUNG=h;RKS_LURING=false;
@@ -3101,14 +3128,15 @@ function reaksiToggle(id,emo){
 }
 function reaksiBar(k){
   if(!k||k.status!=="Terbit")return "";
-  var tomb=Object.keys(RKS_EMO).map(function(emo){
+  var kn=rksKunci(k);
+  var tomb=kn.map(function(emo){
     var on=rksSayaPunya(k.id,emo),n=rksJumlah(k.id,emo);
     return '<button class="rks-b'+(on?" on":"")+'" onclick=\'reaksiToggle("'+k.id+'","'+emo+'")\' '+
       'aria-pressed="'+(on?"true":"false")+'" title="'+esc(RKS_KET[emo])+'">'+
-      '<span class="rks-e">'+RKS_EMO[emo]+'</span><span class="rks-t">'+esc(RKS_LBL[emo])+'</span>'+
+      '<span class="rks-e rks-e-'+emo+'">'+RKS_EMO[emo]+'</span><span class="rks-t">'+esc(RKS_LBL[emo])+'</span>'+
       '<span class="rks-n">'+n+'</span></button>';
   }).join("");
-  var arti='<ul class="rks-arti">'+Object.keys(RKS_EMO).map(function(emo){
+  var arti='<ul class="rks-arti">'+kn.map(function(emo){
     return '<li><span class="rks-arti-e">'+RKS_EMO[emo]+'</span><span><b>'+esc(RKS_LBL[emo])+'</b> \u2014 '+esc(RKS_KET[emo])+'</span></li>';
   }).join("")+'</ul>';
   return '<div class="rks"><span class="rks-h">Tanggapan pembaca</span><div class="rks-row">'+tomb+'</div>'+arti+
@@ -3116,9 +3144,10 @@ function reaksiBar(k){
     '<p class="rks-k">Tahu cerita atau fenomena menarik lain di gunung/alam bebas? <a href="#" onclick=\'go({pv:{n:"usulan"}});return false\'>Kirim ke redaksi →</a></p></div>';
 }
 function rksMini(k){
-  var a=rksJumlah(k.id,"api"),b=rksJumlah(k.id,"kopi");
+  var kn=rksKunci(k);
+  var a=rksJumlah(k.id,kn[0]),b=rksJumlah(k.id,kn[1]);
   if(!a&&!b)return "";
-  return '<span class="rks-mini">'+(a?RKS_EMO.api+" "+a:"")+(a&&b?" \u00b7 ":"")+(b?RKS_EMO.kopi+" "+b:"")+"</span>";
+  return '<span class="rks-mini">'+(a?RKS_EMO[kn[0]]+" "+a:"")+(a&&b?" \u00b7 ":"")+(b?RKS_EMO[kn[1]]+" "+b:"")+"</span>";
 }
 (function(){
   var _clip=viewClip,_kartu=kartuKlip,_boot=bootstrap;
@@ -3160,7 +3189,8 @@ function rksTotalKurator(uid){
   db.kliping.forEach(function(k){
     if(k.kurator!==uid)return;
     var h=(typeof RKS_HITUNG!=="undefined"&&RKS_HITUNG[k.id])||{};
-    var x=h.api||0,y=h.kopi||0;
+    /* Buah Pikir memakai kunci roket/bom, kliping memakai api/kopi */
+    var x=(h.api||0)+(h.roket||0),y=(h.kopi||0)+(h.bom||0);
     out.api+=x;out.kopi+=y;
     if(x+y>0)out.klip.push({judul:k.judul,api:x,kopi:y});
   });
