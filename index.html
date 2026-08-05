@@ -1331,6 +1331,55 @@ function bersihkanTembolok(){
   Promise.all(janji).then(function(){location.reload()},function(){location.reload()});
 }
 supa.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_IN"||event==="SIGNED_OUT"){bootstrap()}});
+/* ===== lapis: notifikasi usulan baru untuk pengelola ===== */
+var _usPoll=null,_usTahu={};
+function jumlahUsulanBaru(){return (db.usulan||[]).filter(function(u){return u.status==="Baru"}).length}
+function mulaiNotifUsulan(){
+  if(_usPoll)return;
+  (db.usulan||[]).forEach(function(u){_usTahu[u.id]=1});
+  _usPoll=setInterval(cekUsulanBaru,60000);
+}
+async function cekUsulanBaru(){
+  if(!S||!S.me||!db)return;
+  try{
+    var r=await supa.from("usulan").select("*");
+    if(r.error)return;
+    var data=r.data||[];
+    var masuk=data.filter(function(u){return u.status==="Baru"&&!_usTahu[u.id]});
+    data.forEach(function(u){_usTahu[u.id]=1});
+    var berubah=data.length!==(db.usulan||[]).length;
+    if(!masuk.length&&!berubah)return;
+    db.usulan=data;
+    if(!S.draft)render();
+    if(masuk.length){
+      toast("\u2709 "+masuk.length+" usulan baru dari pembaca masuk!");
+      notifDesktop("Usulan Pembaca baru",masuk.length+" cerita menunggu direspons di panel Usulan Pembaca.");
+      bunyiNotif();
+    }
+  }catch(e){}
+}
+function notifDesktop(judul,isi){
+  try{
+    if("Notification" in window&&Notification.permission==="granted")new Notification(judul,{body:isi,icon:"/icon-192.png"});
+  }catch(e){}
+}
+function bunyiNotif(){
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    var ctx=new AC(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.value=.06;
+    o.start();o.stop(ctx.currentTime+.18);o.onended=function(){try{ctx.close()}catch(e){}};
+  }catch(e){}
+}
+function mintaIzinNotif(){
+  try{
+    if(!("Notification" in window)){toast("Peramban tidak mendukung notifikasi desktop");return}
+    Notification.requestPermission().then(function(p){toast(p==="granted"?"Notifikasi desktop aktif. Kamu akan diberi tahu saat ada usulan baru.":"Izin notifikasi tidak diberikan — kamu tetap melihat lencana jumlah di tab Usulan Pembaca.")});
+  }catch(e){}
+}
+var _bootstrapNotifAsli=bootstrap;
+bootstrap=async function(){await _bootstrapNotifAsli.apply(this,arguments);try{mulaiNotifUsulan()}catch(e){}};
+
 S={mode:"public",pv:{n:"board"},av:"dasbor",filter:"Semua",me:null,draft:null,err:[]};
 const DRAFT_KEY="rcs_draft_kliping_v1";
 function simpanDrafLokal(){try{if(S.draft)sessionStorage.setItem(DRAFT_KEY,JSON.stringify(S.draft))}catch(e){}}
@@ -2893,16 +2942,12 @@ function pasangEkstra(){
 }
 try{window.addEventListener("online",_luring);window.addEventListener("offline",_luring);}catch(e){}
 try{document.addEventListener("keydown",function(e){
-  if(e.key==="/"&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||""))){var c=document.getElementById("cari");if(c){e.preventDefault();c.focus()}}
-  if(e.key==="Escape"){var m=document.querySelector(".modal-bg");if(m)closeModal()}
-});}catch(e){}
-
-var _K_TDATA = [
-  { t: "TERJEBAK MITOS ATAU PEKA FAKTA?", s: '"Laporan misteri di lereng Gunung Latimojong tahun 1994 kembali heboh. Tapi benarkah kejadian aslinya seperti itu?"', d: "Jangan cuma geser feed. Kliping REICHAS membongkar fakta historis & verifikasi ilmiah di balik cerita mistis Sulawesi.", b: "SLIDE 1: HOOK", img: "reichas_ig_card_hero.png" },
-  { t: "1. BACA: TANYAKAN SUMBER ASLINYA", s: '"Banyak informasi beredar hanya potongan screenshot tanpa tanggal, tanpa penulis, dan tanpa pembanding."', d: "Langkah pertama literasi REICHAS: telusuri dokumen koran lama, verifikasi arsip, dan pastikan data bukan karangan.", b: "SLIDE 2: BACA", img: "reichas_factcheck_card.png" },
+  if(e.key==="/"&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.targevar _K_TDATA = [
+  { t: "TERJEBAK MITOS ATAU PEKA FAKTA?", s: '"Laporan misteri di lereng Gunung Latimojong tahun 1994 kembali heboh. Tapi benarkah kejadian aslinya seperti itu?"', d: "Jangan cuma geser feed. Kliping RCS.CBS membongkar fakta historis & verifikasi ilmiah di balik cerita mistis Sulawesi.", b: "SLIDE 1: HOOK", img: "reichas_ig_card_hero.png" },
+  { t: "1. BACA: TANYAKAN SUMBER ASLINYA", s: '"Banyak informasi beredar hanya potongan screenshot tanpa tanggal, tanpa penulis, dan tanpa pembanding."', d: "Langkah pertama literasi Kliping RCS.CBS: telusuri dokumen koran lama, verifikasi arsip, dan pastikan data bukan karangan.", b: "SLIDE 2: BACA", img: "reichas_factcheck_card.png" },
   { t: "2. PAHAMI: DEKONSTRUKSI LOGIKA", s: '"Mengapa narasi ini mendadak viral? Siapa yang diuntungkan dari kepanikan dan hoaks masyarakat?"', d: "Pahami konteks sosial dan bias informasi. Kebenaran tidak diukur dari seberapa ramai netizen berkomentar.", b: "SLIDE 3: PAHAMI", img: "reichas_ig_card_hero.png" },
   { t: "3. BAGIKAN: JADI BENTENG LITERASI", s: '"Menyebarkan kebenaran adalah bentuk kepedulian digital. Hentikan rantai hoaks di jemari Anda."', d: "Sebelum menekan tombol share, pastikan tulisan sudah dibaca utuh dan dipahami faktanya.", b: "SLIDE 4: BAGIKAN", img: "tiktok_vertical_card_reichas.png" },
-  { t: "MELEK FAKTA BERSAMA REICHAS CHELEBES", s: '"Membaca Hari Ini, Melek Fakta Selamanya. Galeri kliping literasi & cek fakta Sulawesi."', d: "Kunjungi kliping-reichas.my.id untuk membaca ratusan analisis kliping & verifikasi fakta lengkap.", b: "SLIDE 5: REICHAS CORE", img: "reichas_factcheck_card.png" }
+  { t: "MELEK FAKTA BERSAMA KLIPING RCS.CBS", s: '"Membaca Hari Ini, Melek Fakta Selamanya. Galeri kliping literasi & cek fakta Sulawesi."', d: "Kunjungi kliping-reichas.my.id untuk membaca ratusan analisis kliping & verifikasi fakta lengkap.", b: "SLIDE 5: RCS.CBS CORE", img: "reichas_factcheck_card.png" }
 ];
 
 function setStudioFmt(fmt){
@@ -2933,22 +2978,24 @@ function updateKStudioText(badge,img){
   var stTitle=document.getElementById("stTitle"),stSnippet=document.getElementById("stSnippet"),stDesc=document.getElementById("stDesc");
   var stBadge=document.getElementById("stBadge"),stWrap=document.getElementById("stWrap");
   if(ij&&stTitle)stTitle.textContent=ij.value;
-  if(is&&stSnippet)stSnippet.textContent=is.value;
+  if(is&&stSnippet){
+    stSnippet.innerHTML=esc(is.value)+'<div style="text-align:right;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:8.5px;font-weight:800;color:#718096;margin-top:4px;letter-spacing:0.08em">KUTIPAN ARSIP · KLIPING RCS.CBS</div>';
+  }
   if(id&&stDesc)stDesc.textContent=id.value;
   if(badge&&stBadge)stBadge.textContent=badge;
-  if(img&&stWrap)stWrap.style.backgroundImage="linear-gradient(to bottom, rgba(15,20,29,0.7), rgba(9,13,20,0.95)), url('"+img+"')";
+  if(img&&stWrap)stWrap.style.backgroundImage="linear-gradient(180deg, rgba(13,19,29,0.55) 0%, rgba(9,13,20,0.92) 100%), url('"+img+"')";
 }
 
 function salinKontenKampanye(){
-  var t="🚀 KAMPANYE LITERASI REICHAS CHELEBES: BACA, PAHAMI, BAGIKAN\n\n"+
+  var t="🚀 KAMPANYE LITERASI KLIPING RCS.CBS: BACA, PAHAMI, BAGIKAN\n\n"+
     "Kalian pernah denger cerita viral tapi pas dicari sumber aslinya ternyata cuma karangan? 🤯\n\n"+
-    "Mari terapkan gerakan 3B dari Kliping REICHAS:\n"+
+    "Mari terapkan gerakan 3B dari Kliping RCS.CBS:\n"+
     "📖 BACA — Telusuri fakta dari arsip & data resmi.\n"+
     "🧠 PAHAMI — Dekonstruksi logikanya, uji apakah narasi masuk akal.\n"+
     "📤 BAGIKAN — Hentikan rantai hoaks. Bagikan hanya kebenaran!\n\n"+
     "Membaca hari ini, melek fakta selamanya.\n"+
     "🔗 kliping-reichas.my.id\n\n"+
-    "#KlipingReichas #LiterasiDigital #BacaPahamiBagikan #CekFakta #Chelebes #Sulawesi";
+    "#KlipingRCSCBS #LiterasiDigital #BacaPahamiBagikan #CekFakta #RCSCBS #Sulawesi";
   salinTeks(t,"Teks & Caption Kampanye disalin! Siap ditempel di Instagram / TikTok");
 }
 
@@ -2958,7 +3005,7 @@ function viewKampanyeKartu(){
       '<h2 style="margin:0;font-size:26px;color:var(--navy)">Studio Kartu IG &amp; TikTok Literasi</h2>'+
       '<span class="tag tag-g" style="font-weight:800;letter-spacing:0.06em">BACA · PAHAMI · BAGIKAN</span>'+
     '</div>'+
-    '<p style="color:var(--ink2);max-width:720px;margin:0 0 24px">Kampanye Literasi Digital REICHAS CHELEBES: ubah rasa penasaran mitos &amp; koran lama menjadi daya kritis. Pilih format, sunting teks, dan bagikan kartu visual hyper-realistic ke Instagram &amp; TikTok!</p>'+
+    '<p style="color:var(--ink2);max-width:720px;margin:0 0 24px">Kampanye Literasi Digital Kliping RCS.CBS: ubah rasa penasaran mitos &amp; koran lama menjadi daya kritis. Pilih format, sunting teks, dan bagikan kartu visual hyper-realistic ke Instagram &amp; TikTok!</p>'+
     
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;align-items:start">'+
       
@@ -2984,19 +3031,34 @@ function viewKampanyeKartu(){
 
       '<!-- Right Card Preview -->'+
       '<div style="display:flex;flex-direction:column;align-items:center;gap:18px">'+
-        '<div id="stWrap" style="width:340px;height:425px;border-radius:20px;box-shadow:0 20px 40px rgba(16,42,67,0.25);overflow:hidden;position:relative;background:#0d131d center/cover no-repeat;transition:all 0.3s ease;padding:24px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;border:1px solid rgba(255,255,255,0.15)">'+
+        '<div id="stWrap" style="width:340px;height:425px;border-radius:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.7), 0 0 35px rgba(115,87,255,0.2);overflow:hidden;position:relative;background:#0d131d center/cover no-repeat;transition:all 0.35s cubic-bezier(0.175,0.885,0.32,1.275);padding:24px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;border:1px solid rgba(255,255,255,0.18)">'+
+          '<!-- Glow Lights overlay -->'+
+          '<div style="position:absolute;inset:0;background:radial-gradient(circle at 15% 15%, rgba(183,234,94,0.15) 0%, transparent 45%), radial-gradient(circle at 85% 85%, rgba(115,87,255,0.2) 0%, transparent 50%), linear-gradient(180deg, rgba(13,19,29,0.55) 0%, rgba(9,13,20,0.92) 100%);pointer-events:none;z-index:1"></div>'+
+          
+          '<!-- Header -->'+
           '<div style="display:flex;justify-content:space-between;align-items:center;z-index:2">'+
-            '<span style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:var(--lime,#b7ea5e)">● REICHAS CHELEBES</span>'+
-            '<span id="stBadge" class="tag tag-b" style="font-size:10px;font-weight:800">'+_K_TDATA[0].b+'</span>'+
+            '<span style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#b7ea5e;display:inline-flex;align-items:center;gap:6px;background:rgba(183,234,94,0.14);padding:4px 10px;border-radius:20px;border:1px solid rgba(183,234,94,0.3);backdrop-filter:blur(6px)"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#b7ea5e;box-shadow:0 0 8px #b7ea5e"></i>● Kliping RCS.CBS</span>'+
+            '<span id="stBadge" class="tag tag-b" style="font-size:10px;font-weight:800;background:linear-gradient(135deg,#7357ff,#4267e7);color:#fff;border:none;padding:5px 11px;border-radius:99px;box-shadow:0 4px 14px rgba(115,87,255,0.4);letter-spacing:0.04em">'+_K_TDATA[0].b+'</span>'+
           '</div>'+
+
+          '<!-- Body Content -->'+
           '<div style="z-index:2;display:flex;flex-direction:column;gap:12px;margin:auto 0">'+
-            '<div id="stSnippet" style="background:rgba(246,243,237,0.94);color:#1a202c;padding:12px;border-radius:10px;border-left:4px solid var(--coral,#ff6b5d);font-family:Georgia,serif;font-size:12px;line-height:1.4;box-shadow:0 6px 16px rgba(0,0,0,0.3)">'+esc(_K_TDATA[0].s)+'</div>'+
-            '<h3 id="stTitle" style="margin:0;font-size:20px;line-height:1.2;font-weight:800;color:#fff;text-shadow:0 3px 10px rgba(0,0,0,0.7)">'+esc(_K_TDATA[0].t)+'</h3>'+
-            '<p id="stDesc" style="margin:0;font-size:12px;line-height:1.45;color:rgba(255,255,255,0.88)">'+esc(_K_TDATA[0].d)+'</p>'+
+            '<div id="stSnippet" style="background:rgba(248,245,238,0.96);color:#1a202c;padding:12px 14px;border-radius:12px;border-left:4px solid #ff6b5d;font-family:\'Playfair Display\',Georgia,serif;font-size:12px;line-height:1.45;box-shadow:0 10px 24px rgba(0,0,0,0.4);position:relative">'+
+              esc(_K_TDATA[0].s)+
+              '<div style="text-align:right;font-family:\'Plus Jakarta Sans\',sans-serif;font-size:8.5px;font-weight:800;color:#718096;margin-top:4px;letter-spacing:0.08em">KUTIPAN ARSIP · KLIPING RCS.CBS</div>'+
+            '</div>'+
+            '<h3 id="stTitle" style="margin:0;font-size:20px;line-height:1.18;font-weight:900;color:#fff;text-shadow:0 4px 14px rgba(0,0,0,0.85);letter-spacing:-0.01em">'+esc(_K_TDATA[0].t)+'</h3>'+
+            '<p id="stDesc" style="margin:0;font-size:12px;line-height:1.48;color:rgba(240,248,255,0.92)">'+esc(_K_TDATA[0].d)+'</p>'+
           '</div>'+
-          '<div style="z-index:2;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">'+
-            '<span style="font-size:10px;font-weight:800;color:var(--lime,#b7ea5e)">BACA · PAHAMI · BAGIKAN</span>'+
-            '<span style="font-size:11px;font-weight:800;background:#fff;color:#102a43;padding:4px 10px;border-radius:99px">Buka Kliping →</span>'+
+
+          '<!-- Footer Bar -->'+
+          '<div style="z-index:2;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.18);padding-top:12px">'+
+            '<div style="display:flex;gap:4px">'+
+              '<span style="font-size:9px;font-weight:800;background:rgba(115,87,255,0.35);color:#d4cbff;padding:3px 7px;border-radius:5px;letter-spacing:0.04em">1. BACA</span>'+
+              '<span style="font-size:9px;font-weight:800;background:rgba(255,200,87,0.35);color:#ffeaab;padding:3px 7px;border-radius:5px;letter-spacing:0.04em">2. PAHAMI</span>'+
+              '<span style="font-size:9px;font-weight:800;background:rgba(183,234,94,0.35);color:#e2fbab;padding:3px 7px;border-radius:5px;letter-spacing:0.04em">3. BAGIKAN</span>'+
+            '</div>'+
+            '<span style="font-size:11px;font-weight:800;background:linear-gradient(135deg,#ffffff,#f1f5f9);color:#0f172a;padding:5px 13px;border-radius:99px;box-shadow:0 4px 14px rgba(0,0,0,0.3)">Buka Kliping →</span>'+
           '</div>'+
         '</div>'+
         '<p style="font-size:12px;color:var(--ink2)">*Pratinjau kartu hyper-realistic live. Klik tombol salin untuk menggunakan materi caption.</p>'+
@@ -5001,7 +5063,7 @@ function pUsulan(){
         (boleh?'<button class="btn btn-sm btn-d" onclick=\'usulanHapus("'+u.id+'")\'>Hapus</button>':"")+
       '</div></div>';
   }).join("");
-  return ph("Usulan Pembaca","Setara “Surat Pembaca” pada media konvensional — dikirim pembaca tanpa akun, terlihat oleh Admin dan Kurator, dan keduanya punya akses yang sama untuk merespons serta memilih menjadikannya Kliping atau Buah Pikir.","")+
+  return ph("Usulan Pembaca","Setara “Surat Pembaca” pada media konvensional — dikirim pembaca tanpa akun, terlihat oleh Admin dan Kurator, dan keduanya punya akses yang sama untuk merespons serta memilih menjadikannya Kliping atau Buah Pikir.",'<button class="btn btn-sm" onclick="mintaIzinNotif()">🔔 Aktifkan notifikasi</button>')+
     tabHtml+
     (filtered.length?kartu:'<p class="empty">Belum ada usulan pada status ini.</p>');
 }
