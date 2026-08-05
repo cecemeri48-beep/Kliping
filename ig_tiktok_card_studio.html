@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REICHAS CELEBES — Studio Kartu Kampanye IG & TikTok Literasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d14;
+      --card-bg: #121824;
+      --card-border: #232c3d;
+      --accent-lime: #b7ea5e;
+      --accent-violet: #7357ff;
+      --accent-coral: #ff6b5d;
+      --accent-gold: #ffc857;
+      --text-main: #f0f4f8;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(115, 87, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(183, 234, 94, 0.08) 0%, transparent 45%);
+    }
+
+    header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(18, 24, 36, 0.8);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-title h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, #fff, var(--text-muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .badge-pill {
+      background: rgba(183, 234, 94, 0.15);
+      color: var(--accent-lime);
+      border: 1px solid rgba(183, 234, 94, 0.3);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 32px;
+    }
+
+    @media (max-width: 1024px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    .sidebar {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      height: fit-content;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .control-group label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+    .control-group select, .control-group input, .control-group textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    .control-group select:focus, .control-group input:focus, .control-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-violet);
+    }
+
+    .format-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .btn-format {
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-format.active {
+      background: linear-gradient(135deg, var(--accent-violet), #4267e7);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(115, 87, 255, 0.4);
+    }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .card-preview-wrapper {
+      position: relative;
+      perspective: 1000px;
+      transition: all 0.4s ease;
+    }
+
+    .card-preview-wrapper.ig-post {
+      width: 440px;
+      height: 550px;
+    }
+    .card-preview-wrapper.tiktok-story {
+      width: 360px;
+      height: 640px;
+    }
+
+    .card-preview {
+      width: 100%;
+      height: 100%;
+      background: #0f141d;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.7),
+        0 0 30px rgba(115, 87, 255, 0.15);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 32px;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .card-preview:hover {
+      transform: translateY(-4px) rotateX(2deg) rotateY(-2deg);
+    }
+
+    .card-preview::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 70%),
+                  repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .card-header-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-brand-tag {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      color: var(--accent-lime);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-brand-tag i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-coral);
+      box-shadow: 0 0 8px var(--accent-coral);
+    }
+
+    .step-badge {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+
+    .card-body-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: auto 0;
+    }
+
+    .newspaper-snippet {
+      background: rgba(246, 243, 237, 0.95);
+      color: #1a202c;
+      padding: 16px;
+      border-radius: 12px;
+      border-left: 4px solid var(--accent-coral);
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      line-height: 1.5;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .newspaper-snippet::after {
+      content: "REICHAS ARSIP 1994";
+      position: absolute;
+      right: 12px;
+      bottom: 6px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 800;
+      color: #718096;
+      letter-spacing: 0.08em;
+    }
+
+    .card-title-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #fff;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    }
+
+    .card-desc-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .card-footer-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 16px;
+    }
+
+    .literacy-pillars {
+      display: flex;
+      gap: 6px;
+    }
+    .pillar-chip {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .pillar-baca { background: rgba(115, 87, 255, 0.3); color: #c3b7ff; }
+    .pillar-pahami { background: rgba(255, 200, 87, 0.3); color: #ffe699; }
+    .pillar-bagikan { background: rgba(183, 234, 94, 0.3); color: #d6f599; }
+
+    .cta-btn-mini {
+      background: var(--text-main);
+      color: var(--bg-dark);
+      padding: 8px 14px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+      margin-top: 32px;
+    }
+
+    .gallery-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+    }
+
+    .gallery-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .gallery-info h4 {
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .gallery-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <h1>KLIPING REICHAS CELEBES</h1>
+      <span class="badge-pill">KAMPANYE LITERASI 2026</span>
+    </div>
+    <div style="font-size: 13px; font-weight: 700; color: var(--accent-lime);">
+      BACA · PAHAMI · BAGIKAN
+    </div>
+  </header>
+
+  <main>
+    <!-- Left Sidebar: Customizer Controls -->
+    <div class="sidebar">
+      <h3 style="font-size: 16px; font-weight: 800;">Studio Editor Kartu</h3>
+      
+      <div class="control-group">
+        <label>Format Media Sosial</label>
+        <div class="format-selector">
+          <button class="btn-format active" onclick="setFormat('ig-post')">
+            📱 IG Card (4:5)
+          </button>
+          <button class="btn-format" onclick="setFormat('tiktok-story')">
+            🎬 TikTok (9:16)
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Pilih Tema Kartu</label>
+        <select id="selectTheme" onchange="updateCard()">
+          <option value="1">Slide 1: Hook Mitos vs Fakta Celebes</option>
+          <option value="2">Slide 2: Tahap BACA — Verifikasi Sumber</option>
+          <option value="3">Slide 3: Tahap PAHAMI — Dekonstruksi Logika</option>
+          <option value="4">Slide 4: Tahap BAGIKAN — Stop Hoaks</option>
+          <option value="5">Slide 5: Core REICHAS CTA — Gabung Kliping</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Judul Utama (Headline)</label>
+        <input type="text" id="inputTitle" value="TERJEBAK MITOS ATAU PEKA FAKTA?" oninput="updateCard()">
+      </div>
+
+      <div class="control-group">
+        <label>Kutipan Kliping Koran</label>
+        <textarea id="inputSnippet" rows="3" oninput="updateCard()">"Laporan misteri di lereng Gunung Latimojong tahun 1994 kembali heboh. Tapi benarkah kejadian aslinya seperti itu?"</textarea>
+      </div>
+
+      <div class="control-group">
+        <label>Pesan Analisis Literasi</label>
+        <textarea id="inputDesc" rows="3" oninput="updateCard()">Jangan cuma geser feed. Kliping REICHAS membongkar fakta historis & verifikasi ilmiah di balik cerita mistis Sulawesi.</textarea>
+      </div>
+
+      <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+        <button style="background: linear-gradient(135deg, var(--accent-lime), #84cc16); color: #1a2e05; border: 0; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer;" onclick="alert('Desain kartu siap digunakan dalam postingan IG/TikTok Anda!')">
+          ✨ Salin Teks & Siapkan Post
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Stage: Live Interactive Preview -->
+    <div class="stage">
+      
+      <!-- Live Card Preview -->
+      <div id="cardWrapper" class="card-preview-wrapper ig-post">
+        <div id="cardPreview" class="card-preview" style="background-image: linear-gradient(to bottom, rgba(15,20,29,0.7), rgba(9,13,20,0.95)), url('reichas_ig_card_hero_1785909893432.png');">
+          
+          <div class="card-header-bar">
+            <div class="card-brand-tag">
+              <i></i> REICHAS CELEBES
+            </div>
+            <div id="stepBadge" class="step-badge" style="color: var(--accent-lime);">
+              BACA · PAHAMI · BAGIKAN
+            </div>
+          </div>
+
+          <div class="card-body-content">
+            <div id="cardSnippet" class="newspaper-snippet">
+              "Laporan misteri di lereng Gunung Latimojong tahun 1994 kembali heboh. Tapi benarkah kejadian aslinya seperti itu?"
+            </div>
+
+            <h2 id="cardTitle" class="card-title-text">
+              TERJEBAK MITOS ATAU PEKA FAKTA?
+            </h2>
+
+            <p id="cardDesc" class="card-desc-text">
+              Jangan cuma geser feed. Kliping REICHAS membongkar fakta historis & verifikasi ilmiah di balik cerita mistis Sulawesi.
+            </p>
+          </div>
+
+          <div class="card-footer-bar">
+            <div class="literacy-pillars">
+              <span class="pillar-chip pillar-baca">1. BACA</span>
+              <span class="pillar-chip pillar-pahami">2. PAHAMI</span>
+              <span class="pillar-chip pillar-bagikan">3. BAGIKAN</span>
+            </div>
+            <div class="cta-btn-mini">
+              Buka Kliping →
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Generated Visual Asset Showcase -->
+      <div style="width: 100%; margin-top: 20px;">
+        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">Aset Hyper-Realistis Tergenerasi (HD Ready)</h3>
+        <div class="gallery-grid">
+          <div class="gallery-item">
+            <img src="reichas_ig_card_hero_1785909893432.png" alt="Hyper Realistic IG Card">
+            <div class="gallery-info">
+              <h4>Aset 1: Hero Carousel IG</h4>
+              <p>Tekstur kliping koran klasik, kayu mahoni, kaca pembesar, dan pendar digital fakta.</p>
+            </div>
+          </div>
+
+          <div class="gallery-item">
+            <img src="tiktok_vertical_card_reichas_1785909906828.png" alt="TikTok Story Card">
+            <div class="gallery-info">
+              <h4>Aset 2: Vertical TikTok 9:16 Card</h4>
+              <p>Visual 9:16 khusus Stories & TikTok Feed untuk daya tarik maksimal 3 detik pertama.</p>
+            </div>
+          </div>
+
+          <div class="gallery-item">
+            <img src="reichas_factcheck_card_1785909918425.png" alt="Fact Check Glassmorphism Card">
+            <div class="gallery-info">
+              <h4>Aset 3: Fact Check Stamp Card</h4>
+              <p>Stempel "FAKTA VERIFIKASI" transparan di atas kliping arsitektur jurnalisme klasik.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const themesData = {
+      "1": {
+        title: "TERJEBAK MITOS ATAU PEKA FAKTA?",
+        snippet: '"Laporan misteri di lereng Gunung Latimojong tahun 1994 kembali heboh. Tapi benarkah kejadian aslinya seperti itu?"',
+        desc: "Jangan cuma geser feed. Kliping REICHAS membongkar fakta historis & verifikasi ilmiah di balik cerita mistis Sulawesi.",
+        badge: "SLIDE 1: HOOK",
+        img: "reichas_ig_card_hero_1785909893432.png"
+      },
+      "2": {
+        title: "1. BACA: TANYAKAN SUMBER ASLINYA",
+        snippet: '"Banyak informasi beredar hanya potongan screenshot tanpa tanggal, tanpa penulis, dan tanpa pembanding."',
+        desc: "Langkah pertama literasi REICHAS: telusuri dokumen koran lama, verifikasi arsip, dan pastikan data bukan karangan.",
+        badge: "SLIDE 2: BACA",
+        img: "reichas_factcheck_card_1785909918425.png"
+      },
+      "3": {
+        title: "2. PAHAMI: DEKONSTRUKSI LOGIKA",
+        snippet: '"Mengapa narasi ini mendadak viral? Siapa yang diuntungkan dari kepanikan dan hoaks masyarakat?"',
+        desc: "Pahami konteks sosial dan bias informasi. Kebenaran tidak diukur dari seberapa ramai netizen berkomentar.",
+        badge: "SLIDE 3: PAHAMI",
+        img: "reichas_ig_card_hero_1785909893432.png"
+      },
+      "4": {
+        title: "3. BAGIKAN: JADI BENTENG LITERASI",
+        snippet: '"Menyebarkan kebenaran adalah bentuk kepedulian digital. Hentikan rantai hoaks di jemari Anda."',
+        desc: "Sebelum menekan tombol share, pastikan tulisan sudah dibaca utuh dan dipahami faktanya.",
+        badge: "SLIDE 4: BAGIKAN",
+        img: "tiktok_vertical_card_reichas_1785909906828.png"
+      },
+      "5": {
+        title: "MELEK FAKTA BERSAMA REICHAS CELEBES",
+        snippet: '"Membaca Hari Ini, Melek Fakta Selamanya. Galeri kliping literasi & cek fakta Sulawesi."',
+        desc: "Kunjungi kliping-reichas.my.id untuk membaca ratusan analisis kliping & verifikasi fakta lengkap.",
+        badge: "SLIDE 5: REICHAS CORE",
+        img: "reichas_factcheck_card_1785909918425.png"
+      }
+    };
+
+    function setFormat(fmt) {
+      const wrapper = document.getElementById('cardWrapper');
+      const btns = document.querySelectorAll('.btn-format');
+      btns.forEach(b => b.classList.remove('active'));
+      
+      if(fmt === 'ig-post') {
+        wrapper.className = 'card-preview-wrapper ig-post';
+        btns[0].classList.add('active');
+      } else {
+        wrapper.className = 'card-preview-wrapper tiktok-story';
+        btns[1].classList.add('active');
+      }
+    }
+
+    function updateCard() {
+      const themeId = document.getElementById('selectTheme').value;
+      const tData = themesData[themeId];
+
+      const inputTitle = document.getElementById('inputTitle');
+      const inputSnippet = document.getElementById('inputSnippet');
+      const inputDesc = document.getElementById('inputDesc');
+
+      if(document.activeElement !== inputTitle) inputTitle.value = tData.title;
+      if(document.activeElement !== inputSnippet) inputSnippet.value = tData.snippet;
+      if(document.activeElement !== inputDesc) inputDesc.value = tData.desc;
+
+      document.getElementById('cardTitle').innerText = inputTitle.value;
+      document.getElementById('cardSnippet').innerText = inputSnippet.value;
+      document.getElementById('cardDesc').innerText = inputDesc.value;
+      document.getElementById('stepBadge').innerText = tData.badge;
+
+      document.getElementById('cardPreview').style.backgroundImage = 
+        `linear-gradient(to bottom, rgba(15,20,29,0.7), rgba(9,13,20,0.95)), url('${tData.img}')`;
+    }
+  </script>
+</body>
+</html>
