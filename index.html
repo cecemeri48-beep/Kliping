@@ -2521,15 +2521,21 @@ function viewRak(){
   return body+'</div>'+foot();
 }
 
+var US_JENIS=["Penampakan/Sosok Misterius","Suara atau Cahaya Aneh","Kecelakaan atau Kejadian SAR","Mitos dan Pantangan Lokal","Tips Keselamatan","Lainnya"];
 function viewUsulan(){
+  var opsJenis=US_JENIS.map(function(j){return '<option value="'+esc(j)+'">'+esc(j)+'</option>'}).join("");
   var body='<div class="wrap" style="padding:28px 24px 56px;max-width:640px">'+
     '<h2 style="margin:0 0 6px;font-size:26px">Kirim Cerita ke Redaksi</h2>'+
     '<p style="color:var(--ink2);margin:0 0 22px">Tahu fenomena, kejadian, atau cerita menarik seputar gunung dan alam bebas? Ceritakan di sini. Tanpa akun, tanpa nama wajib — redaksi akan menelusuri dan menuliskannya dengan cek fakta.</p>'+
     '<div class="f"><label>Judul singkat</label><input type="text" id="usJudul" maxlength="140" placeholder="Contoh: Suara aneh di jalur pendakian X" /></div>'+
+    '<div class="f"><label>Jenis fenomena</label><select id="usJenis">'+opsJenis+'</select></div>'+
     '<div class="f"><label>Ceritanya</label><textarea id="usCerita" rows="6" maxlength="4000" placeholder="Ceritakan apa yang terjadi, kapan, dan di mana"></textarea></div>'+
+    '<div class="f"><label>Tanggal kejadian (opsional)</label><input type="date" id="usTgl" /></div>'+
     '<div class="f"><label>Lokasi (opsional)</label><input type="text" id="usLokasi" maxlength="140" placeholder="Contoh: Gunung Semeru" /></div>'+
     '<div class="f"><label>Tautan sumber/berita pendukung (opsional)</label><input type="url" id="usTautan" maxlength="500" placeholder="https://..." /></div>'+
-    '<div class="f"><label>Kontak (opsional, kalau mau dihubungi redaksi)</label><input type="text" id="usKontak" maxlength="200" placeholder="Email atau nomor WhatsApp" /></div>'+
+    '<div class="f"><label>Nama samaran/tampilan (opsional)</label><input type="text" id="usNama" maxlength="80" placeholder="Kosongkan untuk anonim total" /></div>'+
+    '<div class="f"><label>Kontak (opsional, kalau mau dihubungi redaksi — tidak dipublikasikan)</label><input type="text" id="usKontak" maxlength="200" placeholder="Email atau nomor WhatsApp" /></div>'+
+    '<label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink2);margin-top:6px"><input type="checkbox" id="usIzin" style="margin-top:3px" />Saya mengizinkan cerita ini disunting dan diterbitkan redaksi dengan nama samaran/anonim.</label>'+
     '<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">'+
       '<button class="btn btn-p" onclick="kirimUsulan()">Kirim ke redaksi</button>'+
       '<button class="btn" onclick=\'go({pv:{n:"board"}})\'>Batal</button>'+
@@ -2539,12 +2545,16 @@ function viewUsulan(){
   return body;
 }
 function kirimUsulan(){
-  var elJ=document.getElementById("usJudul"),elC=document.getElementById("usCerita"),elL=document.getElementById("usLokasi"),elT=document.getElementById("usTautan"),elK=document.getElementById("usKontak");
+  var elJ=document.getElementById("usJudul"),elJs=document.getElementById("usJenis"),elC=document.getElementById("usCerita"),elTg=document.getElementById("usTgl"),elL=document.getElementById("usLokasi"),elT=document.getElementById("usTautan"),elN=document.getElementById("usNama"),elK=document.getElementById("usKontak"),elI=document.getElementById("usIzin");
   var judul=elJ?elJ.value.trim():"";
+  var jenis=elJs?elJs.value:"";
   var cerita=elC?elC.value.trim():"";
+  var tglKejadian=elTg?elTg.value:"";
   var lokasi=elL?elL.value.trim():"";
   var tautan=elT?elT.value.trim():"";
+  var namaTampilan=elN?elN.value.trim():"";
   var kontak=elK?elK.value.trim():"";
+  var izinAnonim=elI?!!elI.checked:false;
   if(!judul){toast("Judul singkat belum diisi");return}
   if(!cerita){toast("Ceritanya belum diisi");return}
   var kunci="rcs_usulan_terakhir";
@@ -2552,7 +2562,7 @@ function kirimUsulan(){
     var t=localStorage.getItem(kunci);
     if(t&&(Date.now()-parseInt(t,10))<24*60*60*1000){toast("Kamu sudah mengirim usulan hari ini. Coba lagi besok ya.");return}
   }catch(e){}
-  var rec={judul:judul,cerita:cerita,lokasi:lokasi||null,tautan:tautan||null,kontak:kontak||null,status:"Baru",sidik:_rksSidik(),hari:new Date().toISOString().slice(0,10)};
+  var rec={judul:judul,cerita:cerita,lokasi:lokasi||null,tautan:tautan||null,kontak:kontak||null,status:"Baru",sidik:_rksSidik(),hari:new Date().toISOString().slice(0,10),jenis:jenis||null,tgl_kejadian:tglKejadian||null,nama_tampilan:namaTampilan||null,izin_anonim:izinAnonim};
   Promise.resolve(supa.from("usulan").insert(rec)).then(function(r){
     if(r&&r.error){
       var kode=(r.error.code||""),pesan=(r.error.message||"");
@@ -3069,8 +3079,7 @@ function reaksiBar(k){
     return '<li><span class="rks-arti-e">'+RKS_EMO[emo]+'</span><span><b>'+esc(RKS_LBL[emo])+'</b> \u2014 '+esc(RKS_KET[emo])+'</span></li>';
   }).join("")+'</ul>';
   return '<div class="rks"><span class="rks-h">Tanggapan pembaca</span><div class="rks-row">'+tomb+'</div>'+arti+
-    '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p>'+
-    '<p class="rks-k">Tahu cerita atau fenomena menarik lain di gunung/alam bebas? <a href="#" onclick=\'go({pv:{n:"usulan"}});return false\'>Kirim ke redaksi →</a></p></div>';
+    '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p></div>';
 }
 function rksMini(k){
   var a=rksJumlah(k.id,"api"),b=rksJumlah(k.id,"kopi");
@@ -4556,17 +4565,21 @@ function pUsulan(){
   }).join("")+'</div>';
   var kartu=filtered.map(function(u){
     var tgl=u.created_at?tglID(String(u.created_at).slice(0,10)):"—";
+    var tglKej=u.tgl_kejadian?tglID(u.tgl_kejadian):"";
+    var kredit=u.nama_tampilan?esc(u.nama_tampilan):"Tim Redaksi (laporan pembaca)";
     return '<div class="card" style="margin-bottom:12px">'+
       '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">'+
         '<b style="font-size:15px">'+esc(u.judul||"(tanpa judul)")+'</b>'+
         '<span class="tag'+(u.status==="Baru"?" tag-b":u.status==="Ditindak"?" tag-g":"")+'">'+esc(u.status)+'</span>'+
       '</div>'+
-      '<p style="font-size:13px;color:var(--ink2);margin:4px 0 10px">'+esc(tgl)+(u.lokasi?" · "+esc(u.lokasi):"")+'</p>'+
+      '<p style="font-size:13px;color:var(--ink2);margin:4px 0 10px">'+esc(tgl)+(u.jenis?" · "+esc(u.jenis):"")+(u.lokasi?" · "+esc(u.lokasi):"")+(tglKej?" · kejadian "+esc(tglKej):"")+'</p>'+
       '<p style="font-size:14px;white-space:pre-wrap;margin:0 0 10px">'+esc(u.cerita||"")+'</p>'+
       (u.tautan?'<p style="font-size:13px;margin:0 0 10px"><a href="'+esc(u.tautan)+'" target="_blank" rel="noopener">'+esc(u.tautan)+'</a></p>':"")+
-      (u.kontak?'<p style="font-size:13px;color:var(--ink2);margin:0 0 10px">Kontak: '+esc(u.kontak)+'</p>':"")+
+      (u.kontak?'<p style="font-size:13px;color:var(--ink2);margin:0 0 10px">Kontak (internal): '+esc(u.kontak)+'</p>':"")+
+      '<p style="font-size:12px;margin:0 0 10px">'+(u.izin_anonim?'<span class="tag tag-g">Ada izin publikasi · kredit: '+kredit+'</span>':'<span class="tag">Belum ada izin publikasi</span>')+'</p>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-        '<button class="btn btn-sm btn-p" onclick=\'usulanKeDraft("'+u.id+'")\'>Jadikan bahan kliping</button>'+
+        (u.izin_anonim?'<button class="btn btn-sm btn-p" onclick=\'usulanTerbitkan("'+u.id+'")\'>Terbitkan langsung</button>':"")+
+        '<button class="btn btn-sm'+(u.izin_anonim?"":" btn-p")+'" onclick=\'usulanKeDraft("'+u.id+'")\'>Jadikan bahan kliping</button>'+
         (u.status!=="Ditindak"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Ditindak")\'>Tandai ditindak</button>':"")+
         (u.status!=="Diabaikan"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Diabaikan")\'>Abaikan</button>':"")+
         (u.status!=="Baru"?'<button class="btn btn-sm" onclick=\'usulanUbahStatus("'+u.id+'","Baru")\'>Tandai baru lagi</button>':"")+
@@ -4597,6 +4610,19 @@ function usulanKeDraft(id){
   usulanUbahStatus(id,"Ditindak");
   go({});
   toast("Draf kliping dibuat dari usulan pembaca");
+}
+function usulanTerbitkan(id){
+  var u=(db.usulan||[]).find(function(x){return x.id===id});if(!u)return;
+  if(!u.izin_anonim){toast("Usulan ini belum ada izin publikasi dari pengirim");return}
+  var kredit=u.nama_tampilan?u.nama_tampilan:"Tim Redaksi (laporan pembaca)";
+  var infoKej=u.tgl_kejadian?(" pada "+tglID(u.tgl_kejadian)):"";
+  var konteksAwal="Laporan ini disampaikan oleh "+kredit+" melalui formulir Kirim Cerita"+infoKej+(u.lokasi?(" di "+u.lokasi):"")+". Redaksi menelusuri dan melengkapi konteks berikut sebelum diterbitkan:\n\n";
+  S.av="kliping";
+  S.draft={id:"",judul:u.judul||"",lead:"",rubrik:db.rubrik[0],media:db.media[0],tautan:u.tautan||"",tglBerita:u.tgl_kejadian||new Date().toISOString().slice(0,10),tglKliping:new Date().toISOString().slice(0,10),wilayah:"Sulawesi Selatan",lokasi:u.lokasi?[u.lokasi]:[],topik:u.jenis?[u.jenis]:[],potongan:u.cerita||"",konteks:konteksAwal,pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",gbrKet:"",vonis:"",catatan:"Kredit publik: "+kredit+(u.kontak?(" · kontak internal: "+u.kontak):"")};
+  S.err=[];
+  usulanUbahStatus(id,"Ditindak");
+  go({});
+  toast("Draf siap terbit dibuat. Lengkapi Konteks & 3 Pelajaran sebelum menekan Terbitkan.");
 }
 function _opiRubrik(){
   try{
