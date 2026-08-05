@@ -677,6 +677,10 @@ a.spon:hover{box-shadow:0 10px 26px rgba(16,42,67,.10);transform:translateY(-2px
 .lcn-wrap{margin-top:3px}
 .lcn-wrap:empty{display:none}
 .lcn-wrap .lcn{margin-left:0;font-size:15px}
+.streak-chip{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;background:var(--orange-s);color:var(--orange);font-size:13px;font-weight:700;border:1px solid rgba(213,128,59,.35);white-space:nowrap;cursor:default}
+.streak-chip .streak-n{font-variant-numeric:tabular-nums}
+[data-tema="gelap"] .streak-chip{background:rgba(213,128,59,.14)}
+@media(max-width:640px){.streak-chip{padding:5px 10px;font-size:12px}}
 .lcn-lg{font-size:20px;margin-left:0;margin-right:4px}
 .lcn-p{margin:8px 0 0;font-size:14px}
 .lcn-list{margin-top:10px;border-top:1px solid var(--line);padding-top:6px}
@@ -1471,7 +1475,7 @@ function header(){
       +'<div class="akun-pop" role="menu"><div class="akun-head"><div class="avat">'+_ini+'</div><div class="akun-id"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+(m.divisi?" \u00b7 "+esc(m.divisi):"")+'</small></div></div>'+_tmi+_pact+'<button class="ai ai-out" role="menuitem" onclick="tutupAkun();keluar()"><span class="ai-ic">\ud83d\udeaa</span>Keluar</button></div>'
       +'</div>';
   }
-  return '<header class="top"><div class="top-in'+(m?" auth":"")+'"><div class="brand"><img src="'+LOGO+'" alt="Logo REICHAS CHELEBES"'+(m?'':' onclick=\'go({mode:"login"})\' style="cursor:pointer"')+' /><div><h1>KLIPING RCS.CBS</h1><p>'+esc(db.settings.tagline)+'</p></div></div><nav class="nav">'+nav+"</nav>"+temaBtn()+right+"</div></header>";
+  return '<header class="top"><div class="top-in'+(m?" auth":"")+'"><div class="brand"><img src="'+LOGO+'" alt="Logo REICHAS CHELEBES"'+(m?'':' onclick=\'go({mode:"login"})\' style="cursor:pointer"')+' /><div><h1>KLIPING RCS.CBS</h1><p>'+esc(db.settings.tagline)+'</p></div></div><nav class="nav">'+nav+"</nav>"+(S.mode==="public"?streakBadgeHTML():"")+temaBtn()+right+"</div></header>";
 }
 async function keluar(){try{await supa.auth.signOut()}catch(e){}S.me=null;go({mode:"public",pv:{n:"board"},draft:null});toast("Sesi diakhiri")}
 
@@ -2359,6 +2363,41 @@ function render(){
 function _ls(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
 function _lset(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
+/* ---- Beruntun membaca (streak) ---- */
+function _tglYMD(d){var p=function(n){return String(n).padStart(2,"0")};return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())}
+function streakData(){var d=_ls("rcs_streak",{tgl:"",n:0,terbaik:0});return (d&&typeof d==="object")?d:{tgl:"",n:0,terbaik:0}}
+function lencanaStreak(n){
+  if(n>=30)return {icon:"\ud83c\udfc6",nama:"Legenda Baca"};
+  if(n>=14)return {icon:"\ud83e\udd47",nama:"Konsisten"};
+  if(n>=7)return {icon:"\ud83e\udd48",nama:"Rajin Baca"};
+  if(n>=3)return {icon:"\ud83e\udd49",nama:"Mulai Rutin"};
+  return null;
+}
+function streakCatat(){
+  var hari=86400000,now=new Date(),hariIni=_tglYMD(now),kemarin=_tglYMD(new Date(now.getTime()-hari));
+  var d=streakData(),naik=false;
+  if(d.tgl===hariIni){/* sudah tercatat hari ini */}
+  else if(d.tgl===kemarin){d.n=(d.n||0)+1;d.tgl=hariIni;naik=true}
+  else{d.n=1;d.tgl=hariIni;naik=(d.n!==1)||!d.terbaik}
+  d.terbaik=Math.max(d.terbaik||0,d.n);
+  _lset("rcs_streak",d);
+  if(naik){
+    var t=lencanaStreak(d.n);
+    setTimeout(function(){
+      if(t&&(d.n===3||d.n===7||d.n===14||d.n===30))toast(t.icon+" Lencana \u201c"+t.nama+"\u201d \u2014 "+d.n+" hari beruntun membaca!");
+      else if(d.n>1)toast("\ud83d\udd25 Beruntun "+d.n+" hari membaca. Lanjutkan besok!");
+    },400);
+  }
+  return d;
+}
+function streakBadgeHTML(){
+  var d=streakData();
+  if(!d||!d.n)return "";
+  var t=lencanaStreak(d.n);
+  var judul="Beruntun "+d.n+" hari membaca"+(t?" \u2014 lencana "+t.nama:"")+(d.terbaik>d.n?" (rekor "+d.terbaik+" hari)":"");
+  return '<span class="streak-chip" title="'+esc(judul)+'">'+(t?t.icon:"\ud83d\udd25")+'<span class="streak-n">'+d.n+' hari</span></span>';
+}
+
 /* ---- Rak baca (simpan kliping) ---- */
 function rakList(){var a=_ls("rcs_rak",[]);return Array.isArray(a)?a:[]}
 function rakAda(id){return rakList().indexOf(id)>=0}
@@ -2527,6 +2566,7 @@ function viewClip(){
   var k=db.kliping.find(function(x){return x.id===S.pv.id});
   if(!k)return '<div class="art"><p class="empty">Kliping tidak ditemukan.</p></div>';
   riwayatCatat(k.id);
+  streakCatat();
   var rj=(k.materi||[]).map(function(id){var m=mat(id);return m?'<li><a href="#" onclick=\'go({pv:{n:"materiDetail",id:"'+m.id+'"}});return false\'>'+esc(m.judul)+'</a> \u00b7 '+esc(m.rumpun)+'</li>':""}).join("");
   var urut=terbit().slice().sort(function(a,b){return String(b.tglKliping).localeCompare(String(a.tglKliping))});
   var i=urut.findIndex(function(x){return x.id===k.id});
