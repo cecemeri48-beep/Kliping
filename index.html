@@ -1821,9 +1821,11 @@ function header(){
     var _ini=esc(m.nama.slice(0,2).toUpperCase());
     var _panelLbl=(m.peran==="Kurator"?"Panel Kurator":(m.peran==="Admin"?"Panel Admin":"Panel admin"));
     var _unCount = (m.peran==="Admin" || m.peran==="Super-Admin") ? unreadEmailCount() : 0;
-    var _act=S.mode==="public"?'<button class="btn btn-sm btn-p" onclick="go({mode:\'admin\'})">Panel</button>':'<button class="btn btn-sm" onclick="go({mode:\'public\',pv:{n:\'board\'}})">Lihat situs</button>';
-    var _pact=S.mode==="public"?'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'admin\'})"><span class="ai-ic">\ud83d\udee0\ufe0f</span>'+esc(_panelLbl)+'</button>':'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'public\',pv:{n:\'board\'}})"><span class="ai-ic">\ud83c\udf10</span>Lihat situs</button>';
-    var _emailItem = (_unCount > 0) ? '<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'admin\',av:\'emailredaksi\'})"><span class="ai-ic">\ud83d\udce9</span>Email Redaksi <span class="tag tag-r" style="margin-left:auto;background:#ff6b5d;color:#fff;font-weight:700;padding:1px 6px;font-size:10px">'+_unCount+' baru</span></button>' : '';
+    var _defAv = (PERM[m.peran] && PERM[m.peran][0]) || "dasbor";
+    var _targetAv = (S.av && PERM[m.peran] && PERM[m.peran].includes(S.av)) ? S.av : _defAv;
+    var _act=S.mode==="public"?'<button class="btn btn-sm btn-p" onclick="go({mode:\'admin\',av:\''+_targetAv+'\',draft:null,err:[]})">Panel</button>':'<button class="btn btn-sm" onclick="go({mode:\'public\',pv:{n:\'board\'}})">Lihat situs</button>';
+    var _pact=S.mode==="public"?'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'admin\',av:\''+_targetAv+'\',draft:null,err:[]})"><span class="ai-ic">\ud83d\udee0\ufe0f</span>'+esc(_panelLbl)+'</button>':'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'public\',pv:{n:\'board\'}})"><span class="ai-ic">\ud83c\udf10</span>Lihat situs</button>';
+    var _emailItem = (_unCount > 0) ? '<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'admin\',av:\'emailredaksi\',draft:null,err:[]})"><span class="ai-ic">\ud83d\udce9</span>Email Redaksi <span class="tag tag-r" style="margin-left:auto;background:#ff6b5d;color:#fff;font-weight:700;padding:1px 6px;font-size:10px">'+_unCount+' baru</span></button>' : '';
     var _tmi='<button class="ai ai-tema" role="menuitem" onclick="tutupAkun();toggleTema()"><span class="ai-ic">'+(_tema()==="gelap"?"\u2600\ufe0f":"\ud83c\udf19")+'</span>'+(_tema()==="gelap"?"Mode terang":"Mode gelap")+'</button>';
     right='<div class="who akunwrap" id="akunWrap">'
       +'<button class="avat avat-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Menu akun" onclick="toggleAkun(event)" style="position:relative">'+_ini+(_unCount > 0 ? '<span style="position:absolute;top:-2px;right:-2px;width:10px;height:10px;background:#ff6b5d;border-radius:50%;border:2px solid #fff"></span>' : '')+'</button>'
@@ -2233,7 +2235,10 @@ function emailRedaksiBadgeHtml(){
 
 function viewAdmin(){
   const m=me();if(!m)return viewLogin();
-  const keys=PERM[m.peran];
+  const keys=PERM[m.peran]||[];
+  if(!S.av || !keys.includes(S.av)){
+    S.av = keys[0] || "dasbor";
+  }
   const tabBtn=(k,cls)=>'<button class="'+cls+(S.av===k?" on":"")+'" onclick=\'tutupSideMenu();go({av:"'+k+'",draft:null,err:[]})\'><i class="ic">'+ICON[k]+"</i>"+LBL[k]+(k==="tinjauan"&&db.kliping.filter(x=>x.status==="Ditinjau").length?' <span class="tag tag-b" style="margin-left:auto">'+db.kliping.filter(x=>x.split===undefined&&x.status==="Ditinjau").length+"</span>":"")+(k==="emailredaksi"?emailRedaksiBadgeHtml():"")+"</button>";
   const side='<aside class="side"><div class="lbl">Panel '+esc(m.peran)+"</div>"+keys.map(k=>tabBtn(k,"")).join("")+"</aside>";
   const smenu='<div class="smenu" id="sideMenu"><button type="button" class="smenu-btn" onclick="toggleSideMenu(event)"><span>'+(ICON[S.av]||"")+" "+esc(LBL[S.av]||"Menu")+(S.av==="emailredaksi"?emailRedaksiBadgeHtml():"")+'</span><span class="smenu-caret">\u25BE</span></button><div class="smenu-pop">'+keys.map(k=>tabBtn(k,"smi")).join("")+"</div></div>";
