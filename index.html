@@ -5525,39 +5525,12 @@ function viewOpini(k){
 
   document.body.appendChild(widget);
 
-  // Black Background Removal Engine
-  var img = new Image();
-  img.crossOrigin = "Anonymous";
-  img.onload = function() {
-    try {
-      var canvas = document.getElementById("mascotCanvas");
-      var fallback = document.getElementById("mascotFallbackImg");
-      if (!canvas || !fallback) return;
-
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      var ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-
-      var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      var data = imgData.data;
-
-      // Filter black background (RGB <= 35) while preserving the white outline & mascot
-      for (var i = 0; i < data.length; i += 4) {
-        var r = data[i], g = data[i+1], b = data[i+2];
-        if (r <= 38 && g <= 38 && b <= 38) {
-          data[i+3] = 0; // Make transparent
-        }
-      }
-
-      ctx.putImageData(imgData, 0, 0);
-      fallback.style.display = "none";
-      canvas.style.display = "block";
-    } catch(e) {
-      console.warn("Mascot canvas processing fallback:", e);
-    }
-  };
-  img.src = mascotSrc;
+  // Directly render PNG asset with 100% solid body opacity
+  var fallback = document.getElementById("mascotFallbackImg");
+  if (fallback) {
+    fallback.src = mascotSrc;
+    fallback.style.display = "block";
+  }
 
   // Drag and Drop Engine (Mouse + Touch)
   var avatarWrap = document.getElementById("mascotAvatarWrap");
