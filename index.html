@@ -1158,6 +1158,257 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
   box-shadow: 0 0 0 2px #161b24, 0 0 0 5px rgba(125, 192, 245, 0.75), 0 12px 26px rgba(125, 192, 245, 0.4) !important;
 }
 
+/* ================= ANOA MASCOT ================= */
+.anoa-wrap {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  z-index: 100;
+  width: 200px;
+  height: 200px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  filter: drop-shadow(0 0 18px rgba(115, 87, 255, 0.45)) drop-shadow(0 0 40px rgba(49, 197, 194, 0.25));
+  transition: filter 0.4s ease;
+}
+.anoa-wrap:hover {
+  filter: drop-shadow(0 0 24px rgba(115, 87, 255, 0.65)) drop-shadow(0 0 50px rgba(49, 197, 194, 0.4)) drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+.anoa-wrap:active {
+  cursor: grabbing;
+}
+.anoa-wrap.dragging {
+  cursor: grabbing;
+  transition: none;
+}
+
+/* Anoa SVG body parts — animated via CSS */
+.anoa-body {
+  width: 200px;
+  height: 200px;
+  position: relative;
+}
+
+.anoa-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Idle breathing animation */
+.anoa-torso {
+  transform-origin: 100px 130px;
+  animation: anoaBreath 3s ease-in-out infinite;
+}
+@keyframes anoaBreath {
+  0%, 100% { transform: scaleY(1) translateY(0); }
+  50% { transform: scaleY(1.02) translateY(-1px); }
+}
+
+/* Tail wag */
+.anoa-tail {
+  transform-origin: 45px 105px;
+  animation: anoaTailWag 2s ease-in-out infinite;
+}
+@keyframes anoaTailWag {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(12deg); }
+  75% { transform: rotate(-8deg); }
+}
+
+/* Ear flick */
+.anoa-ear-l, .anoa-ear-r {
+  animation: anoaEarFlick 4s ease-in-out infinite;
+}
+.anoa-ear-r { animation-delay: 0.5s; }
+@keyframes anoaEarFlick {
+  0%, 85%, 100% { transform: rotate(0deg); }
+  90% { transform: rotate(-8deg); }
+  95% { transform: rotate(4deg); }
+}
+.anoa-ear-l { transform-origin: 115px 55px; }
+.anoa-ear-r { transform-origin: 140px 55px; }
+
+/* Eye blink */
+.anoa-eye-l, .anoa-eye-r {
+  animation: anoaBlink 5s ease-in-out infinite;
+}
+.anoa-eye-r { animation-delay: 0.1s; }
+@keyframes anoaBlink {
+  0%, 42%, 46%, 100% { transform: scaleY(1); }
+  44% { transform: scaleY(0.05); }
+}
+.anoa-eye-l { transform-origin: 118px 76px; }
+.anoa-eye-r { transform-origin: 138px 76px; }
+
+/* SQUAT pose */
+.anoa-wrap.pose-squat .anoa-body-group {
+  animation: anoaSquat 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes anoaSquat {
+  0% { transform: translateY(0) scaleY(1); }
+  100% { transform: translateY(18px) scaleY(0.85); }
+}
+
+/* STAND pose (from squat) */
+.anoa-wrap.pose-stand .anoa-body-group {
+  animation: anoaStand 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes anoaStand {
+  0% { transform: translateY(18px) scaleY(0.85); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+/* JUMP pose */
+.anoa-wrap.pose-jump .anoa-body-group {
+  animation: anoaJump 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes anoaJump {
+  0% { transform: translateY(0) scaleY(1); }
+  15% { transform: translateY(12px) scaleY(0.82); }
+  40% { transform: translateY(-45px) scaleY(1.08) scaleX(0.96); }
+  55% { transform: translateY(-50px) scaleY(1.05) scaleX(0.97); }
+  75% { transform: translateY(-15px) scaleY(1); }
+  85% { transform: translateY(5px) scaleY(0.94); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+/* JUMP shadow */
+.anoa-shadow {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 14px;
+  background: radial-gradient(ellipse, rgba(16, 42, 67, 0.22) 0%, transparent 70%);
+  border-radius: 50%;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.anoa-wrap.pose-jump .anoa-shadow {
+  animation: anoaShadowJump 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes anoaShadowJump {
+  0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+  15% { transform: translateX(-50%) scale(1.15); opacity: 0.9; }
+  40% { transform: translateX(-50%) scale(0.5); opacity: 0.3; }
+  55% { transform: translateX(-50%) scale(0.45); opacity: 0.25; }
+  75% { transform: translateX(-50%) scale(0.8); opacity: 0.6; }
+  100% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+}
+.anoa-wrap.pose-squat .anoa-shadow {
+  transform: translateX(-50%) scale(1.2);
+  opacity: 0.95;
+}
+
+/* Legs animation on jump */
+.anoa-legs {
+  transform-origin: 100px 160px;
+}
+.anoa-wrap.pose-jump .anoa-legs {
+  animation: anoaLegsJump 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes anoaLegsJump {
+  0%, 100% { transform: scaleY(1); }
+  15% { transform: scaleY(0.8); }
+  40%, 55% { transform: scaleY(1.15); }
+}
+
+/* Horns bob on jump */
+.anoa-horns {
+  transform-origin: 128px 50px;
+}
+.anoa-wrap.pose-jump .anoa-horns {
+  animation: anoaHornsBob 0.7s ease forwards;
+}
+@keyframes anoaHornsBob {
+  0%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(-5deg); }
+  55% { transform: rotate(3deg); }
+}
+
+/* Glow pulse behind mascot */
+.anoa-glow {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(115, 87, 255, 0.12) 0%, rgba(49, 197, 194, 0.08) 40%, transparent 70%);
+  animation: anoaGlowPulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes anoaGlowPulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+
+/* Pose label tooltip */
+.anoa-label {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  background: linear-gradient(135deg, var(--violet), #4267e7);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(115, 87, 255, 0.35);
+}
+.anoa-wrap.pose-squat .anoa-label,
+.anoa-wrap.pose-stand .anoa-label,
+.anoa-wrap.pose-jump .anoa-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Dark mode adjustments */
+[data-tema="gelap"] .anoa-wrap {
+  filter: drop-shadow(0 0 22px rgba(125, 192, 245, 0.4)) drop-shadow(0 0 45px rgba(115, 87, 255, 0.3));
+}
+[data-tema="gelap"] .anoa-wrap:hover {
+  filter: drop-shadow(0 0 30px rgba(125, 192, 245, 0.6)) drop-shadow(0 0 55px rgba(115, 87, 255, 0.45));
+}
+[data-tema="gelap"] .anoa-glow {
+  background: radial-gradient(circle, rgba(125, 192, 245, 0.12) 0%, rgba(115, 87, 255, 0.08) 40%, transparent 70%);
+}
+[data-tema="gelap"] .anoa-shadow {
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .anoa-wrap {
+    width: 140px;
+    height: 140px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    right: 12px;
+  }
+  .anoa-body { width: 140px; height: 140px; }
+  .anoa-shadow { width: 70px; height: 10px; }
+  .anoa-label { font-size: 9px; top: -10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anoa-torso, .anoa-tail, .anoa-ear-l, .anoa-ear-r,
+  .anoa-eye-l, .anoa-eye-r, .anoa-glow,
+  .anoa-wrap.pose-squat .anoa-body-group,
+  .anoa-wrap.pose-stand .anoa-body-group,
+  .anoa-wrap.pose-jump .anoa-body-group,
+  .anoa-wrap.pose-jump .anoa-shadow,
+  .anoa-wrap.pose-jump .anoa-legs,
+  .anoa-wrap.pose-jump .anoa-horns {
+    animation: none !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1459,9 +1710,16 @@ function tutupAkun(){var w=document.getElementById("akunWrap");if(!w)return;w.cl
 document.addEventListener("click",function(e){var w=document.getElementById("akunWrap");if(w&&w.classList.contains("open")&&!w.contains(e.target))tutupAkun()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape")tutupAkun()});
 function _q(){return (S.q||"").trim().toLowerCase()}
+function _match(k){var q=_q();if(!q)return true;return ((k.judul||"")+" "+(k.lead||"")+" "+(k.media||"")+" "+(k.wilayah||"")+" "+(k.rubrik||"")+" "+(k.konteks||"")).toLowerCase().indexOf(q)>=0}
 function cari(v){S.q=v;render();var el=document.getElementById("cari");if(el){el.focus();try{var n=el.value.length;el.setSelectionRange(n,n)}catch(e){}}}
 try{document.documentElement.setAttribute("data-tema",_tema())}catch(e){}
 function vonisTag(k){var v=k&&k.vonis;if(!v)return "";var c={"Fakta":"tag-g","Sebagian benar":"tag-o","Menyesatkan":"tag-o","Hoaks":"tag-r","Belum diverifikasi":"tag"};var ic={"Fakta":"✅","Sebagian benar":"⚠️","Menyesatkan":"⚠️","Hoaks":"❌","Belum diverifikasi":"❓"};return '<span class="tag '+(c[v]||"tag")+'" style="margin-left:6px" title="Vonis cek fakta">'+(ic[v]||"")+" "+esc(v)+"</span>"}
+function viewBoard(){
+  const list=terbit().filter(k=>(S.filter==="Semua"||k.rubrik===S.filter)&&_match(k)).sort((a,b)=>b.tglKliping.localeCompare(a.tglKliping));
+  const chips=["Semua"].concat(db.rubrik.filter(r=>terbit().some(k=>k.rubrik===r))).map(r=>'<button class="chip '+(S.filter===r?"on":"")+'" onclick=\'go({filter:"'+r+'"})\'>'+r+"</button>").join("");
+  const cards=list.map(k=>'<article class="clip">'+(isImg(k.gambar)?'<img src="'+esc(k.gambar)+'" alt="" style="width:100%;height:150px;object-fit:cover;border-radius:10px;margin-bottom:12px" />':"")+'<span class="tag tag-b">'+esc(k.rubrik)+'</span>'+vonisTag(k)+'<h3>'+esc(k.judul)+'</h3><p class="lead">'+esc(k.lead)+'</p><div class="src"><span>'+esc(k.media)+'</span><span>'+tglID(k.tglBerita)+'</span></div><button class="btn btn-sm open" onclick=\'go({pv:{n:"clip",id:"'+k.id+'"}})\'>Buka kliping ↗</button></article>').join("");
+  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS — menggunting berita, menanam pengetahuan"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p><button type="button" class="btn btn-sm btn-p" onclick="mulaiPodcast(0)" style="margin-top:14px;display:inline-flex;align-items:center;gap:8px"><span>📻</span> <b>Putar Podcast Literasi (Auto-Play)</b></button></div></div></section>'+litBanner()+'<div class="wrap"><div class="cari-row"><input id="cari" class="cari-inp" type="search" placeholder="🔎 Cari judul, media, wilayah, atau isi…" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" /></div><div class="filters" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0 22px;margin:0">'+chips+'</div><div class="board">'+(cards||'<p class="empty">Tidak ada kliping yang cocok dengan pencarian/filter ini.</p>')+"</div></div>"+foot();
+}
 
 /* ================= PODCAST CONTINUOUS PLAYER ================= */
 let PODCAST = { active: false, queue: [], idx: 0, playing: false, paused: false };
@@ -1637,6 +1895,21 @@ try{if("speechSynthesis" in window){
     if(ttsSegarkanPilihan()||_ttsCoba>24)clearInterval(_ttsJam);
   },400);
 }}catch(e){}
+function viewClip(){
+  const k=db.kliping.find(x=>x.id===S.pv.id);
+  if(!k)return '<div class="art"><p class="empty">Kliping tidak ditemukan.</p></div>';
+  const rj=k.materi.map(id=>{const m=mat(id);return m?'<li><a href="#" onclick=\'go({pv:{n:"materiDetail",id:"'+m.id+'"}});return false\'>'+esc(m.judul)+"</a> \u00b7 "+esc(m.rumpun)+"</li>":""}).join("");
+  return '<div class="art"><button class="btn btn-sm" onclick=\'go({pv:{n:"board"}})\'>\u2190 Papan kliping</button>'+
+   '<div style="margin-top:16px"><span class="tag tag-b">'+esc(k.rubrik)+'</span> <span class="tag">'+esc(k.wilayah)+"</span> "+vonisTag(k)+"</div>"+
+   "<h2>"+esc(k.judul)+'</h2><p class="lead">'+esc(k.lead)+"</p>"+'<div class="tts"><button id="ttsBtn" class="btn btn-sm btn-p" onclick="dengarkan()">🔊 Dengarkan</button> <button class="btn btn-sm" onclick="hentikanTTS()">⏹ Stop</button> <select id="ttsVoice" class="tts-sel" onchange="ttsPick(this.value)" title="Pilih suara">'+ttsVoiceOptions()+'</select><span class="tts-hint">Pilih suara ternatural di perangkatmu</span></div>'+
+   '<div class="sec"><h4>1 \u00b7 Potongan</h4><div class="cut">'+esc(k.potongan)+'</div><div class="src" style="border-top:1px dashed var(--line)"><span>'+esc(k.media)+" \u00b7 "+tglID(k.tglBerita)+'</span><a href="'+esc(k.tautan)+'" target="_blank" rel="noopener">Baca sumber asli \u2197</a></div></div>'+
+   '<div class="sec"><h4>2 \u00b7 Konteks</h4><p>'+esc(k.konteks)+"</p></div>"+
+   '<div class="sec"><h4>3 \u00b7 Pelajaran</h4><ol>'+k.pelajaran.map(p=>"<li>"+esc(p)+"</li>").join("")+"</ol></div>"+
+   '<div class="sec"><h4>4 \u00b7 Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+(rj||"<li>—</li>")+"</ul></div>"+
+   '<div class="note o">'+esc(db.settings.penyangkalan)+"</div>"+
+   (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+'</div>':"")+
+   '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Digunting '+tglID(k.tglKliping)+" oleh "+esc(nm(k.kurator))+(k.peninjau?" \u00b7 ditinjau "+esc(nm(k.peninjau)):"")+" \u00b7 gambar: "+(isImg(k.gambar)?"foto":esc(k.gambar))+"</p>"+'<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'</div></div>'+foot();
+}
 function viewMateri(){
   const rum=[...new Set(db.materi.map(m=>m.rumpun))];
   return '<div class="wrap" style="padding:32px 24px 56px"><h2 style="margin:0 0 6px;font-size:26px">Materi</h2>'+
@@ -2018,6 +2291,18 @@ function ambil(){
   d.materi=[].slice.call(document.querySelectorAll(".fMat")).filter(c=>c.checked).map(c=>c.value);
   d.peninjau=g("fPen").value;d.kepekaan=g("fKep").value;var _v=g("fVonis");if(_v)d.vonis=(_v.value==="—")?"":_v.value;simpanDrafLokal();
 }
+function periksa(d,status){
+  const e=[];
+  if(!d.judul)e.push("Judul kliping belum diisi.");
+  if(!d.lead)e.push("Ringkasan satu baris belum diisi.");
+  if(!d.tautan)e.push("Tautan sumber asli wajib diisi.");
+  if(!d.potongan)e.push("Bagian Potongan belum diisi.");
+  if(!d.konteks)e.push("Bagian Konteks belum diisi.");
+  if(d.pelajaran.filter(x=>x).length<3)e.push("Bagian Pelajaran harus berisi tiga poin.");
+  if(!d.materi.length)e.push("Wajib menaut minimal satu halaman materi.");
+  if(status==="Terbit"&&db.settings.wajibTinjauan&&db.sensitif.includes(d.rubrik)&&!d.peninjau)e.push("Rubrik sensitif wajib punya peninjau sebelum terbit.");
+  return e;
+}
 function simpanDraft(status){
   ambil();const d=S.draft;
   if(status==="Ditulis"){
@@ -2133,6 +2418,25 @@ function simpanPengguna(){
   db.pengguna.push(rec);
   log("Menambah pengguna",nama);supa.from("profiles").insert(rec).then(({error})=>pErr(error,"pengguna"));S.modal=null;render();toast("Pengguna ditambahkan");
 }
+
+/* ================= render ================= */
+function goTab(i){var n=["board","materi","arsip","pedoman"][i];if(n)go({pv:{n:n}})}
+function bottomNav(){if(S.mode!=="public")return "";var t=[["board","📰","Papan"],["materi","📚","Materi"],["arsip","📁","Arsip"],["pedoman","📖","Pedoman"]];return '<nav class="btabs">'+t.map(function(p,i){var on=(S.pv.n===p[0]||(p[0]==="board"&&S.pv.n==="clip")||(p[0]==="materi"&&S.pv.n==="materiDetail"))?"on":"";return '<button class="'+on+'" onclick="goTab('+i+')"><span class="bi">'+p[1]+'</span><span class="bl">'+p[2]+'</span></button>'}).join("")+'</nav>'}
+function render(){
+  document.body.className=db.settings.sinyalTipis?"thin":"";
+  let body;
+  if(S.mode==="login")body=viewLogin();
+  else if(S.mode==="admin")body=viewAdmin();
+  else{
+    const n=S.pv.n;
+    body=n==="clip"?viewClip():n==="materi"?viewMateri():n==="materiDetail"?viewMateriDetail():n==="arsip"?viewArsip():n==="pedoman"?viewPedomanPublik():viewBoard();
+  }
+  document.getElementById("app").innerHTML=header()+body+modalView()+bottomNav();
+  save();
+}
+
+/* ================= LAPIS PENYEMPURNAAN =================
+   Ditulis setelah fungsi asli; deklarasi function di bawah menimpa yang di atas. */
 
 function _ls(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
 function _lset(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -4492,6 +4796,233 @@ function viewOpini(k){
 
 
 bootstrap();
+</script>
+<!-- ================= ANOA MASCOT ================= -->
+<div class="anoa-wrap" id="anoaMascot">
+  <div class="anoa-glow"></div>
+  <div class="anoa-label" id="anoaLabel">🐃 Hai!</div>
+  <div class="anoa-body">
+    <svg class="anoa-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <g class="anoa-body-group">
+        <!-- Shadow on ground -->
+        <ellipse class="anoa-ground-shadow" cx="100" cy="188" rx="48" ry="6" fill="rgba(16,42,67,0.12)"/>
+
+        <!-- LEGS (back) -->
+        <g class="anoa-legs">
+          <!-- Back left leg -->
+          <path d="M72 148 L66 178 L60 180 L74 180 L76 178 L78 148" fill="#5a4a3a" stroke="#4a3a2a" stroke-width="1"/>
+          <ellipse cx="67" cy="180" rx="8" ry="3" fill="#3a3020"/>
+          <!-- Back right leg -->
+          <path d="M122 148 L118 178 L112 180 L126 180 L128 178 L130 148" fill="#5a4a3a" stroke="#4a3a2a" stroke-width="1"/>
+          <ellipse cx="119" cy="180" rx="8" ry="3" fill="#3a3020"/>
+          <!-- Front left leg -->
+          <path d="M82 145 L78 175 L72 177 L86 177 L88 175 L90 145" fill="#6b5a48" stroke="#5a4a3a" stroke-width="1"/>
+          <ellipse cx="79" cy="177" rx="8" ry="3" fill="#3a3020"/>
+          <!-- Front right leg -->
+          <path d="M110 145 L106 175 L100 177 L114 177 L116 175 L118 145" fill="#6b5a48" stroke="#5a4a3a" stroke-width="1"/>
+          <ellipse cx="107" cy="177" rx="8" ry="3" fill="#3a3020"/>
+        </g>
+
+        <!-- TAIL -->
+        <path class="anoa-tail" d="M52 106 Q38 100 32 108 Q28 114 36 116 Q42 114 48 112" fill="#5a4a3a" stroke="#4a3a2a" stroke-width="1.5" stroke-linecap="round"/>
+
+        <!-- BODY / TORSO -->
+        <g class="anoa-torso">
+          <!-- Main body ellipse -->
+          <ellipse cx="100" cy="128" rx="52" ry="32" fill="#7a6850"/>
+          <!-- Body highlight -->
+          <ellipse cx="96" cy="122" rx="38" ry="20" fill="#8a7860" opacity="0.6"/>
+          <!-- Belly lighter patch -->
+          <ellipse cx="100" cy="138" rx="30" ry="14" fill="#9a8a72" opacity="0.4"/>
+        </g>
+
+        <!-- NECK -->
+        <path d="M115 105 Q125 85 128 72 Q132 85 135 105" fill="#7a6850" stroke="none"/>
+        <path d="M112 108 Q118 90 122 75 L130 75 Q134 90 138 108" fill="#8a7860" stroke="none"/>
+
+        <!-- HEAD -->
+        <g>
+          <!-- Head shape -->
+          <ellipse cx="128" cy="68" rx="26" ry="22" fill="#7a6850"/>
+          <!-- Forehead lighter -->
+          <ellipse cx="128" cy="62" rx="18" ry="13" fill="#8a7860" opacity="0.7"/>
+          <!-- White/light face marking (Anoa characteristic) -->
+          <path d="M120 72 Q128 84 136 72 Q132 78 128 80 Q124 78 120 72" fill="#c8b898" opacity="0.5"/>
+
+          <!-- HORNS -->
+          <g class="anoa-horns">
+            <!-- Left horn -->
+            <path d="M112 56 Q106 42 100 38 Q104 40 108 44 Q110 48 112 56" fill="#3a3528" stroke="#2a2518" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M112 56 Q108 46 104 42" fill="none" stroke="#4a4030" stroke-width="2" stroke-linecap="round"/>
+            <!-- Right horn -->
+            <path d="M144 56 Q150 42 156 38 Q152 40 148 44 Q146 48 144 56" fill="#3a3528" stroke="#2a2518" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M144 56 Q148 46 152 42" fill="none" stroke="#4a4030" stroke-width="2" stroke-linecap="round"/>
+          </g>
+
+          <!-- EARS -->
+          <ellipse class="anoa-ear-l" cx="108" cy="58" rx="8" ry="5" fill="#6b5a48" transform="rotate(-25,108,58)"/>
+          <ellipse cx="108" cy="58" rx="5" ry="3" fill="#c8a888" opacity="0.5" transform="rotate(-25,108,58)"/>
+          <ellipse class="anoa-ear-r" cx="148" cy="58" rx="8" ry="5" fill="#6b5a48" transform="rotate(25,148,58)"/>
+          <ellipse cx="148" cy="58" rx="5" ry="3" fill="#c8a888" opacity="0.5" transform="rotate(25,148,58)"/>
+
+          <!-- EYES -->
+          <g class="anoa-eye-l">
+            <ellipse cx="118" cy="68" rx="5" ry="5.5" fill="#1a1510"/>
+            <ellipse cx="116.5" cy="66.5" rx="2" ry="2.2" fill="#fff" opacity="0.85"/>
+            <ellipse cx="120" cy="69" rx="1" ry="1" fill="#fff" opacity="0.4"/>
+          </g>
+          <g class="anoa-eye-r">
+            <ellipse cx="138" cy="68" rx="5" ry="5.5" fill="#1a1510"/>
+            <ellipse cx="136.5" cy="66.5" rx="2" ry="2.2" fill="#fff" opacity="0.85"/>
+            <ellipse cx="140" cy="69" rx="1" ry="1" fill="#fff" opacity="0.4"/>
+          </g>
+
+          <!-- NOSTRILS -->
+          <ellipse cx="124" cy="78" rx="2" ry="1.5" fill="#3a3020"/>
+          <ellipse cx="132" cy="78" rx="2" ry="1.5" fill="#3a3020"/>
+
+          <!-- MOUTH (subtle smile) -->
+          <path d="M122 82 Q128 86 134 82" fill="none" stroke="#4a3a2a" stroke-width="1.2" stroke-linecap="round"/>
+
+          <!-- CHEEK blush -->
+          <ellipse cx="112" cy="74" rx="4" ry="2.5" fill="#d4836b" opacity="0.3"/>
+          <ellipse cx="144" cy="74" rx="4" ry="2.5" fill="#d4836b" opacity="0.3"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+  <div class="anoa-shadow"></div>
+</div>
+
+<script>
+/* ================= ANOA MASCOT CONTROLLER ================= */
+(function(){
+  var el = document.getElementById('anoaMascot');
+  var label = document.getElementById('anoaLabel');
+  if (!el) return;
+
+  /* --- Drag logic --- */
+  var isDragging = false, startX, startY, elX, elY;
+  var moved = false;
+
+  function getPos() {
+    var r = el.getBoundingClientRect();
+    return { x: r.left, y: r.top };
+  }
+
+  function onStart(e) {
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    isDragging = true;
+    moved = false;
+    el.classList.add('dragging');
+    var p = getPos();
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    startX = clientX;
+    startY = clientY;
+    elX = p.x;
+    elY = p.y;
+    e.preventDefault();
+  }
+
+  function onMove(e) {
+    if (!isDragging) return;
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    var dx = clientX - startX;
+    var dy = clientY - startY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+    var newX = elX + dx;
+    var newY = elY + dy;
+    // Keep within viewport
+    var w = el.offsetWidth, h = el.offsetHeight;
+    newX = Math.max(0, Math.min(window.innerWidth - w, newX));
+    newY = Math.max(0, Math.min(window.innerHeight - h, newY));
+    el.style.left = newX + 'px';
+    el.style.top = newY + 'px';
+    el.style.right = 'auto';
+    el.style.bottom = 'auto';
+    e.preventDefault();
+  }
+
+  function onEnd(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    el.classList.remove('dragging');
+    if (!moved) {
+      triggerPoseOnClick();
+    }
+  }
+
+  el.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+  el.addEventListener('touchstart', onStart, { passive: false });
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
+
+  /* --- Pose animation cycle --- */
+  var poses = ['idle', 'squat', 'stand', 'jump'];
+  var poseLabels = {
+    idle: '🐃 Hai!',
+    squat: '🦵 Jongkok...',
+    stand: '💪 Berdiri!',
+    jump: '🚀 Lompat!!'
+  };
+  var currentPose = 0;
+  var poseTimer = null;
+  var autoCycle = true;
+
+  function setPose(name) {
+    el.className = 'anoa-wrap';
+    if (name !== 'idle') {
+      el.classList.add('pose-' + name);
+    }
+    label.textContent = poseLabels[name] || '';
+  }
+
+  function nextPose() {
+    currentPose = (currentPose + 1) % poses.length;
+    setPose(poses[currentPose]);
+  }
+
+  function triggerPoseOnClick() {
+    // Manual click triggers next pose
+    autoCycle = false;
+    clearInterval(poseTimer);
+    nextPose();
+    // Resume auto cycle after 8s of no clicks
+    setTimeout(function() {
+      autoCycle = true;
+      startAutoCycle();
+    }, 8000);
+  }
+
+  function startAutoCycle() {
+    clearInterval(poseTimer);
+    poseTimer = setInterval(function() {
+      if (autoCycle) nextPose();
+    }, 3500);
+  }
+
+  // Start cycling after a small delay
+  setTimeout(function() {
+    startAutoCycle();
+  }, 2000);
+
+  /* --- Entrance animation --- */
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(30px)';
+  setTimeout(function() {
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+    setTimeout(function() {
+      el.style.transition = '';
+    }, 700);
+  }, 800);
+
+})();
 </script>
 </body>
 </html>
