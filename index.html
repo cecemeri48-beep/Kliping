@@ -5431,18 +5431,18 @@ function viewOpini(k){
 
   /* Animated GIF-like Living Keyframes */
   @keyframes mascotGifMotion {
-    0% { transform: translateY(0) rotate(0deg) scale(1); }
-    20% { transform: translateY(-7px) rotate(-1.5deg) scale(1.01); }
-    40% { transform: translateY(-12px) rotate(1deg) scale(1.02); }
-    60% { transform: translateY(-5px) rotate(-1deg) scale(1.01); }
-    80% { transform: translateY(-9px) rotate(1.5deg) scale(1.015); }
-    100% { transform: translateY(0) rotate(0deg) scale(1); }
+    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+    15% { transform: translateY(-6px) rotate(-1.5deg) scale(1.02); }
+    30% { transform: translateY(-12px) rotate(1deg) scale(1.03); }
+    50% { transform: translateY(-8px) rotate(-2deg) scale(1.015); }
+    70% { transform: translateY(-14px) rotate(1.5deg) scale(1.025); }
+    85% { transform: translateY(-4px) rotate(-0.5deg) scale(1.01); }
   }
 
   @keyframes mascotShadowPulse {
     0%, 100% { transform: scale(1); opacity: 0.25; }
-    40% { transform: scale(0.7); opacity: 0.12; }
-    80% { transform: scale(0.8); opacity: 0.16; }
+    30% { transform: scale(0.65); opacity: 0.10; }
+    70% { transform: scale(0.60); opacity: 0.08; }
   }
 
   @keyframes mascotBounce {
@@ -5452,23 +5452,6 @@ function viewOpini(k){
   }
   .mascot-bounce {
     animation: mascotBounce 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
-  }
-
-  /* Hint Drag Indicator */
-  .mascot-drag-hint {
-    font-size: 10px;
-    background: rgba(0,0,0,0.65);
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-top: 4px;
-    opacity: 0.8;
-    letter-spacing: 0.02em;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-  .mascot-avatar-wrap:hover .mascot-drag-hint {
-    opacity: 1;
   }
 
   #reichasMascotWidget.minimized .mascot-bubble,
@@ -5504,7 +5487,7 @@ function viewOpini(k){
       right: 16px;
     }
     .mascot-canvas-img {
-      height: 120px;
+      height: 125px;
     }
     .mascot-bubble {
       max-width: 220px;
@@ -5519,11 +5502,10 @@ function viewOpini(k){
     "Jangan gampang percaya hoaks ya! Saring dulu sebelum sharing. 🔎",
     "Membaca hari ini, melek fakta selamanya! 📚",
     "Punya masukan atau temuan hoaks? Kirim ke tim REICHAS! 🛡️",
-    "Geser saya ke mana saja kalau menutupi layar ya! 🤏",
     "Tetap kritis & bijak membaca informasi! 💡"
   ];
   
-  var mascotSrc = "mascot.jpg";
+  var mascotSrc = "mascot.png";
   
   var widget = document.createElement("div");
   widget.id = "reichasMascotWidget";
@@ -5536,7 +5518,6 @@ function viewOpini(k){
       '<canvas id="mascotCanvas" class="mascot-canvas-img" style="display:none;"></canvas>' +
       '<img id="mascotFallbackImg" class="mascot-canvas-img" src="' + mascotSrc + '" alt="Maskot Anoa Gunung RCS.CES" />' +
       '<div class="mascot-shadow"></div>' +
-      '<span class="mascot-drag-hint">⇄ Tahan & Geser</span>' +
     '</div>' +
     '<div class="mascot-badge" onclick="restoreMascot()">' +
       '<span>🦬 Anoa Gunung RCS.CES</span>' +
