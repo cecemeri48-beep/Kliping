@@ -353,6 +353,9 @@ body{background:#f6f3ed;background-image:radial-gradient(circle at 10% 8%,#fff 0
 .sh:active{transform:translateY(0)}
 .sh-wa{background:#25D366}
 .sh-fb{background:#1877F2}
+.sh-ig{background:linear-gradient(45deg,#F58529 0%,#DD2A7B 45%,#8134AF 72%,#515BD4 100%)}
+.sh-tw{background:#000}
+.sh-tk{background:linear-gradient(135deg,#25F4EE 0%,#111 45%,#111 60%,#FE2C55 100%)}
 .siaga-banner{background:linear-gradient(135deg,#c0392b,#d35400);color:#fff;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 4px 14px rgba(192,57,43,.35);position:relative;z-index:240}
 .siaga-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .siaga-ic{background:rgba(0,0,0,.25);padding:3px 8px;border-radius:6px;font-size:11px;letter-spacing:.5px;flex:none}
@@ -2194,7 +2197,7 @@ function viewClip(){
    '<div class="sec"><h4>1 \u00b7 Potongan</h4><div class="cut">'+esc(k.potongan)+'</div><div class="src" style="border-top:1px dashed var(--line)"><span>'+esc(k.media)+" \u00b7 "+tglID(k.tglBerita)+'</span><a href="'+esc(k.tautan)+'" target="_blank" rel="noopener">Baca sumber asli \u2197</a></div></div>'+
    '<div class="sec"><h4>2 \u00b7 Konteks</h4><p>'+esc(k.konteks)+"</p></div>"+
    '<div class="sec"><h4>3 \u00b7 Pelajaran</h4><ol>'+k.pelajaran.map(p=>"<li>"+esc(p)+"</li>").join("")+"</ol></div>"+
-   '<div class="sec"><h4>4 \u00b7 Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+(rj||"<li>—</li>")+"</ul></div>"+
+   '<div class="sec"><h4>4 \u00b7 Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+(rj||"<li>���</li>")+"</ul></div>"+
    '<div class="note o">'+esc(db.settings.penyangkalan)+"</div>"+
    (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+'</div>':"")+
    '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Digunting '+tglID(k.tglKliping)+" oleh "+esc(nm(k.kurator))+(k.peninjau?" \u00b7 ditinjau "+esc(nm(k.peninjau)):"")+" \u00b7 gambar: "+(isImg(k.gambar)?"foto":esc(k.gambar))+"</p>"+'<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'</div></div>'+foot();
@@ -2664,11 +2667,11 @@ function ph(judul,ket,aksi){
 
 function pDasbor(){
   const t=terbit(),q=db.kliping.filter(k=>k.status==="Ditinjau");
-  const lengkap=db.kliping.filter(k=>k.pelajaran.filter(x=>x&&x.trim()).length>=3&&k.materi.length>0).length;
-  const rasio=Math.round(lengkap/db.kliping.length*100);
+  const lengkap=db.kliping.filter(k=>(k.pelajaran||[]).filter(x=>x&&x.trim()).length>=3&&(k.materi||[]).length>0).length;
+  const rasio=db.kliping.length?Math.round(lengkap/db.kliping.length*100):0;
   const bulan=db.kliping.filter(k=>jilid(k.tglKliping)==="2026-07").length;
   const perRub=db.rubrik.map(r=>[r,db.kliping.filter(k=>k.rubrik===r).length]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]);
-  const maxR=Math.max.apply(null,perRub.map(x=>x[1]));
+  const maxR=perRub.length?Math.max.apply(null,perRub.map(x=>x[1])):0;
   return ph("Dasbor","Diukur dengan mutu kurasi, bukan dengan jumlah klik.",
       (can("kliping")?'<button class="btn btn-p" onclick="baru()">+ Kliping baru</button>':""))+
    '<div class="grid g4" style="margin-bottom:16px">'+
@@ -2680,7 +2683,7 @@ function pDasbor(){
    '<div class="card"><b style="font-size:14px">Kepatuhan pedoman</b><ul style="margin:10px 0 0;padding-left:18px;font-size:14px">'+
      '<li>Tautan sumber asli: <b>'+db.kliping.filter(k=>k.tautan).length+"/"+db.kliping.length+'</b></li>'+
      '<li>Tanpa foto media lain: <b>'+db.kliping.filter(k=>k.gambar!=="Media lain").length+"/"+db.kliping.length+'</b></li>'+
-     '<li>Rubrik sensitif punya peninjau: <b>'+db.kliping.filter(k=>db.sensitif.includes(k.rubrik)&&k.peninjau).length+"/"+db.kliping.filter(k=>db.sensitif.includes(k.rubrik)).length+"</b></li></ul></div></div>"+
+     '<li>Rubrik sensitif punya peninjau: <b>'+db.kliping.filter(k=>(db.sensitif||[]).includes(k.rubrik)&&k.peninjau).length+"/"+db.kliping.filter(k=>(db.sensitif||[]).includes(k.rubrik)).length+"</b></li></ul></div></div>"+
    '<div class="card" style="margin-top:16px"><b style="font-size:14px">Sebaran rubrik</b><div style="margin-top:12px">'+
    perRub.map(x=>'<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;font-size:14px"><span style="width:140px;flex:none;color:var(--ink2)">'+esc(x[0])+'</span><div class="bar" style="flex:1;margin:0"><i style="width:'+(x[1]/maxR*100)+'%"></i></div><b style="width:22px;text-align:right">'+x[1]+"</b></div>").join("")+"</div></div>";
 }
@@ -2690,7 +2693,7 @@ function pKliping(){
   let list=db.kliping.filter(k=>!isOpini(k)).sort((a,b)=>b.tglKliping.localeCompare(a.tglKliping));
   if(m.peran==="Kurator")list=list.filter(k=>k.kurator===m.id);
   const rows=list.map(k=>{
-    const ok=k.pelajaran.filter(x=>x&&x.trim()).length>=3&&k.materi.length>0&&k.tautan;
+    const ok=(k.pelajaran||[]).filter(x=>x&&x.trim()).length>=3&&(k.materi||[]).length>0&&k.tautan;
     return "<tr><td><b>"+esc(k.judul)+'</b><br /><span style="color:var(--ink2);font-size:13px">'+esc(k.media)+" \u00b7 "+tglID(k.tglBerita)+'</span></td><td><span class="tag">'+esc(k.rubrik)+'</span></td><td><span class="'+STAG[k.status]+'">'+k.status+"</span></td><td>"+esc(nm(k.kurator))+'</td><td>'+(ok?'<span class="tag tag-g">Lengkap</span>':'<span class="tag tag-r">Belum</span>')+'</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="sunting(\''+k.id+'\')">Sunting</button>'+((m.peran==="Super-Admin"||m.peran==="Admin")?' <button class="btn btn-sm btn-d" onclick="hapus(\''+k.id+'\')">Hapus</button>':"")+"</td></tr>"}).join("");
   return ph("Kliping",m.peran==="Kurator"?"Menampilkan kliping yang kamu kurasi.":"Seluruh entri, dari calon sampai terbit.",'<button class="btn btn-p" onclick="baru()">+ Kliping baru</button>')+
    '<div class="tbl tbl-scroll"><table><thead><tr><th>Judul</th><th>Rubrik</th><th>Status</th><th>Kurator</th><th>Anotasi</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">Belum ada entri.</td></tr>')+"</tbody></table></div>";
@@ -2761,12 +2764,12 @@ function tambahUser(){openModal("pengguna")}
 function pTaksonomi(){
   return ph("Rubrik & Sumber","Daftar tertutup agar penamaan tetap rapi selama bertahun-tahun.","")+
    '<div class="grid g2"><div class="card"><b style="font-size:14px">Rubrik</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Rubrik bertanda wajib tinjau tidak boleh terbit tanpa peninjau.</p>'+
-   db.rubrik.map((r,ri)=>'<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px"><span>'+esc(r)+'</span>'+(db.sensitif.includes(r)?' <span class="tag tag-r">wajib tinjau</span>':"")+'<button class="btn btn-sm" style="margin-left:auto" onclick="toggleSensitif(\''+r+'\')">'+(db.sensitif.includes(r)?"Jadikan biasa":"Jadikan sensitif")+'</button><button class="btn btn-sm btn-d" style="margin-left:6px" onclick="hapusRubrik('+ri+')">Hapus</button></div>').join("")+
+   db.rubrik.map((r,ri)=>'<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px"><span>'+esc(r)+'</span>'+((db.sensitif||[]).includes(r)?' <span class="tag tag-r">wajib tinjau</span>':"")+'<button class="btn btn-sm" style="margin-left:auto" onclick="toggleSensitif(\''+r+'\')">'+((db.sensitif||[]).includes(r)?"Jadikan biasa":"Jadikan sensitif")+'</button><button class="btn btn-sm btn-d" style="margin-left:6px" onclick="hapusRubrik('+ri+')">Hapus</button></div>').join("")+
    '<button class="btn btn-sm" style="margin-top:12px" onclick="tambahRubrik()">+ Rubrik</button></div>'+
    '<div class="card"><b style="font-size:14px">Sumber media</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Dipakai sebagai pilihan pada formulir kliping.</p><div style="display:flex;gap:6px;flex-wrap:wrap">'+
    db.media.map((x,xi)=>'<span class="tag" style="display:inline-flex;align-items:center;gap:6px">'+esc(x)+'<button onclick="hapusMedia('+xi+')" title="Hapus" style="border:0;background:none;cursor:pointer;color:#c0392b;font-weight:700;font-size:15px;line-height:1;padding:0">&times;</button></span>').join("")+'</div><button class="btn btn-sm" style="margin-top:14px" onclick="tambahMedia()">+ Sumber</button></div></div>';
 }
-function toggleSensitif(r){const i=db.sensitif.indexOf(r);if(i<0)db.sensitif.push(r);else db.sensitif.splice(i,1);const sens=db.sensitif.includes(r);log("Mengubah status rubrik",r);supa.from("rubrik").update({sensitif:sens}).eq("nama",r).then(({error})=>pErr(error,"rubrik"));render()}
+function toggleSensitif(r){const i=db.sensitif.indexOf(r);if(i<0)db.sensitif.push(r);else db.sensitif.splice(i,1);const sens=(db.sensitif||[]).includes(r);log("Mengubah status rubrik",r);supa.from("rubrik").update({sensitif:sens}).eq("nama",r).then(({error})=>pErr(error,"rubrik"));render()}
 function tambahRubrik(){openModal("rubrik")}
 function tambahMedia(){openModal("media")}
 function hapusRubrik(ri){var r=db.rubrik[ri];if(!r)return;if(db.rubrik.length<=1){toast("Minimal harus ada satu rubrik");return}var used=db.kliping.filter(k=>k.rubrik===r).length;if(!confirm("Hapus rubrik: "+r+(used?" ("+used+" kliping memakainya)":"")+"?"))return;db.rubrik=db.rubrik.filter(x=>x!==r);db.sensitif=db.sensitif.filter(x=>x!==r);log("Menghapus rubrik",r);supa.from("rubrik").delete().eq("nama",r).then(({error})=>pErr(error,"rubrik"));render();toast("Rubrik dihapus")}
@@ -2941,7 +2944,7 @@ function gbrField(d){
   return '<div>'+selHtml+'<div class="hint" style="margin-top:6px">atau unggah foto asli \u2014 JPEG atau PNG, otomatis dikecilkan ke maksimal 1600 piksel:</div>'+file+'</div>';
 }
 function formKliping(){
-  const d=S.draft,m=me(),sens=db.sensitif.includes(d.rubrik);
+  const d=S.draft,m=me(),sens=(db.sensitif||[]).includes(d.rubrik);
   const sel=(id,val,arr)=>'<select id="'+id+'">'+arr.map(o=>'<option '+(val===o?"selected":"")+">"+esc(o)+"</option>").join("")+"</select>";
   return ph(d.id?"Sunting kliping":"Kliping baru","Empat bagian wajib: potongan, konteks, pelajaran, rujukan.",'<button class="btn" onclick=\'go({draft:null,err:[]})\'>Tutup</button>')+
   (S.err.length?'<div class="note r" style="margin-bottom:16px"><b>Belum bisa diterbitkan:</b><ul style="margin:8px 0 0;padding-left:18px">'+S.err.map(e=>"<li>"+esc(e)+"</li>").join("")+"</ul></div>":"")+
@@ -2986,7 +2989,7 @@ function periksa(d,status){
   if(!d.konteks)e.push("Bagian Konteks belum diisi.");
   if(d.pelajaran.filter(x=>x).length<3)e.push("Bagian Pelajaran harus berisi tiga poin.");
   if(!d.materi.length)e.push("Wajib menaut minimal satu halaman materi.");
-  if(status==="Terbit"&&db.settings.wajibTinjauan&&db.sensitif.includes(d.rubrik)&&!d.peninjau)e.push("Rubrik sensitif wajib punya peninjau sebelum terbit.");
+  if(status==="Terbit"&&db.settings.wajibTinjauan&&(db.sensitif||[]).includes(d.rubrik)&&!d.peninjau)e.push("Rubrik sensitif wajib punya peninjau sebelum terbit.");
   return e;
 }
 function simpanDraft(status){
