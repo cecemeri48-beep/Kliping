@@ -2146,10 +2146,73 @@ function viewAdmin(){
 }
 function ph(t,s,act){return '<div class="ph"><div><h2>'+esc(t)+"</h2><p>"+esc(s)+'</p></div><div class="act">'+(act||"")+"</div></div>"}
 
-/* ================= Panel Email Redaksi (Hanya Admin / Super-Admin) ================= */
+/* ================= Panel Email Redaksi & Kotak Masuk (Hanya Admin / Super-Admin) ================= */
+function dapatkanPesanRedaksi(){
+  var bawaan = [
+    {
+      id: "m1",
+      pengirim: "Rahmat Hidayat",
+      email: "rahmat.pendaki@gmail.com",
+      subjek: "[Surat Pembaca] Tanggapan artikel Pematang Dua Pagi",
+      tgl: "2026-08-06 21:15",
+      isi: "Halo Meja Redaksi REICHAS CHELEBES,\n\nSaya sangat mengapresiasi tulisan 'Pematang, Pukul Dua Pagi'. Narasinya sangat menyentuh dan menggambarkan realitas anak muda di daerah. Semoga tulisan-tulisan inspiratif seperti ini terus direproduksi.\n\nSalam hangat,\nRahmat",
+      baca: false
+    },
+    {
+      id: "m2",
+      pengirim: "Dewi Anggraini",
+      email: "dewi.an@gmail.com",
+      subjek: "[Sanggahan Opini] Masukan perihal akurasi data jam perjalanan",
+      tgl: "2026-08-05 14:40",
+      isi: "Kepada Redaksi RCS.CBS,\n\nMenanggapi artikel riset tentang keputusan buruk pada jam keenam perjalanan, saya memiliki catatan statistik pendukung dari tim pos perizinan jalur selatan yang mungkin bisa dijadikan bahan rujukan tambahan.\n\nTerima kasih.",
+      baca: true
+    },
+    {
+      id: "m3",
+      pengirim: "Agus Subagyo",
+      email: "agus.subagyo@yahoo.com",
+      subjek: "[Usulan Kliping] Usulan liputan pemadaman listrik di Makassar",
+      tgl: "2026-08-04 10:05",
+      isi: "Yth. Kurator REICHAS,\n\nBerikut tautan berita lokal terkait dampak pemadaman listrik berkepanjangan terhadap UMKM digital di Makassar. Mohon dapat dibuatkan kliping dan bedah faktanya.\n\nLink: https://beritalokal.id/pemadaman-makassar-2026",
+      baca: true
+    }
+  ];
+
+  var lokal = [];
+  try {
+    lokal = JSON.parse(localStorage.getItem("rcs_inbox_emails")) || [];
+  } catch(e){}
+
+  var gabung = [].concat(lokal, bawaan);
+
+  if (db && db.kliping) {
+    db.kliping.filter(function(k){ return k.media === "Surat Pembaca" || (k.topik && k.topik.indexOf("Surat Pembaca")>=0); }).forEach(function(k){
+      if (!gabung.some(function(x){ return x.id === k.id; })) {
+        gabung.unshift({
+          id: k.id,
+          pengirim: k.lead ? k.lead.replace(/^Kiriman.*?dari pembaca:\s*/i, "") : "Pembaca Web",
+          email: "kliping.rcscbs@gmail.com",
+          subjek: k.judul,
+          tgl: k.tglKliping || new Date().toISOString().slice(0,10),
+          isi: k.konteks || k.potongan || "-",
+          baca: false
+        });
+      }
+    });
+  }
+
+  return gabung;
+}
+
+function simpanPesanRedaksi(list){
+  try {
+    localStorage.setItem("rcs_inbox_emails", JSON.stringify(list));
+  } catch(e){}
+}
+
 function pEmailRedaksi(){
   if(!can("emailredaksi")){
-    return '<div class="panel"><p class="empty">Akses terbatas. Hanya Admin &amp; Super-Admin yang dapat melihat kredensial email redaksi.</p></div>';
+    return '<div class="panel"><p class="empty">Akses terbatas. Hanya Admin &amp; Super-Admin yang dapat melihat kredensial &amp; surat email redaksi.</p></div>';
   }
 
   var defaultEmail = "kliping.rcscbs@gmail.com";
@@ -2167,30 +2230,112 @@ function pEmailRedaksi(){
   var passDisplay = cred.pass ? esc(cred.pass) : '<i style="color:var(--coral)">(Password dihapus / kosong)</i>';
   var passInputVal = cred.pass || "";
 
-  return ph("Email Redaksi Google", "Hanya Admin & Super-Admin yang dapat melihat & mengelola kredensial email redaksi Google ini.")+
-    '<div class="card" style="max-width:640px;margin-bottom:20px;padding:24px">'+
+  var daftarPesan = dapatkanPesanRedaksi();
+  var unreadCount = daftarPesan.filter(function(m){ return !m.baca; }).length;
+
+  var htmlPesan = daftarPesan.map(function(m){
+    return '<div class="card" style="margin-bottom:10px;padding:14px 16px;cursor:pointer;border-left:4px solid '+(m.baca?'var(--line)':'var(--blue)')+';background:'+(m.baca?'var(--paper)':'#f0f7ff')+'" onclick=\'bukaPesanEmail("'+m.id+'")\'>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'+
+        '<div style="display:flex;align-items:center;gap:8px"><b style="font-size:14.5px;color:var(--navy)">'+esc(m.pengirim)+'</b> <span style="font-size:12px;color:var(--ink2)">&lt;'+esc(m.email)+'&gt;</span></div>'+
+        '<span style="font-size:12px;color:var(--ink2)">'+esc(m.tgl)+'</span>'+
+      '</div>'+
+      '<div style="font-weight:600;font-size:14px;color:var(--navy);margin-bottom:4px">'+(m.baca?'':'<span class="tag tag-b" style="margin-right:6px">Baru</span>')+esc(m.subjek)+'</div>'+
+      '<p style="margin:0;font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc((m.isi||"").slice(0,120))+'...</p>'+
+    '</div>';
+  }).join("");
+
+  return ph("Email Redaksi Google & Kotak Masuk", "Kelola kredensial dan baca langsung surat & email yang masuk ke redaksi tanpa membuka Gmail.")+
+    '<div class="grid g2" style="margin-bottom:20px;align-items:start">'+
+    /* Kolom Kiri: Kredensial Email & Pengaturan */
+    '<div class="card" style="padding:24px">'+
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line)">'+
       '<div style="width:44px;height:44px;border-radius:12px;background:var(--blue-s);color:var(--blue);display:grid;place-items:center;font-size:22px">\u2709\ufe0f</div>'+
       '<div><b style="font-size:16px;color:var(--navy);display:block">Akun Gmail Redaksi REICHAS CHELEBES</b>'+
-      '<span style="font-size:13px;color:var(--ink2)">Digunakan untuk komunikasi resmi, sanggahan, &amp; surat pembaca.</span></div>'+
+      '<span style="font-size:13px;color:var(--ink2)">Kredensial resmi redaksi untuk komunikasi luar.</span></div>'+
     '</div>'+
 
     '<div style="background:var(--soft);padding:16px;border-radius:12px;border:1px solid var(--line);margin-bottom:20px">'+
       '<div style="margin-bottom:10px"><b>Email Redaksi:</b> <code style="font-size:14px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--blue)">'+esc(cred.email)+'</code></div>'+
       '<div><b>Password Email:</b> <code id="passCodeTxt" style="font-size:14px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--navy)">'+passDisplay+'</code> '+
-      '<button type="button" class="btn btn-sm" onclick="salinPassEmail()" style="margin-left:8px">\ud83d\udccb Salin Password</button></div>'+
+      '<button type="button" class="btn btn-sm" onclick="salinPassEmail()" style="margin-left:8px">\ud83d\udccb Salin</button></div>'+
     '</div>'+
 
-    '<h4 style="margin:20px 0 10px;font-size:15px;color:var(--navy)">\u2699\ufe0f Kelola / Ganti Kredensial Email Redaksi</h4>'+
+    '<h4 style="margin:20px 0 10px;font-size:15px;color:var(--navy)">\u2699\ufe0f Kelola / Ganti Kredensial</h4>'+
     '<form onsubmit="simpanEmailRedaksi(event)">'+
       '<div class="f" style="margin-bottom:12px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Alamat Email Redaksi</label><input type="email" id="editRedaksiEmail" value="'+esc(cred.email)+'" required class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
       '<div class="f" style="margin-bottom:16px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Kata Sandi / Password Baru</label><input type="text" id="editRedaksiPass" value="'+esc(passInputVal)+'" placeholder="Tulis password baru atau kosongkan untuk menghapus" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
       '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">'+
         '<button type="button" class="btn" onclick="hapusPassEmail()" style="background:var(--red-s);color:var(--red);border:1px solid rgba(229,100,88,0.3)">\ud83d\uddd1\ufe0f Hapus Password</button>'+
-        '<button type="submit" class="btn btn-p" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff">\ud83d\udcbe Simpan Perubahan</button>'+
+        '<button type="submit" class="btn btn-p" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff">\ud83d\udcbe Simpan</button>'+
       '</div>'+
     '</form>'+
+    '</div>'+
+
+    /* Kolom Kanan: Kotak Masuk Surat & Email Pembaca */
+    '<div class="card" style="padding:24px">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)">'+
+      '<div><b style="font-size:16px;color:var(--navy);display:flex;align-items:center;gap:6px">\ud83d\udce5 Kotak Masuk Email '+(unreadCount?'<span class="tag tag-b">'+unreadCount+' baru</span>':'')+'</b>'+
+      '<span style="font-size:13px;color:var(--ink2)">Pesan &amp; Surat Pembaca yang masuk ke '+esc(cred.email)+'</span></div>'+
+      '<button class="btn btn-sm" onclick="render()">\ud83d\udd04 Segarkan</button>'+
+    '</div>'+
+
+    (htmlPesan||'<p class="empty">Belum ada email atau surat pembaca yang masuk.</p>')+
+    '</div>'+
     '</div>';
+}
+
+function bukaPesanEmail(id){
+  var daftar = dapatkanPesanRedaksi();
+  var m = daftar.find(function(x){ return x.id === id; });
+  if(!m) return;
+
+  m.baca = true;
+  simpanPesanRedaksi(daftar);
+
+  var old = document.getElementById("modalMailBg");
+  if(old) old.remove();
+
+  var bg = document.createElement("div");
+  bg.id = "modalMailBg";
+  bg.className = "modal-bg";
+  bg.style.display = "grid";
+  bg.style.placeItems = "center";
+  bg.style.zIndex = "320";
+
+  bg.innerHTML =
+    '<div class="modal" style="max-width:620px;padding:24px;position:relative;animation:modalPop 0.25s cubic-bezier(0.16,1,0.3,1) both">'+
+    '<button type="button" onclick="tutupPesanEmail()" style="position:absolute;top:16px;right:16px;background:none;border:0;font-size:22px;cursor:pointer;color:var(--ink2);line-height:1">&times;</button>'+
+    '<h3 style="margin-bottom:6px;display:flex;align-items:center;gap:8px">\ud83d\udce9 Baca Surat Email Redaksi</h3>'+
+    '<div style="font-size:13px;color:var(--ink2);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);line-height:1.6">'+
+      '<div><b>Pengirim:</b> '+esc(m.pengirim)+' &lt;<a href="mailto:'+esc(m.email)+'" style="color:var(--blue)">'+esc(m.email)+'</a>&gt;</div>'+
+      '<div><b>Waktu Masuk:</b> '+esc(m.tgl)+'</div>'+
+      '<div><b>Subjek:</b> <span style="color:var(--navy);font-weight:600">'+esc(m.subjek)+'</span></div>'+
+    '</div>'+
+    '<div style="background:var(--soft);padding:16px;border-radius:10px;border:1px solid var(--line);font-size:14px;line-height:1.6;white-space:pre-wrap;margin-bottom:20px;max-height:280px;overflow-y:auto;color:var(--navy)">'+
+      esc(m.isi)+
+    '</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">'+
+      '<button type="button" class="btn" onclick="hapusPesanRedaksi(\''+m.id+'\')" style="background:var(--red-s);color:var(--red);border:1px solid rgba(229,100,88,0.3)">\ud83d\uddd1\ufe0f Hapus Pesan</button>'+
+      '<a href="mailto:'+esc(m.email)+'?subject=Re: '+encodeURIComponent(m.subjek)+'" class="btn btn-p" target="_blank" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff;text-decoration:none">\u2709\ufe0f Balas Pesan</a>'+
+    '</div>'+
+    '</div>';
+
+  document.body.appendChild(bg);
+  render();
+}
+
+function tutupPesanEmail(){
+  var bg = document.getElementById("modalMailBg");
+  if(bg) bg.remove();
+}
+
+function hapusPesanRedaksi(id){
+  if(!confirm("Hapus pesan email ini dari kotak masuk?")) return;
+  var daftar = dapatkanPesanRedaksi().filter(function(x){ return x.id !== id; });
+  simpanPesanRedaksi(daftar);
+  tutupPesanEmail();
+  toast("\ud83d\uddd1\ufe0f Pesan email berhasil dihapus.");
+  render();
 }
 
 function simpanEmailRedaksi(e){
