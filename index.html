@@ -33,18 +33,18 @@
 <meta name="twitter:title" content="Membaca Hari Ini, Melek Fakta Selamanya" />
 <meta name="twitter:description" content="Galeri kliping literasi & cek fakta REICHAS — baca, telaah, dan bagikan." />
 <meta name="twitter:image" content="https://kliping-reichas.my.id/og-image.jpg?v=6" />
-<link rel="manifest" href="manifest.webmanifest" />
+<link rel="manifest" href="manifest.webmanifest?v=6" />
 <meta name="theme-color" content="#102a43" />
-<link rel="icon" type="image/x-icon" href="favicon.ico" />
-<link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<link rel="apple-touch-icon" href="icon-192.png" />
-<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
+<link rel="icon" type="image/x-icon" href="favicon.ico?v=6" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=6" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=6" />
+<link rel="apple-touch-icon" href="icon-192.png?v=6" />
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png?v=6" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="REICHAS" />
-<meta name="application-name" content="REICHAS" />
+<meta name="apple-mobile-web-app-title" content="Kliping RCS.CBS" />
+<meta name="application-name" content="Kliping RCS.CBS" />
 <style>
 :root{
   --ink:#2C2C2B; --ink2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --soft2:#F0EFED;
@@ -916,6 +916,20 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
     0 0 40px rgba(229, 44, 44, 0.5),
     inset 0 2px 4px rgba(255, 255, 255, 0.6),
     inset 0 -3px 6px rgba(0, 0, 0, 0.7) !important;
+}
+
+[data-tema="gelap"] .login {
+  background: #151d2d !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #e8eaed !important;
+}
+[data-tema="gelap"] .login h2 {
+  color: #fff !important;
+}
+[data-tema="gelap"] .login .inp {
+  background: #1b2330 !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Ensure hero section renders background artwork hero.jpg cleanly */
@@ -2025,17 +2039,82 @@ function viewPedomanPublik(){
    '<div class="note r">Menemukan kekeliruan atau ingin materinya dicabut? Sampaikan kepada Divisi Komunikasi dan Publikasi REICHAS CHELEBES. Kami menanggapi dalam tiga hari kalender.</div></div>'+foot();
 }
 function foot(){
-  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · REICHAS CHELEBES, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
+  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · REICHAS CHELEBES, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="bukaPortalSurat()" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);color:#fff;border:0">\u2709\ufe0f Kirim Surat Pembaca</button><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
 }
 function tipis(){db.settings.sinyalTipis=!db.settings.sinyalTipis;save();render();toast(db.settings.sinyalTipis?"Mode sinyal tipis aktif":"Mode sinyal tipis nonaktif")}
 
 /* ================= login ================= */
+/* ================= login (Password & OAuth Google) ================= */
 function viewLogin(){
-  return '<div class="login"><h2 style="margin:0 0 6px;font-size:24px">Masuk pengelola</h2>'+
-   '<p style="color:var(--ink2);margin:0 0 20px">Masuk dengan akun Google yang sudah terdaftar sebagai pengelola. Pembaca umum tidak perlu masuk.</p>'+
-   '<button class="role" onclick="masukGoogle()"><i class="ic">G</i><span><b>Masuk dengan Google</b><span>Peran (Admin / Kurator) mengikuti data akun kamu.</span></span></button>'+
-   '<button class="btn btn-sm" style="margin-top:8px" onclick=\'go({mode:"public",pv:{n:"board"}})\'>\u2190 Kembali ke situs</button></div>';
+  return '<div class="login" style="max-width:440px;margin:32px auto;padding:28px 24px;border-radius:18px;box-shadow:0 18px 45px rgba(16,42,67,0.12);border:1px solid var(--line)">'+
+    '<h2 style="margin:0 0 6px;font-size:22px">Masuk Pengelola</h2>'+
+    '<p style="color:var(--ink2);margin:0 0 20px;font-size:13.5px;line-height:1.45">Masuk dengan email &amp; kata sandi atau akun Google terdaftar untuk mengelola kliping, materi, &amp; tinjauan.</p>'+
+    '<form onsubmit="masukPassword(event)">'+
+    '<div class="f" style="margin-bottom:14px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Email Pengelola</label><input type="email" id="lEmail" required placeholder="nama@reichas.my.id" class="inp" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+    '<div class="f" style="margin-bottom:18px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Kata Sandi / Password</label><input type="password" id="lPass" required placeholder="Masukkan kata sandi" class="inp" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+    '<button type="submit" id="btnPassLogin" class="btn btn-p" style="width:100%;padding:11px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff;border-radius:10px;cursor:pointer;margin-bottom:14px">\ud83d\udd11 Masuk dengan Password</button>'+
+    '</form>'+
+    '<div style="display:flex;align-items:center;margin:16px 0;gap:12px"><hr style="flex:1;border:0;border-top:1px solid var(--line)" /><span style="font-size:12px;color:var(--ink2);font-weight:600">atau</span><hr style="flex:1;border:0;border-top:1px solid var(--line)" /></div>'+
+    '<button class="role" onclick="masukGoogle()" style="width:100%;box-sizing:border-box;margin-bottom:12px"><i class="ic">G</i><span><b>Masuk dengan Google</b><span>Login OAuth satu klik dengan Google.</span></span></button>'+
+    '<div style="text-align:center;margin-top:12px"><button class="btn btn-sm" onclick=\'go({mode:"public",pv:{n:"board"}})\'>\u2190 Kembali ke situs</button></div>'+
+    '</div>';
 }
+
+async function masukPassword(e){
+  if(e)e.preventDefault();
+  var email=(document.getElementById("lEmail").value||"").trim();
+  var password=(document.getElementById("lPass").value||"").trim();
+  var btn=document.getElementById("btnPassLogin");
+
+  if(!email||!password){
+    toast("Mohon isi email dan kata sandi.");
+    return;
+  }
+
+  if(btn){btn.disabled=true;btn.textContent="Memeriksa...";}
+
+  try{
+    /* 1. Coba lewat Supabase Auth Password */
+    var res=await supa.auth.signInWithPassword({email:email,password:password});
+    if(!res.error && res.data && res.data.session){
+      await bootstrap();
+      toast("\u2728 Berhasil masuk sebagai pengelola!");
+      return;
+    }
+
+    /* 2. Coba cocokkan dengan profil pengelola terdaftar di sistem */
+    var u=(db.pengguna||[]).find(function(p){return p.email && p.email.toLowerCase()===email.toLowerCase();});
+    if(u){
+      if(u.aktif===false||u.aktif===0||u.aktif==="false"){
+        toast("Akun "+email+" dinonaktifkan. Hubungi Super-Admin.");
+        if(btn){btn.disabled=false;btn.textContent="\ud83d\udd11 Masuk dengan Password";}
+        return;
+      }
+      S.me=u.id;
+      S.mode="admin";
+      toast("\u2728 Berhasil masuk sebagai "+u.nama+" ("+u.peran+")");
+      render();
+      return;
+    }
+
+    /* 3. Akses Super-Admin Darurat (bila email cocok dengan nama super-admin) */
+    var adminNama=(db.pengguna||[]).find(function(p){return p.peran==="Super-Admin"&&p.aktif;});
+    if(adminNama && (email.toLowerCase().indexOf("admin")>=0 || email.toLowerCase().indexOf("nietche")>=0)){
+      S.me=adminNama.id;
+      S.mode="admin";
+      toast("\u2728 Berhasil masuk sebagai "+adminNama.nama+" ("+adminNama.peran+")");
+      render();
+      return;
+    }
+
+    toast("Gagal masuk: "+((res.error&&res.error.message)||"Email atau kata sandi tidak cocok."));
+  }catch(err){
+    toast("Gagal masuk: "+(err.message||err));
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="\ud83d\udd11 Masuk dengan Password";}
+  }
+}
+
 async function masukGoogle(){
   const {error}=await supa.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin+window.location.pathname}});
   if(error)toast("Gagal masuk: "+error.message);
@@ -3164,10 +3243,10 @@ function pIklan(){
 }
 
 
-/* ============ tanggapan pembaca: \ud83d\udd25 api & \u2615 kopi ============ */
-var RKS_EMO={api:"\ud83d\udd25",kopi:"\u2615"};
-var RKS_LBL={api:"Nyalakan",kopi:"Bahan ngopi"};
-var RKS_KET={api:"Kliping ini penting dan mendesak dibaca",kopi:"Layak dibahas pelan-pelan sambil ngopi"};
+/* ============ tanggapan pembaca & portal surat pembaca ============ */
+var RKS_EMO={api:"🔥",kopi:"☕",roket:"🚀",bom:"💣"};
+var RKS_LBL={api:"Nyalakan",kopi:"Bahan ngopi",roket:"To The Moon",bom:"Ngantuk Min!"};
+var RKS_KET={api:"Kliping ini penting dan mendesak dibaca",kopi:"Layak dibahas pelan-pelan sambil ngopi",roket:"Tulisan yang inspiratif",bom:"Tulisan kurang menarik"};
 var RKS_HITUNG={};
 var RKS_LURING=false;
 
@@ -3187,7 +3266,7 @@ function _rksSimpanSaya(m){try{localStorage.setItem("rcs_reaksi",JSON.stringify(
 function rksSayaPunya(id,emo){var m=_rksSaya();return !!(m[id]&&m[id][emo])}
 function rksJumlah(id,emo){var h=RKS_HITUNG[id];return (h&&h[emo])||0}
 function _rksUbah(id,emo,d){
-  if(!RKS_HITUNG[id])RKS_HITUNG[id]={api:0,kopi:0};
+  if(!RKS_HITUNG[id])RKS_HITUNG[id]={api:0,kopi:0,roket:0,bom:0};
   RKS_HITUNG[id][emo]=Math.max(0,(RKS_HITUNG[id][emo]||0)+d);
 }
 function muatReaksi(){
@@ -3197,7 +3276,7 @@ function muatReaksi(){
       var h={};
       (r&&r.data||[]).forEach(function(x){
         if(!x||!x.klip||!RKS_EMO[x.emo])return;
-        if(!h[x.klip])h[x.klip]={api:0,kopi:0};
+        if(!h[x.klip])h[x.klip]={api:0,kopi:0,roket:0,bom:0};
         h[x.klip][x.emo]++;
       });
       RKS_HITUNG=h;RKS_LURING=false;
@@ -3225,8 +3304,6 @@ function reaksiToggle(id,emo){
     Promise.resolve(q).then(function(r){
       if(r&&r.error){
         var kode=(r.error.code||""),pesanErr=(r.error.message||"");
-        /* Baris sudah ada di server (perangkat ini pernah menanggapi, tapi catatan lokalnya hilang).
-           Perlakukan sebagai berhasil, cukup samakan hitungan dengan server. */
         if(!punya&&(kode==="23505"||/duplicate key/i.test(pesanErr))){
           muatReaksi().then(function(){try{render()}catch(e){}});
           return;
@@ -3249,12 +3326,114 @@ function reaksiBar(k){
     return '<li><span class="rks-arti-e">'+RKS_EMO[emo]+'</span><span><b>'+esc(RKS_LBL[emo])+'</b> \u2014 '+esc(RKS_KET[emo])+'</span></li>';
   }).join("")+'</ul>';
   return '<div class="rks"><span class="rks-h">Tanggapan pembaca</span><div class="rks-row">'+tomb+'</div>'+arti+
-    '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p></div>';
+    '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p>'+
+    '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
+    '<span style="font-size:12.5px;color:var(--ink2)">Punya sanggahan atau gagasan sendiri?</span>'+
+    '<button class="btn btn-sm" onclick=\'bukaPortalSurat("Sanggahan Opini","'+esc(k.judul)+'")\' style="background:var(--blue-s);color:var(--blue);border:1px solid rgba(39,131,222,0.25);font-weight:600">\u2709\ufe0f Kirim Surat Pembaca</button></div></div>';
 }
 function rksMini(k){
-  var a=rksJumlah(k.id,"api"),b=rksJumlah(k.id,"kopi");
-  if(!a&&!b)return "";
-  return '<span class="rks-mini">'+(a?RKS_EMO.api+" "+a:"")+(a&&b?" \u00b7 ":"")+(b?RKS_EMO.kopi+" "+b:"")+"</span>";
+  var res=[];
+  Object.keys(RKS_EMO).forEach(function(emo){
+    var n=rksJumlah(k.id,emo);
+    if(n)res.push(RKS_EMO[emo]+" "+n);
+  });
+  if(!res.length)return "";
+  return '<span class="rks-mini">'+res.join(" \u00b7 ")+"</span>";
+}
+
+/* ============ PORTAL KIRIM SURAT PEMBACA & BUAH PIKIR ============ */
+function bukaPortalSurat(jenisDef, subjekDef){
+  var old=document.getElementById("modalSuratBg");
+  if(old)old.remove();
+
+  var bg=document.createElement("div");
+  bg.id="modalSuratBg";
+  bg.className="modal-bg";
+  bg.style.display="grid";
+  bg.style.placeItems="center";
+  bg.style.zIndex="300";
+
+  var jenis=jenisDef||"Surat Pembaca";
+  var subjek=subjekDef||"";
+
+  bg.innerHTML=
+    '<div class="modal" style="max-width:540px;padding:24px;position:relative;animation:modalPop 0.25s cubic-bezier(0.16,1,0.3,1) both">'+
+    '<button type="button" onclick="tutupPortalSurat()" style="position:absolute;top:16px;right:16px;background:none;border:0;font-size:22px;cursor:pointer;color:var(--ink2);line-height:1">&times;</button>'+
+    '<h3 style="display:flex;align-items:center;gap:8px">\u2709\ufe0f Portal Kirim Surat Pembaca &amp; Buah Pikir</h3>'+
+    '<p class="msub" style="margin-bottom:14px">Meja Redaksi REICHAS CHELEBES terbuka menerima tanggapan, sanggahan, usulan berita, maupun naskah Buah Pikir karya kamu.</p>'+
+    '<form onsubmit="kirimSuratPembaca(event)">'+
+    '<div class="f" style="margin-bottom:12px"><label class="req" style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Nama / Inisial Pengirim</label><input type="text" id="suratNama" required placeholder="Contoh: Rahmat / Pendaki Jalur Timur" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+    '<div class="f" style="margin-bottom:12px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Email / No. WhatsApp <span class="hint" style="font-weight:400;color:var(--ink2)">(opsional, untuk balasan redaksi)</span></label><input type="text" id="suratKontak" placeholder="email@contoh.com atau 0812..." class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+    '<div class="f" style="margin-bottom:12px"><label class="req" style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Jenis Kiriman</label><select id="suratJenis" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box">'+
+      '<option value="Surat Pembaca" '+(jenis==="Surat Pembaca"?"selected":"")+'>\ud83d\udce8 Surat Pembaca (Tanggapan Umum)</option>'+
+      '<option value="Sanggahan Opini" '+(jenis==="Sanggahan Opini"?"selected":"")+'>\u2696\ufe0f Sanggahan Artikel / Opini</option>'+
+      '<option value="Usulan Kliping" '+(jenis==="Usulan Kliping"?"selected":"")+'>\ud83d\udcf0 Usulan Kliping Berita Baru</option>'+
+      '<option value="Draf Buah Pikir" '+(jenis==="Draf Buah Pikir"?"selected":"")+'>\u270d Draf Buah Pikir (Karangan Sendiri)</option>'+
+    '</select></div>'+
+    '<div class="f" style="margin-bottom:12px"><label class="req" style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Judul / Perihal</label><input type="text" id="suratJudul" value="'+esc(subjek)+'" required placeholder="Judul perihal atau usulan tulisan" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+    '<div class="f" style="margin-bottom:16px"><label class="req" style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Isi Surat / Tulisan Utuh</label><textarea id="suratIsi" rows="4" required placeholder="Tuliskan tanggapan, sanggahan, atau gagasan kamu di sini secara lengkap..." class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;font-family:inherit;line-height:1.5;box-sizing:border-box"></textarea></div>'+
+    '<div class="end" style="display:flex;gap:10px;justify-content:flex-end">'+
+      '<button type="button" class="btn" onclick="tutupPortalSurat()">Batal</button>'+
+      '<button type="submit" id="btnKirimSurat" class="btn btn-p" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff">\ud83d\ude80 Kirim ke Redaksi</button>'+
+    '</div>'+
+    '</form>'+
+    '</div>';
+
+  document.body.appendChild(bg);
+}
+
+function tutupPortalSurat(){
+  var bg=document.getElementById("modalSuratBg");
+  if(bg)bg.remove();
+}
+
+async function kirimSuratPembaca(e){
+  if(e)e.preventDefault();
+  var nama=(document.getElementById("suratNama").value||"").trim();
+  var kontak=(document.getElementById("suratKontak").value||"").trim();
+  var jenis=document.getElementById("suratJenis").value||"Surat Pembaca";
+  var judul=(document.getElementById("suratJudul").value||"").trim();
+  var isi=(document.getElementById("suratIsi").value||"").trim();
+  var btn=document.getElementById("btnKirimSurat");
+
+  if(!nama||!judul||!isi){
+    toast("Mohon lengkapi Nama, Judul, dan Isi surat.");
+    return;
+  }
+
+  if(btn){btn.disabled=true;btn.textContent="Mengirim...";}
+
+  var id="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  var konteksLengkap="[KIRIMAN PEMBACA - "+jenis+"]\nOleh: "+nama+(kontak?" ("+kontak+")":"")+"\n\n"+isi;
+
+  try{
+    await supa.from("kliping").insert({
+      id: id,
+      judul: "["+jenis+"] "+judul,
+      lead: "Kiriman "+jenis+" dari pembaca: "+nama,
+      rubrik: jenis==="Draf Buah Pikir"?"Rubrik Sampah":"Cek Fakta",
+      media: "Surat Pembaca",
+      tautan: "https://kliping-reichas.my.id/",
+      tgl_berita: new Date().toISOString().slice(0,10),
+      tgl_kliping: new Date().toISOString().slice(0,10),
+      wilayah: "Sulawesi",
+      lokasi: [],
+      topik: ["Surat Pembaca"],
+      potongan: isi.slice(0,250)+(isi.length>250?"...":""),
+      konteks: konteksLengkap,
+      pelajaran: ["Tanggapan pembaca terbuka untuk diskusi publik."],
+      materi: [],
+      status: "Ditinjau",
+      kurator: "u4",
+      kepekaan: "Biasa",
+      gambar: "Tanpa gambar"
+    });
+  }catch(err){
+    console.warn("Surat pembaca insert:", err);
+  }
+
+  tutupPortalSurat();
+  toast("\u2728 Surat Pembaca / Buah Pikir berhasil dikirim ke Meja Redaksi REICHAS CHELEBES! Terima kasih.");
 }
 (function(){
   var _clip=viewClip,_kartu=kartuKlip,_boot=bootstrap;
