@@ -1855,6 +1855,25 @@ function litBanner(){
   '</section>';
 }
 
+/* ================= masukPanel — navigasi ke panel admin ================= */
+function masukPanel(){
+  try { tutupAkun(); } catch(e){}
+  var m = me();
+  if(!m){
+    /* Belum login, arahkan ke halaman login */
+    S.mode = "login";
+    render();
+    return;
+  }
+  var keys = PERM[m.peran] || [];
+  S.mode = "admin";
+  S.av = (S.av && keys.includes(S.av)) ? S.av : (keys[0] || "dasbor");
+  S.draft = null;
+  S.err = [];
+  window.scrollTo(0,0);
+  render();
+}
+
 /* ================= header ================= */
 function header(){
   const m=me(); const pub=[["board","Papan Kliping"],["materi","Materi"],["arsip","Arsip"],["pedoman","Pedoman"]];
@@ -1873,8 +1892,8 @@ function header(){
     var _unCount = (m.peran==="Admin" || m.peran==="Super-Admin") ? unreadEmailCount() : 0;
     var _defAv = (PERM[m.peran] && PERM[m.peran][0]) || "dasbor";
     var _targetAv = (S.av && PERM[m.peran] && PERM[m.peran].includes(S.av)) ? S.av : _defAv;
-    var _act=S.mode==="public"?'<button class="btn btn-sm btn-p" onclick="go({mode:\'admin\',av:\''+_targetAv+'\',draft:null,err:[]})">Panel</button>':'<button class="btn btn-sm" onclick="go({mode:\'public\',pv:{n:\'board\'}})">Lihat situs</button>';
-    var _pact=S.mode==="public"?'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'admin\',av:\''+_targetAv+'\',draft:null,err:[]})"><span class="ai-ic">\ud83d\udee0\ufe0f</span>'+esc(_panelLbl)+'</button>':'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'public\',pv:{n:\'board\'}})"><span class="ai-ic">\ud83c\udf10</span>Lihat situs</button>';
+    var _act=S.mode==="public"?'<button class="btn btn-sm btn-p" onclick="masukPanel()">Panel</button>':'<button class="btn btn-sm" onclick="go({mode:\'public\',pv:{n:\'board\'}})">Lihat situs</button>';
+    var _pact=S.mode==="public"?'<button class="ai" role="menuitem" onclick="masukPanel()"><span class="ai-ic">\ud83d\udee0\ufe0f</span>'+esc(_panelLbl)+'</button>':'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'public\',pv:{n:\'board\'}})"><span class="ai-ic">\ud83c\udf10</span>Lihat situs</button>';
     var _emailItem = (_unCount > 0) ? '<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'admin\',av:\'emailredaksi\',draft:null,err:[]})"><span class="ai-ic">\ud83d\udce9</span>Email Redaksi <span class="tag tag-r" style="margin-left:auto;background:#ff6b5d;color:#fff;font-weight:700;padding:1px 6px;font-size:10px">'+_unCount+' baru</span></button>' : '';
     var _tmi='<button class="ai ai-tema" role="menuitem" onclick="tutupAkun();toggleTema()"><span class="ai-ic">'+(_tema()==="gelap"?"\u2600\ufe0f":"\ud83c\udf19")+'</span>'+(_tema()==="gelap"?"Mode terang":"Mode gelap")+'</button>';
     right='<div class="who akunwrap" id="akunWrap">'
