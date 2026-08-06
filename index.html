@@ -1649,12 +1649,12 @@ function toggleSideMenu(e){try{e.stopPropagation()}catch(_){}var w=document.getE
 document.addEventListener("click",function(e){var w=document.getElementById("sideMenu");if(w&&w.classList.contains("open")&&!(e.target&&w.contains(e.target)))w.classList.remove("open")});
 
 const PERM={
- "Super-Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","taksonomi","pedoman","iklan","audit","pengaturan"],
- "Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","pedoman","iklan"],
+ "Super-Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","taksonomi","pedoman","emailredaksi","iklan","audit","pengaturan"],
+ "Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","pedoman","emailredaksi","iklan"],
  "Kurator":["dasbor","kliping","buahpikir"]
 };
-const ICON={dasbor:"\u25F1",kliping:"\u2702",buahpikir:"\u270D",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",audit:"\u2261",iklan:"\u25B1",pengaturan:"\u2699"};
-const LBL={dasbor:"Dasbor",kliping:"Kliping",buahpikir:"Buah Pikir",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs"};
+const ICON={dasbor:"\u25F1",kliping:"\u2702",buahpikir:"\u270D",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",emailredaksi:"\u2709",audit:"\u2261",iklan:"\u25B1",pengaturan:"\u2699"};
+const LBL={dasbor:"Dasbor",kliping:"Kliping",buahpikir:"Buah Pikir",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",emailredaksi:"Email Redaksi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs"};
 const STAG={"Calon":"tag","Ditulis":"tag tag-o","Ditinjau":"tag tag-b","Terbit":"tag tag-g","Diarsipkan":"tag"};
 
 function me(){return db.pengguna.find(u=>u.id===S.me)||null}
@@ -2137,6 +2137,7 @@ function viewAdmin(){
   else if(S.av==="pengguna")body=pPengguna();
   else if(S.av==="taksonomi")body=pTaksonomi();
   else if(S.av==="pedoman")body=pPedoman();
+  else if(S.av==="emailredaksi")body=pEmailRedaksi();
   else if(S.av==="audit")body=pAudit();
   else if(S.av==="iklan")body=pIklan();
   else if(S.av==="pengaturan")body=pPengaturan();
@@ -2144,6 +2145,92 @@ function viewAdmin(){
   return '<div class="shell">'+smenu+side+'<div class="panel">'+body+"</div></div>";
 }
 function ph(t,s,act){return '<div class="ph"><div><h2>'+esc(t)+"</h2><p>"+esc(s)+'</p></div><div class="act">'+(act||"")+"</div></div>"}
+
+/* ================= Panel Email Redaksi (Hanya Admin / Super-Admin) ================= */
+function pEmailRedaksi(){
+  if(!can("emailredaksi")){
+    return '<div class="panel"><p class="empty">Akses terbatas. Hanya Admin &amp; Super-Admin yang dapat melihat kredensial email redaksi.</p></div>';
+  }
+
+  var defaultEmail = "kliping.rcscbs@gmail.com";
+  var defaultPass  = "klipingrcscbs2026";
+  
+  var cred = { email: defaultEmail, pass: defaultPass };
+  try {
+    var stored = JSON.parse(localStorage.getItem("rcs_email_redaksi"));
+    if (stored) {
+      cred.email = stored.email !== undefined ? stored.email : defaultEmail;
+      cred.pass  = stored.pass  !== undefined ? stored.pass  : defaultPass;
+    }
+  } catch(e) {}
+
+  var passDisplay = cred.pass ? esc(cred.pass) : '<i style="color:var(--coral)">(Password dihapus / kosong)</i>';
+  var passInputVal = cred.pass || "";
+
+  return ph("Email Redaksi Google", "Hanya Admin & Super-Admin yang dapat melihat & mengelola kredensial email redaksi Google ini.")+
+    '<div class="card" style="max-width:640px;margin-bottom:20px;padding:24px">'+
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line)">'+
+      '<div style="width:44px;height:44px;border-radius:12px;background:var(--blue-s);color:var(--blue);display:grid;place-items:center;font-size:22px">\u2709\ufe0f</div>'+
+      '<div><b style="font-size:16px;color:var(--navy);display:block">Akun Gmail Redaksi REICHAS CHELEBES</b>'+
+      '<span style="font-size:13px;color:var(--ink2)">Digunakan untuk komunikasi resmi, sanggahan, &amp; surat pembaca.</span></div>'+
+    '</div>'+
+
+    '<div style="background:var(--soft);padding:16px;border-radius:12px;border:1px solid var(--line);margin-bottom:20px">'+
+      '<div style="margin-bottom:10px"><b>Email Redaksi:</b> <code style="font-size:14px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--blue)">'+esc(cred.email)+'</code></div>'+
+      '<div><b>Password Email:</b> <code id="passCodeTxt" style="font-size:14px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--navy)">'+passDisplay+'</code> '+
+      '<button type="button" class="btn btn-sm" onclick="salinPassEmail()" style="margin-left:8px">\ud83d\udccb Salin Password</button></div>'+
+    '</div>'+
+
+    '<h4 style="margin:20px 0 10px;font-size:15px;color:var(--navy)">\u2699\ufe0f Kelola / Ganti Kredensial Email Redaksi</h4>'+
+    '<form onsubmit="simpanEmailRedaksi(event)">'+
+      '<div class="f" style="margin-bottom:12px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Alamat Email Redaksi</label><input type="email" id="editRedaksiEmail" value="'+esc(cred.email)+'" required class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+      '<div class="f" style="margin-bottom:16px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Kata Sandi / Password Baru</label><input type="text" id="editRedaksiPass" value="'+esc(passInputVal)+'" placeholder="Tulis password baru atau kosongkan untuk menghapus" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">'+
+        '<button type="button" class="btn" onclick="hapusPassEmail()" style="background:var(--red-s);color:var(--red);border:1px solid rgba(229,100,88,0.3)">\ud83d\uddd1\ufe0f Hapus Password</button>'+
+        '<button type="submit" class="btn btn-p" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff">\ud83d\udcbe Simpan Perubahan</button>'+
+      '</div>'+
+    '</form>'+
+    '</div>';
+}
+
+function simpanEmailRedaksi(e){
+  if(e)e.preventDefault();
+  if(!can("emailredaksi")){toast("Akses ditolak");return;}
+  var email=(document.getElementById("editRedaksiEmail").value||"").trim();
+  var pass=(document.getElementById("editRedaksiPass").value||"").trim();
+  if(!email){toast("Alamat email tidak boleh kosong");return;}
+  
+  try{
+    localStorage.setItem("rcs_email_redaksi", JSON.stringify({email: email, pass: pass}));
+    log("Memperbarui kredensial email redaksi", email);
+  }catch(err){}
+  
+  toast("\u2728 Kredensial email redaksi berhasil disimpan!");
+  render();
+}
+
+function hapusPassEmail(){
+  if(!can("emailredaksi")){toast("Akses ditolak");return;}
+  if(!confirm("Yakin ingin menghapus password email redaksi dari tampilan panel ini?"))return;
+  var email=(document.getElementById("editRedaksiEmail").value||"kliping.rcscbs@gmail.com").trim();
+  try{
+    localStorage.setItem("rcs_email_redaksi", JSON.stringify({email: email, pass: ""}));
+    log("Menghapus password email redaksi", email);
+  }catch(err){}
+  
+  toast("\ud83d\uddd1\ufe0f Password email redaksi telah dihapus.");
+  render();
+}
+
+function salinPassEmail(){
+  try{
+    var stored = JSON.parse(localStorage.getItem("rcs_email_redaksi"));
+    var pass = (stored && stored.pass !== undefined) ? stored.pass : "klipingrcscbs2026";
+    if(!pass){toast("Password kosong / telah dihapus.");return;}
+    if(navigator.clipboard)navigator.clipboard.writeText(pass);
+    toast("\ud83d\udccb Password email disalin ke clipboard!");
+  }catch(e){toast("Gagal menyalin");}
+}
 
 function pDasbor(){
   const t=terbit(),q=db.kliping.filter(k=>k.status==="Ditinjau");
