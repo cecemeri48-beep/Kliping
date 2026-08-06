@@ -1158,6 +1158,264 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
   box-shadow: 0 0 0 2px #161b24, 0 0 0 5px rgba(125, 192, 245, 0.75), 0 12px 26px rgba(125, 192, 245, 0.4) !important;
 }
 
+/* ================= MASCOT INTERAKTIF ================= */
+.mascot-wrap {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 55;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mascot-wrap.masuk {
+  animation: mascotEntry 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.mascot-wrap.sembunyikan {
+  opacity: 0;
+  transform: translateY(40px) scale(0.8);
+  pointer-events: none !important;
+}
+.mascot-inner {
+  position: relative;
+  pointer-events: auto;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none;
+  filter: drop-shadow(0 8px 20px rgba(16, 42, 67, 0.28));
+  transition: filter 0.3s ease;
+}
+.mascot-inner:active, .mascot-inner.dragging {
+  cursor: grabbing !important;
+}
+.mascot-inner:hover {
+  filter: drop-shadow(0 12px 30px rgba(115, 87, 255, 0.45)) drop-shadow(0 0 18px rgba(115, 87, 255, 0.2));
+}
+.mascot-img {
+  display: block;
+  width: 160px;
+  height: auto;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  animation: mascotIdle 4s ease-in-out infinite;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Cutout fix: smooth edges */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  backface-visibility: hidden;
+}
+.mascot-inner:hover .mascot-img {
+  animation: mascotWave 0.6s ease-in-out;
+}
+.mascot-inner.lompat .mascot-img {
+  animation: mascotJump 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Speech bubble */
+.mascot-speech {
+  position: absolute;
+  left: -10px;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: var(--navy, #102a43);
+  font-family: var(--display, 'Outfit', sans-serif);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  padding: 10px 14px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(16, 42, 67, 0.18), 0 0 0 1px rgba(16, 42, 67, 0.06);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(8px) scale(0.9);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+  pointer-events: none;
+  max-width: 220px;
+  white-space: normal;
+}
+.mascot-speech.tampil {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+.mascot-speech:after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 30px;
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  transform: rotate(45deg);
+  box-shadow: 2px 2px 4px rgba(16, 42, 67, 0.08);
+  border-radius: 0 0 3px 0;
+}
+[data-tema="gelap"] .mascot-speech {
+  background: #1b2330;
+  color: #e8eaed;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+[data-tema="gelap"] .mascot-speech:after {
+  background: #1b2330;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Minimize button */
+.mascot-toggle {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: linear-gradient(135deg, var(--violet, #7357ff), #4267e7);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(115, 87, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.2s ease;
+}
+.mascot-inner:hover .mascot-toggle,
+.mascot-wrap:hover .mascot-toggle {
+  opacity: 1;
+}
+.mascot-toggle:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 14px rgba(115, 87, 255, 0.5);
+}
+[data-tema="gelap"] .mascot-toggle {
+  border-color: #161b24;
+}
+
+/* Mini mascot (collapsed) */
+.mascot-mini {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 55;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 20px rgba(16, 42, 67, 0.22), 0 0 0 2px rgba(115, 87, 255, 0.3);
+  cursor: pointer;
+  display: none;
+  animation: mascotMiniPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.mascot-mini:hover {
+  transform: scale(1.12) rotate(5deg);
+  box-shadow: 0 10px 26px rgba(115, 87, 255, 0.4), 0 0 0 3px rgba(115, 87, 255, 0.5);
+}
+.mascot-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+[data-tema="gelap"] .mascot-mini {
+  border-color: #161b24;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(125, 192, 245, 0.3);
+}
+
+/* Sparkle particles */
+.mascot-sparkle {
+  position: absolute;
+  inset: -20px;
+  pointer-events: none;
+  overflow: visible;
+}
+.mascot-sparkle i {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: 0;
+}
+.mascot-sparkle.aktif i {
+  animation: sparkle 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.mascot-sparkle i:nth-child(1) { left: 10%; top: 20%; background: var(--coral, #ff6b5d); animation-delay: 0s; }
+.mascot-sparkle i:nth-child(2) { left: 80%; top: 10%; background: var(--sun, #ffc857); animation-delay: 0.05s; }
+.mascot-sparkle i:nth-child(3) { left: 90%; top: 50%; background: var(--lime, #b7ea5e); animation-delay: 0.1s; }
+.mascot-sparkle i:nth-child(4) { left: 5%; top: 60%; background: var(--aqua, #31c5c2); animation-delay: 0.15s; }
+.mascot-sparkle i:nth-child(5) { left: 50%; top: 5%; background: var(--violet, #7357ff); animation-delay: 0.08s; }
+.mascot-sparkle i:nth-child(6) { left: 70%; top: 70%; background: var(--coral, #ff6b5d); animation-delay: 0.12s; }
+.mascot-sparkle i:nth-child(7) { left: 20%; top: 80%; background: var(--sun, #ffc857); animation-delay: 0.18s; }
+.mascot-sparkle i:nth-child(8) { left: 40%; top: 30%; background: var(--lime, #b7ea5e); animation-delay: 0.06s; }
+
+/* Keyframes */
+@keyframes mascotEntry {
+  0%   { opacity: 0; transform: translateY(80px) scale(0.7); }
+  60%  { opacity: 1; transform: translateY(-12px) scale(1.04); }
+  80%  { transform: translateY(4px) scale(0.98); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes mascotIdle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25%  { transform: translateY(-3px) rotate(0.5deg); }
+  50%  { transform: translateY(-1px) rotate(0deg); }
+  75%  { transform: translateY(-4px) rotate(-0.5deg); }
+}
+@keyframes mascotWave {
+  0%   { transform: rotate(0deg) scale(1); }
+  15%  { transform: rotate(-8deg) scale(1.05); }
+  30%  { transform: rotate(6deg) scale(1.03); }
+  45%  { transform: rotate(-5deg) scale(1.04); }
+  60%  { transform: rotate(3deg) scale(1.02); }
+  75%  { transform: rotate(-2deg) scale(1.01); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+@keyframes mascotJump {
+  0%   { transform: translateY(0) scale(1, 1); }
+  20%  { transform: translateY(4px) scale(1.05, 0.92); }
+  50%  { transform: translateY(-28px) scale(0.95, 1.08); }
+  70%  { transform: translateY(-10px) scale(1, 1); }
+  85%  { transform: translateY(2px) scale(1.02, 0.97); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes mascotMiniPop {
+  0%   { opacity: 0; transform: scale(0.3); }
+  60%  { transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes sparkle {
+  0%   { opacity: 1; transform: scale(0) translate(0, 0); }
+  50%  { opacity: 1; transform: scale(1.5) translate(var(--sx, 10px), var(--sy, -15px)); }
+  100% { opacity: 0; transform: scale(0.5) translate(var(--ex, 20px), var(--ey, -30px)); }
+}
+
+/* Responsive mascot */
+@media (max-width: 640px) {
+  .mascot-wrap { right: 10px; bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .mascot-img { width: 110px; }
+  .mascot-speech { font-size: 11px; padding: 8px 11px; max-width: 170px; left: -20px; }
+  .mascot-mini { right: 10px; bottom: calc(76px + env(safe-area-inset-bottom)); width: 44px; height: 44px; }
+}
+@media (min-width: 641px) and (max-width: 900px) {
+  .mascot-img { width: 130px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot-wrap, .mascot-img, .mascot-inner, .mascot-speech, .mascot-mini {
+    animation: none !important;
+    transition: none !important;
+  }
+  .mascot-img { transform: none !important; }
+}
+/* Hide mascot when admin panel is open */
+body.admin-mode .mascot-wrap,
+body.admin-mode .mascot-mini { display: none !important; }
+
 </style>
 </head>
 <body>
@@ -1174,6 +1432,28 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
 
 <div id="app"></div>
 <div id="toast"></div>
+
+<!-- ========== MASCOT INTERAKTIF ========== -->
+<div class="mascot-wrap" id="mascotWrap" style="display:none">
+  <div class="mascot-inner" id="mascotInner">
+    <button class="mascot-toggle" id="mascotToggle" title="Sembunyikan mascot" aria-label="Sembunyikan mascot">✕</button>
+    <div class="mascot-speech" id="mascotSpeech"></div>
+    <div class="mascot-sparkle" id="mascotSparkle">
+      <i style="--sx:-12px;--sy:-18px;--ex:-22px;--ey:-35px"></i>
+      <i style="--sx:14px;--sy:-20px;--ex:28px;--ey:-38px"></i>
+      <i style="--sx:18px;--sy:5px;--ex:32px;--ey:10px"></i>
+      <i style="--sx:-15px;--sy:8px;--ex:-28px;--ey:18px"></i>
+      <i style="--sx:5px;--sy:-25px;--ex:10px;--ey:-42px"></i>
+      <i style="--sx:12px;--sy:12px;--ex:24px;--ey:22px"></i>
+      <i style="--sx:-8px;--sy:15px;--ex:-18px;--ey:28px"></i>
+      <i style="--sx:0px;--sy:-10px;--ex:2px;--ey:-20px"></i>
+    </div>
+    <img class="mascot-img" id="mascotImg" src="mascot.png" alt="Mascot RCS — Si Kambing Pemberani" draggable="false" />
+  </div>
+</div>
+<div class="mascot-mini" id="mascotMini" title="Tampilkan mascot">
+  <img src="mascot.png" alt="Mascot RCS" draggable="false" />
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ================= Supabase ================= */
@@ -4545,6 +4825,238 @@ function viewOpini(k){
 
 
 bootstrap();
+
+/* ================= MASCOT INTERAKTIF ================= */
+(function() {
+  var MASCOT_DELAY = 2000;
+  var SPEECH_INTERVAL_MIN = 8000;
+  var SPEECH_INTERVAL_MAX = 14000;
+  var SPEECH_DURATION = 4500;
+  var SPEECH_MSGS = [
+    "Sudah baca kliping hari ini? 📰",
+    "Jangan lupa cek fakta dulu! ✅",
+    "Baca dulu, baru bicara. 📖",
+    "Gunting, tempel, pelajari! ✂️",
+    "Alam tidak butuh pendaki bodoh. 🏔️",
+    "Fakta bukan opini. Bedakan! 🔍",
+    "Satu kliping, seribu pelajaran. 💡",
+    "Siap naik gunung? Baca dulu! 🐐",
+    "Literasi adalah senjata terbaik. 🗡️",
+    "Membaca hari ini, melek fakta selamanya. 🌟",
+    "Kamu ada karena aku ada, aku ada karena kamu ada. 🤝",
+    "Kapan kita ke Bivak lagi? ⛺"
+  ];
+
+  var wrap = document.getElementById('mascotWrap');
+  var inner = document.getElementById('mascotInner');
+  var img = document.getElementById('mascotImg');
+  var speech = document.getElementById('mascotSpeech');
+  var sparkle = document.getElementById('mascotSparkle');
+  var toggle = document.getElementById('mascotToggle');
+  var mini = document.getElementById('mascotMini');
+  var speechTimer = null;
+  var hideTimer = null;
+  var lastScrollY = 0;
+  var isMini = false;
+
+  /* Check image exists before showing */
+  var testImg = new Image();
+  testImg.onload = function() {
+    setTimeout(mascotMasuk, MASCOT_DELAY);
+  };
+  testImg.onerror = function() {
+    console.log('Mascot image not found (mascot.png). Mascot disabled.');
+  };
+  testImg.src = 'mascot.png';
+
+  function mascotMasuk() {
+    if (isMini) return;
+    wrap.style.display = '';
+    void wrap.offsetWidth;
+    wrap.classList.add('masuk');
+    wrap.classList.remove('sembunyikan');
+    mulaiSpeech();
+  }
+
+  function mulaiSpeech() {
+    clearInterval(speechTimer);
+    tampilSpeech();
+    speechTimer = setInterval(function() {
+      tampilSpeech();
+    }, SPEECH_INTERVAL_MIN + Math.random() * (SPEECH_INTERVAL_MAX - SPEECH_INTERVAL_MIN));
+  }
+
+  function tampilSpeech() {
+    if (isMini || wrap.style.display === 'none') return;
+    var msg = SPEECH_MSGS[Math.floor(Math.random() * SPEECH_MSGS.length)];
+    speech.textContent = msg;
+    speech.classList.add('tampil');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function() {
+      speech.classList.remove('tampil');
+    }, SPEECH_DURATION);
+  }
+
+  /* --- DRAG & DROP MASCOT --- */
+  var isDragging = false;
+  var startX = 0, startY = 0;
+  var initialLeft = 0, initialTop = 0;
+  var hasMoved = false;
+
+  /* Restitusi posisi yang tersimpan */
+  try {
+    var savedPos = JSON.parse(localStorage.getItem('mascot-pos'));
+    if (savedPos && typeof savedPos.left === 'number' && typeof savedPos.top === 'number') {
+      wrap.style.left = Math.max(10, Math.min(window.innerWidth - 170, savedPos.left)) + 'px';
+      wrap.style.top = Math.max(10, Math.min(window.innerHeight - 200, savedPos.top)) + 'px';
+      wrap.style.right = 'auto';
+      wrap.style.bottom = 'auto';
+    }
+  } catch(e) {}
+
+  function onPointerDown(e) {
+    if (e.target === toggle) return;
+    isDragging = true;
+    hasMoved = false;
+    startX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+    startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+
+    var rect = wrap.getBoundingClientRect();
+    initialLeft = rect.left;
+    initialTop = rect.top;
+
+    inner.classList.add('dragging');
+    window.addEventListener('pointermove', onPointerMove, { passive: false });
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('touchmove', onPointerMove, { passive: false });
+    window.addEventListener('touchend', onPointerUp);
+  }
+
+  function onPointerMove(e) {
+    if (!isDragging) return;
+    var clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+    var clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+    var dx = clientX - startX;
+    var dy = clientY - startY;
+
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      hasMoved = true;
+    }
+
+    if (hasMoved) {
+      if (e.cancelable) e.preventDefault();
+      var rect = wrap.getBoundingClientRect();
+      var newLeft = Math.max(10, Math.min(window.innerWidth - rect.width - 10, initialLeft + dx));
+      var newTop = Math.max(10, Math.min(window.innerHeight - rect.height - 10, initialTop + dy));
+
+      wrap.style.left = newLeft + 'px';
+      wrap.style.top = newTop + 'px';
+      wrap.style.right = 'auto';
+      wrap.style.bottom = 'auto';
+    }
+  }
+
+  function onPointerUp() {
+    if (!isDragging) return;
+    isDragging = false;
+    inner.classList.remove('dragging');
+
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+    window.removeEventListener('touchmove', onPointerMove);
+    window.removeEventListener('touchend', onPointerUp);
+
+    if (hasMoved) {
+      var rect = wrap.getBoundingClientRect();
+      try {
+        localStorage.setItem('mascot-pos', JSON.stringify({ left: Math.round(rect.left), top: Math.round(rect.top) }));
+      } catch(err) {}
+    } else {
+      /* Klik (tanpa geser) → lompat + sparkle + ucapan */
+      inner.classList.remove('lompat');
+      void inner.offsetWidth;
+      inner.classList.add('lompat');
+      sparkle.classList.remove('aktif');
+      void sparkle.offsetWidth;
+      sparkle.classList.add('aktif');
+      tampilSpeech();
+      setTimeout(function() {
+        inner.classList.remove('lompat');
+        sparkle.classList.remove('aktif');
+      }, 700);
+    }
+  }
+
+  if (inner) {
+    inner.addEventListener('pointerdown', onPointerDown);
+    inner.addEventListener('touchstart', onPointerDown, { passive: true });
+  }
+
+  /* Scroll parallax */
+  var ticking = false;
+  window.addEventListener('scroll', function() {
+    if (ticking || isMini) return;
+    ticking = true;
+    requestAnimationFrame(function() {
+      var sy = window.pageYOffset || document.documentElement.scrollTop;
+      var delta = sy - lastScrollY;
+      var maxShift = 60;
+      var shift = Math.min(Math.max(delta * 0.3, -maxShift), maxShift);
+      if (wrap && !wrap.classList.contains('sembunyikan')) {
+        wrap.style.transform = 'translateY(' + shift + 'px)';
+        clearTimeout(wrap._resetTimer);
+        wrap._resetTimer = setTimeout(function() {
+          wrap.style.transform = '';
+        }, 300);
+      }
+      lastScrollY = sy;
+      ticking = false;
+    });
+  }, { passive: true });
+
+  /* Minimize */
+  if (toggle) toggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    clearInterval(speechTimer);
+    speech.classList.remove('tampil');
+    wrap.classList.add('sembunyikan');
+    isMini = true;
+    setTimeout(function() {
+      wrap.style.display = 'none';
+      mini.style.display = 'block';
+    }, 400);
+    try { localStorage.setItem('mascot-mini', '1'); } catch(e) {}
+  });
+
+  /* Expand from mini */
+  if (mini) mini.addEventListener('click', function() {
+    mini.style.display = 'none';
+    isMini = false;
+    wrap.style.display = '';
+    wrap.classList.remove('sembunyikan', 'masuk');
+    void wrap.offsetWidth;
+    wrap.classList.add('masuk');
+    mulaiSpeech();
+    try { localStorage.removeItem('mascot-mini'); } catch(e) {}
+  });
+
+  /* Remember mini state */
+  try {
+    if (localStorage.getItem('mascot-mini') === '1') {
+      isMini = true;
+      wrap.style.display = 'none';
+      var t2 = new Image();
+      t2.onload = function() { mini.style.display = 'block'; };
+      t2.src = 'mascot.png';
+    }
+  } catch(e) {}
+
+  /* Hide during admin mode */
+  var _origRender = typeof render === 'function' ? render : null;
+  if (_origRender) {
+    var _patchedRender = render;
+  }
+})();
 </script>
 </body>
 </html>
