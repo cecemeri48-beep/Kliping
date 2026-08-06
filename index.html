@@ -1848,7 +1848,7 @@ function viewBoard(){
 }
 
 /* ================= PODCAST CONTINUOUS PLAYER ================= */
-let PODCAST = { active: false, queue: [], idx: 0, playing: false, paused: false };
+let PODCAST = { active: false, queue: [], idx: 0, playing: false, paused: false, rate: 1.0 };
 
 function mulaiPodcast(idx) {
   if (!("speechSynthesis" in window)) {
@@ -1873,7 +1873,7 @@ function putarPodcastTrack() {
   if (!k) { tutupPodcast(); toast("Podcast selesai diputar!"); return; }
   
   const synth = window.speechSynthesis;
-  synth.cancel();
+  try { synth.cancel(); } catch(e){}
   
   const chunks = ttsText(k).match(/[^.!?]+[.!?]*/g) || [ttsText(k)];
   const voice = ttsBest();
@@ -1882,6 +1882,7 @@ function putarPodcastTrack() {
   PODCAST.playing = true;
   PODCAST.paused = false;
   tampilPodcastBar();
+  ttsSet("⏸ Jeda");
   
   (function nextChunk() {
     if (!PODCAST.active || !PODCAST.playing || PODCAST.paused) return;
@@ -1900,7 +1901,7 @@ function putarPodcastTrack() {
     const u = new SpeechSynthesisUtterance((chunks[i] || "").trim());
     u.lang = voice ? voice.lang : "id-ID";
     if (voice) u.voice = voice;
-    u.rate = 0.96;
+    u.rate = (PODCAST.rate || 1.0) * 0.96;
     u.pitch = 1.0;
     u.onend = function() { i++; nextChunk(); };
     u.onerror = function() { i++; nextChunk(); };
@@ -1915,12 +1916,27 @@ function podcastTogglePlay() {
     synth.resume();
     PODCAST.paused = false;
     PODCAST.playing = true;
+    ttsSet("⏸ Jeda");
   } else {
     synth.pause();
     PODCAST.paused = true;
     PODCAST.playing = false;
+    ttsSet("▶ Lanjut");
   }
   tampilPodcastBar();
+}
+
+function podcastToggleSpeed() {
+  var rates = [1.0, 1.25, 1.5, 0.8];
+  var cur = PODCAST.rate || 1.0;
+  var idx = (rates.indexOf(cur) + 1) % rates.length;
+  PODCAST.rate = rates[idx];
+  toast("⚡ Kecepatan narasi: " + PODCAST.rate + "x");
+  if(PODCAST.active && PODCAST.playing && !PODCAST.paused){
+    putarPodcastTrack();
+  } else {
+    tampilPodcastBar();
+  }
 }
 
 function podcastNext() {
@@ -1940,6 +1956,7 @@ function tutupPodcast() {
   PODCAST.playing = false;
   PODCAST.paused = false;
   try { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); } catch(e) {}
+  ttsSet("🔊 Dengarkan");
   const bar = document.getElementById("podcastBar");
   if (bar && bar.parentNode) bar.parentNode.removeChild(bar);
 }
@@ -1971,6 +1988,7 @@ function tampilPodcastBar() {
     '<button type="button" class="pc-btn" onclick="podcastPrev()" title="Sebelumnya">⏮️</button>' +
     '<button type="button" class="pc-btn pc-main" onclick="podcastTogglePlay()" title="Putar/Jeda">' + statusIcon + '</button>' +
     '<button type="button" class="pc-btn" onclick="podcastNext()" title="Berikutnya">⏭️</button>' +
+    '<button type="button" class="pc-btn pc-speed" onclick="podcastToggleSpeed()" title="Ganti Kecepatan Narasi" style="font-size:11px;font-weight:700;width:auto;padding:0 8px;border-radius:12px;min-width:38px">' + (PODCAST.rate || 1.0) + 'x</button>' +
     '<button type="button" class="pc-btn pc-close" onclick="tutupPodcast()" title="Tutup">✕</button>' +
   '</div>';
 }
@@ -2009,8 +2027,34 @@ function ttsBest(){
   if(!v)v=vs.filter(ttsEN).sort(urut)[0];
   return v||null;
 }
-function dengarkan(id){id=id||(S.pv&&S.pv.id);if(!id)return;if(!("speechSynthesis" in window)){toast("Peramban tidak mendukung pembacaan suara");return}var synth=window.speechSynthesis;if(TTS.on&&TTS.id===id){if(synth.paused){synth.resume();TTS.paused=false;ttsSet("⏸ Jeda")}else{synth.pause();TTS.paused=true;ttsSet("▶ Lanjut")}return}synth.cancel();var k=db.kliping.find(function(x){return x.id===id});if(!k)return;var chunks=ttsText(k).match(/[^.!?]+[.!?]*/g)||[ttsText(k)];var voice=ttsBest();TTS={id:id,on:true,paused:false};ttsSet("⏸ Jeda");var i=0;(function next(){if(!TTS.on||TTS.id!==id)return;if(i>=chunks.length){TTS.on=false;ttsSet("🔊 Dengarkan");return}var u=new SpeechSynthesisUtterance((chunks[i]||"").trim());u.lang=voice?voice.lang:"id-ID";if(voice)u.voice=voice;u.rate=0.95;u.pitch=1.0;u.onend=function(){i++;next()};u.onerror=function(){i++;next()};synth.speak(u)})()}
-function hentikanTTS(){try{if("speechSynthesis" in window)window.speechSynthesis.cancel()}catch(e){}TTS={id:null,on:false,paused:false};ttsSet("🔊 Dengarkan")}
+function dengarkan(id){
+  id=id||(S.pv&&S.pv.id);
+  if(!id)return;
+  if(!("speechSynthesis" in window)){toast("Peramban tidak mendukung pembacaan suara");return}
+  if(PODCAST.active&&PODCAST.queue[PODCAST.idx]&&PODCAST.queue[PODCAST.idx].id===id){
+    podcastTogglePlay();
+    return;
+  }
+  var list=terbit().sort(function(a,b){return b.tglKliping.localeCompare(a.tglKliping)});
+  var idx=list.findIndex(function(x){return x.id===id});
+  if(idx>=0){
+    PODCAST.queue=list;
+    PODCAST.idx=idx;
+    PODCAST.active=true;
+    putarPodcastTrack();
+    toast("🎧 Memutar suara kliping");
+  }else{
+    var k=db.kliping.find(function(x){return x.id===id});
+    if(k){
+      PODCAST.queue=[k];
+      PODCAST.idx=0;
+      PODCAST.active=true;
+      putarPodcastTrack();
+      toast("🎧 Memutar: "+k.judul);
+    }
+  }
+}
+function hentikanTTS(){tutupPodcast()}
 function ttsSegarkanPilihan(){var s=document.getElementById("ttsVoice");if(!s)return false;var h=ttsVoiceOptions();if(h.indexOf("memuat suara")>=0)return false;if(s.innerHTML!==h)s.innerHTML=h;return true}
 try{if("speechSynthesis" in window){
   window.speechSynthesis.getVoices();
