@@ -353,9 +353,26 @@ body{background:#f6f3ed;background-image:radial-gradient(circle at 10% 8%,#fff 0
 .sh:active{transform:translateY(0)}
 .sh-wa{background:#25D366}
 .sh-fb{background:#1877F2}
-.sh-ig{background:linear-gradient(45deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888)}
-.sh-tw{background:#000000;color:#fff;border:1px solid rgba(255,255,255,0.18)}
-.sh-tk{background:linear-gradient(135deg,#010101 40%,#25F4EE 75%,#FE2C55 100%);color:#fff}
+.siaga-banner{background:linear-gradient(135deg,#c0392b,#d35400);color:#fff;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:0 4px 14px rgba(192,57,43,.35);position:relative;z-index:240}
+.siaga-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.siaga-ic{background:rgba(0,0,0,.25);padding:3px 8px;border-radius:6px;font-size:11px;letter-spacing:.5px;flex:none}
+.siaga-tx{flex:1;min-width:0;word-break:break-word}
+.siaga-close{background:none;border:0;color:#fff;font-size:18px;cursor:pointer;padding:0 4px;line-height:1;margin-left:auto}
+
+.peta-box{background:var(--soft2,#1c222c);border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin:16px 0 20px;box-shadow:0 6px 20px rgba(16,42,67,.06)}
+.peta-head b{font-size:15px;color:var(--navy);display:block}
+.peta-sub{font-size:12.5px;color:var(--ink2);display:block;margin-top:2px}
+.peta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:14px}
+.peta-pin{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;transition:transform .15s,border-color .15s,box-shadow .15s;box-shadow:0 3px 8px rgba(0,0,0,.04)}
+.peta-pin:hover{transform:translateY(-2px);border-color:var(--violet,#7357ff);box-shadow:0 6px 16px rgba(115,87,255,.15)}
+.peta-pin.on{background:linear-gradient(135deg,rgba(115,87,255,.15),rgba(39,131,222,.15));border-color:var(--violet,#7357ff);font-weight:700}
+.peta-ic{font-size:20px;flex:none}
+.peta-info{flex:1;min-width:0}
+.peta-info b{display:block;font-size:13.5px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.peta-info small{display:block;font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.peta-tag{font-size:10px;background:var(--soft,#f1f3f7);color:var(--ink2);padding:2px 6px;border-radius:6px;flex:none}
+[data-tema="gelap"] .peta-pin{background:#161b24;border-color:#2b313b}
+[data-tema="gelap"] .peta-tag{background:#1b212b;color:#a3a8b0}
 .lit-quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0 16px;position:relative;z-index:2}
 .lit-qitem{background:rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.28);border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.45;color:#fff;display:flex;align-items:flex-start;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
 .lit-qitem-ic{font-size:18px;line-height:1;flex:none;background:rgba(255,255,255,.22);padding:6px;border-radius:8px}
@@ -1803,17 +1820,19 @@ function header(){
   if(m){
     var _ini=esc(m.nama.slice(0,2).toUpperCase());
     var _panelLbl=(m.peran==="Kurator"?"Panel Kurator":(m.peran==="Admin"?"Panel Admin":"Panel admin"));
+    var _unCount = (m.peran==="Admin" || m.peran==="Super-Admin") ? unreadEmailCount() : 0;
     var _act=S.mode==="public"?'<button class="btn btn-sm btn-p" onclick="go({mode:\'admin\'})">Panel</button>':'<button class="btn btn-sm" onclick="go({mode:\'public\',pv:{n:\'board\'}})">Lihat situs</button>';
     var _pact=S.mode==="public"?'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'admin\'})"><span class="ai-ic">\ud83d\udee0\ufe0f</span>'+esc(_panelLbl)+'</button>':'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'public\',pv:{n:\'board\'}})"><span class="ai-ic">\ud83c\udf10</span>Lihat situs</button>';
+    var _emailItem = (_unCount > 0) ? '<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'admin\',av:\'emailredaksi\'})"><span class="ai-ic">\ud83d\udce9</span>Email Redaksi <span class="tag tag-r" style="margin-left:auto;background:#ff6b5d;color:#fff;font-weight:700;padding:1px 6px;font-size:10px">'+_unCount+' baru</span></button>' : '';
     var _tmi='<button class="ai ai-tema" role="menuitem" onclick="tutupAkun();toggleTema()"><span class="ai-ic">'+(_tema()==="gelap"?"\u2600\ufe0f":"\ud83c\udf19")+'</span>'+(_tema()==="gelap"?"Mode terang":"Mode gelap")+'</button>';
     right='<div class="who akunwrap" id="akunWrap">'
-      +'<button class="avat avat-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Menu akun" onclick="toggleAkun(event)">'+_ini+'</button>'
+      +'<button class="avat avat-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Menu akun" onclick="toggleAkun(event)" style="position:relative">'+_ini+(_unCount > 0 ? '<span style="position:absolute;top:-2px;right:-2px;width:10px;height:10px;background:#ff6b5d;border-radius:50%;border:2px solid #fff"></span>' : '')+'</button>'
       +'<span class="avat-caret" aria-hidden="true">\u25be</span>'
       +(_hintAkunOn?'<div class="akun-hint" id="akunHint" onclick="toggleAkun(event)">Ketuk untuk menu &amp; mode gelap</div>':'')
       +'<div class="akun-meta"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+'</small><div class="lcn-wrap">'+lencanaHTML(rksTotalKurator(m.id).total)+'</div></div>'
       +_act
       +'<button class="btn btn-sm" onclick="keluar()">Keluar</button>'
-      +'<div class="akun-pop" role="menu"><div class="akun-head"><div class="avat">'+_ini+'</div><div class="akun-id"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+(m.divisi?" \u00b7 "+esc(m.divisi):"")+'</small></div></div>'+_tmi+_pact+'<button class="ai ai-out" role="menuitem" onclick="tutupAkun();keluar()"><span class="ai-ic">\ud83d\udeaa</span>Keluar</button></div>'
+      +'<div class="akun-pop" role="menu"><div class="akun-head"><div class="avat">'+_ini+'</div><div class="akun-id"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+(m.divisi?" \u00b7 "+esc(m.divisi):"")+'</small></div></div>'+_tmi+_pact+_emailItem+'<button class="ai ai-out" role="menuitem" onclick="tutupAkun();keluar()"><span class="ai-ic">\ud83d\udeaa</span>Keluar</button></div>'
       +'</div>';
   }
   return '<header class="top"><div class="top-in'+(m?" auth":"")+'"><div class="brand"><img src="'+LOGO+'" alt="Logo REICHAS CHELEBES"'+(m?'':' onclick=\'go({mode:"login"})\' style="cursor:pointer"')+' /><div><h1>KLIPING RCS.CBS</h1><p>'+esc(db.settings.tagline)+'</p></div></div><nav class="nav">'+nav+"</nav>"+temaBtn()+right+"</div></header>";
@@ -1844,7 +1863,7 @@ function viewBoard(){
   const list=terbit().filter(k=>(S.filter==="Semua"||k.rubrik===S.filter)&&_match(k)).sort((a,b)=>b.tglKliping.localeCompare(a.tglKliping));
   const chips=["Semua"].concat(db.rubrik.filter(r=>terbit().some(k=>k.rubrik===r))).map(r=>'<button class="chip '+(S.filter===r?"on":"")+'" onclick=\'go({filter:"'+r+'"})\'>'+r+"</button>").join("");
   const cards=list.map(k=>'<article class="clip">'+(isImg(k.gambar)?'<img src="'+esc(k.gambar)+'" alt="" style="width:100%;height:150px;object-fit:cover;border-radius:10px;margin-bottom:12px" />':"")+'<span class="tag tag-b">'+esc(k.rubrik)+'</span>'+vonisTag(k)+'<h3>'+esc(k.judul)+'</h3><p class="lead">'+esc(k.lead)+'</p><div class="src"><span>'+esc(k.media)+'</span><span>'+tglID(k.tglBerita)+'</span></div><button class="btn btn-sm open" onclick=\'go({pv:{n:"clip",id:"'+k.id+'"}})\'>Buka kliping ↗</button></article>').join("");
-  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS — menggunting berita, menanam pengetahuan"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p><button type="button" class="btn btn-sm btn-p" onclick="mulaiPodcast(0)" style="margin-top:14px;display:inline-flex;align-items:center;gap:8px"><span>📻</span> <b>Putar Podcast Literasi (Auto-Play)</b></button></div></div></section>'+litBanner()+'<div class="wrap"><div class="cari-row"><input id="cari" class="cari-inp" type="search" placeholder="🔎 Cari judul, media, wilayah, atau isi…" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" /></div><div class="filters" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0 22px;margin:0">'+chips+'</div><div class="board">'+(cards||'<p class="empty">Tidak ada kliping yang cocok dengan pencarian/filter ini.</p>')+"</div></div>"+foot();
+  return siagaBanner()+'<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS — menggunting berita, menanam pengetahuan"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p><button type="button" class="btn btn-sm btn-p" onclick="mulaiPodcast(0)" style="margin-top:14px;display:inline-flex;align-items:center;gap:8px"><span>📻</span> <b>Putar Podcast Literasi (Auto-Play)</b></button></div></div></section>'+litBanner()+'<div class="wrap">'+petaGunungHTML()+'<div class="cari-row"><input id="cari" class="cari-inp" type="search" placeholder="🔎 Cari judul, media, wilayah, atau isi…" value="'+esc(S.q||"")+'" oninput="cari(this.value)" autocomplete="off" /></div><div class="filters" style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0 22px;margin:0">'+chips+'</div><div class="board">'+(cards||'<p class="empty">Tidak ada kliping yang cocok dengan pencarian/filter ini.</p>')+"</div></div>"+foot();
 }
 
 /* ================= PODCAST CONTINUOUS PLAYER ================= */
@@ -2065,13 +2084,21 @@ try{if("speechSynthesis" in window){
     if(ttsSegarkanPilihan()||_ttsCoba>24)clearInterval(_ttsJam);
   },400);
 }}catch(e){}
+function cetakKlipingIni(id){
+  id = id || (S.pv && S.pv.id);
+  var k = db.kliping.find(function(x){ return x.id === id; });
+  if(!k) return;
+  var ok = cetakBuka(cetakDokumen(k.judul, "Kliping 1 Potongan · " + k.rubrik, [k]), "Kliping RCS.CBS — " + k.judul);
+  toast(ok ? "Menyiapkan PDF zine — pilih Simpan sebagai PDF" : "Peramban menolak membuka jendela cetak");
+}
+
 function viewClip(){
   const k=db.kliping.find(x=>x.id===S.pv.id);
   if(!k)return '<div class="art"><p class="empty">Kliping tidak ditemukan.</p></div>';
   const rj=k.materi.map(id=>{const m=mat(id);return m?'<li><a href="#" onclick=\'go({pv:{n:"materiDetail",id:"'+m.id+'"}});return false\'>'+esc(m.judul)+"</a> \u00b7 "+esc(m.rumpun)+"</li>":""}).join("");
   return '<div class="art"><button class="btn btn-sm" onclick=\'go({pv:{n:"board"}})\'>\u2190 Papan kliping</button>'+
    '<div style="margin-top:16px"><span class="tag tag-b">'+esc(k.rubrik)+'</span> <span class="tag">'+esc(k.wilayah)+"</span> "+vonisTag(k)+"</div>"+
-   "<h2>"+esc(k.judul)+'</h2><p class="lead">'+esc(k.lead)+"</p>"+'<div class="tts"><button id="ttsBtn" class="btn btn-sm btn-p" onclick="dengarkan()">🔊 Dengarkan</button> <button class="btn btn-sm" onclick="hentikanTTS()">⏹ Stop</button> <select id="ttsVoice" class="tts-sel" onchange="ttsPick(this.value)" title="Pilih suara">'+ttsVoiceOptions()+'</select><span class="tts-hint">Pilih suara ternatural di perangkatmu</span></div>'+
+   "<h2>"+esc(k.judul)+'</h2><p class="lead">'+esc(k.lead)+"</p>"+'<div class="tts"><button id="ttsBtn" class="btn btn-sm btn-p" onclick="dengarkan()">🔊 Dengarkan</button> <button class="btn btn-sm" onclick="hentikanTTS()">⏹ Stop</button> <select id="ttsVoice" class="tts-sel" onchange="ttsPick(this.value)" title="Pilih suara">'+ttsVoiceOptions()+'</select><button class="btn btn-sm" onclick="cetakKlipingIni()" style="margin-left:auto">🖨️ Cetak / PDF Zine</button></div>'+
    '<div class="sec"><h4>1 \u00b7 Potongan</h4><div class="cut">'+esc(k.potongan)+'</div><div class="src" style="border-top:1px dashed var(--line)"><span>'+esc(k.media)+" \u00b7 "+tglID(k.tglBerita)+'</span><a href="'+esc(k.tautan)+'" target="_blank" rel="noopener">Baca sumber asli \u2197</a></div></div>'+
    '<div class="sec"><h4>2 \u00b7 Konteks</h4><p>'+esc(k.konteks)+"</p></div>"+
    '<div class="sec"><h4>3 \u00b7 Pelajaran</h4><ol>'+k.pelajaran.map(p=>"<li>"+esc(p)+"</li>").join("")+"</ol></div>"+
@@ -2110,7 +2137,7 @@ function viewPedomanPublik(){
    '<div class="note r">Menemukan kekeliruan atau ingin materinya dicabut? Sampaikan kepada Divisi Komunikasi dan Publikasi REICHAS CHELEBES. Kami menanggapi dalam tiga hari kalender.</div></div>'+foot();
 }
 function foot(){
-  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · REICHAS CHELEBES, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="bukaPortalSurat()" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);color:#fff;border:0">\u2709\ufe0f Kirim Surat Pembaca</button><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
+  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · REICHAS CHELEBES, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="bukaPortalSurat()" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);color:#fff;border:0">\u2709\ufe0f Kirim Surat Pembaca</button><button class="btn btn-sm" onclick="bukaPanduanDarurat()">🎒 Panduan Darurat Lapangan</button><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
 }
 function tipis(){db.settings.sinyalTipis=!db.settings.sinyalTipis;save();render();toast(db.settings.sinyalTipis?"Mode sinyal tipis aktif":"Mode sinyal tipis nonaktif")}
 
@@ -2192,12 +2219,24 @@ async function masukGoogle(){
 }
 
 /* ================= admin shell ================= */
+function unreadEmailCount(){
+  try {
+    var list = dapatkanPesanRedaksi();
+    return list.filter(function(m){ return !m.baca; }).length;
+  } catch(e){ return 0; }
+}
+
+function emailRedaksiBadgeHtml(){
+  var c = unreadEmailCount();
+  return c > 0 ? ' <span class="tag tag-r" style="margin-left:auto;background:#ff6b5d;color:#fff;font-weight:700;padding:2px 7px;border-radius:10px;font-size:11px">'+c+'</span>' : '';
+}
+
 function viewAdmin(){
   const m=me();if(!m)return viewLogin();
   const keys=PERM[m.peran];
-  const tabBtn=(k,cls)=>'<button class="'+cls+(S.av===k?" on":"")+'" onclick=\'tutupSideMenu();go({av:"'+k+'",draft:null,err:[]})\'><i class="ic">'+ICON[k]+"</i>"+LBL[k]+(k==="tinjauan"&&db.kliping.filter(x=>x.status==="Ditinjau").length?' <span class="tag tag-b" style="margin-left:auto">'+db.kliping.filter(x=>x.split===undefined&&x.status==="Ditinjau").length+"</span>":"")+"</button>";
+  const tabBtn=(k,cls)=>'<button class="'+cls+(S.av===k?" on":"")+'" onclick=\'tutupSideMenu();go({av:"'+k+'",draft:null,err:[]})\'><i class="ic">'+ICON[k]+"</i>"+LBL[k]+(k==="tinjauan"&&db.kliping.filter(x=>x.status==="Ditinjau").length?' <span class="tag tag-b" style="margin-left:auto">'+db.kliping.filter(x=>x.split===undefined&&x.status==="Ditinjau").length+"</span>":"")+(k==="emailredaksi"?emailRedaksiBadgeHtml():"")+"</button>";
   const side='<aside class="side"><div class="lbl">Panel '+esc(m.peran)+"</div>"+keys.map(k=>tabBtn(k,"")).join("")+"</aside>";
-  const smenu='<div class="smenu" id="sideMenu"><button type="button" class="smenu-btn" onclick="toggleSideMenu(event)"><span>'+(ICON[S.av]||"")+" "+esc(LBL[S.av]||"Menu")+'</span><span class="smenu-caret">\u25BE</span></button><div class="smenu-pop">'+keys.map(k=>tabBtn(k,"smi")).join("")+"</div></div>";
+  const smenu='<div class="smenu" id="sideMenu"><button type="button" class="smenu-btn" onclick="toggleSideMenu(event)"><span>'+(ICON[S.av]||"")+" "+esc(LBL[S.av]||"Menu")+(S.av==="emailredaksi"?emailRedaksiBadgeHtml():"")+'</span><span class="smenu-caret">\u25BE</span></button><div class="smenu-pop">'+keys.map(k=>tabBtn(k,"smi")).join("")+"</div></div>";
   let body;
   if(S.draft)body=formKliping();
   else if(S.av==="dasbor")body=pDasbor();
@@ -2215,8 +2254,6 @@ function viewAdmin(){
   else body='<div class="panel"><p class="empty">Tidak tersedia untuk peran ini.</p></div>';
   return '<div class="shell">'+smenu+side+'<div class="panel">'+body+"</div></div>";
 }
-function ph(t,s,act){return '<div class="ph"><div><h2>'+esc(t)+"</h2><p>"+esc(s)+'</p></div><div class="act">'+(act||"")+"</div></div>"}
-
 /* ================= Panel Email Redaksi & Kotak Masuk (Hanya Admin / Super-Admin) ================= */
 function dapatkanPesanRedaksi(){
   var emailReal = [];
@@ -2224,10 +2261,12 @@ function dapatkanPesanRedaksi(){
     emailReal = JSON.parse(localStorage.getItem("rcs_inbox_emails")) || [];
   } catch(e){}
 
-  /* Ambil kiriman ASLI dari database Supabase / kliping (Surat Pembaca / Tanggapan / Buah Pikir) */
+  /* Ambil kiriman dari database Supabase / kliping (Surat Pembaca / Tanggapan / Buah Pikir) */
   if (db && db.kliping) {
     db.kliping.filter(function(k){ 
-      return k.media === "Surat Pembaca" || (k.topik && k.topik.indexOf("Surat Pembaca") >= 0); 
+      return k.media === "Surat Pembaca" || 
+             (k.topik && k.topik.indexOf("Surat Pembaca") >= 0) || 
+             /^\[(Surat Pembaca|Sanggahan Opini|Usulan Kliping|Draf Buah Pikir)\]/i.test(k.judul || ""); 
     }).forEach(function(k){
       if (!emailReal.some(function(x){ return x.id === k.id; })) {
         var pengirimNama = "Pembaca Web";
@@ -2258,9 +2297,9 @@ function dapatkanPesanRedaksi(){
 }
 
 function simpanPesanRedaksi(list){
-  try {
+  try{
     localStorage.setItem("rcs_inbox_emails", JSON.stringify(list));
-  } catch(e){}
+  }catch(e){}
 }
 
 function bersihkanKotakMasuk(){
@@ -2268,83 +2307,75 @@ function bersihkanKotakMasuk(){
   try {
     localStorage.removeItem("rcs_inbox_emails");
   } catch(e){}
-  toast("\ud83d\uddd1\ufe0f Kotak masuk email redaksi telah dibersihkan.");
   render();
+  toast("🗑️ Kotak masuk email redaksi telah dibersihkan.");
 }
 
 function pEmailRedaksi(){
   if(!can("emailredaksi")){
-    return '<div class="panel"><p class="empty">Akses terbatas. Hanya Admin &amp; Super-Admin yang dapat melihat kredensial &amp; surat email redaksi.</p></div>';
+    return '<div class="panel"><p class="empty">Akses terbatas. Hanya Admin &amp; Super-Admin yang dapat membuka Panel Email Redaksi.</p></div>';
   }
 
   var defaultEmail = "kliping.rcscbs@gmail.com";
-  var defaultPass  = "klipingrcscbs2026";
-  
+  var defaultPass = "klipingrcscbs2026";
   var cred = { email: defaultEmail, pass: defaultPass };
   try {
     var stored = JSON.parse(localStorage.getItem("rcs_email_redaksi"));
     if (stored) {
       cred.email = stored.email !== undefined ? stored.email : defaultEmail;
-      cred.pass  = stored.pass  !== undefined ? stored.pass  : defaultPass;
+      cred.pass = stored.pass !== undefined ? stored.pass : defaultPass;
     }
-  } catch(e) {}
+  } catch(e){}
 
-  var passDisplay = cred.pass ? esc(cred.pass) : '<i style="color:var(--coral)">(Password dihapus / kosong)</i>';
-  var passInputVal = cred.pass || "";
+  var pesanList = dapatkanPesanRedaksi();
+  var unreadCount = pesanList.filter(function(m){ return !m.baca; }).length;
 
-  var daftarPesan = dapatkanPesanRedaksi();
-  var unreadCount = daftarPesan.filter(function(m){ return !m.baca; }).length;
-
-  var htmlPesan = daftarPesan.map(function(m){
-    return '<div class="card" style="margin-bottom:10px;padding:12px 14px;cursor:pointer;border-left:4px solid '+(m.baca?'var(--line)':'var(--blue)')+';background:'+(m.baca?'var(--paper)':'#f0f7ff')+';max-width:100%;box-sizing:border-box;overflow:hidden;word-break:break-word" onclick=\'bukaPesanEmail("'+m.id+'")\'>'+
-      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:6px;flex-wrap:wrap">'+
-        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;max-width:100%">'+
-          '<b style="font-size:14px;color:var(--navy);word-break:break-word">'+esc(m.pengirim)+'</b> '+
-          '<span style="font-size:11.5px;color:var(--ink2);word-break:break-all">&lt;'+esc(m.email)+'&gt;</span>'+
-        '</div>'+
-        '<span style="font-size:11.5px;color:var(--ink2);white-space:nowrap">'+esc(m.tgl)+'</span>'+
+  var htmlPesan = pesanList.map(function(m){
+    return '<div class="card" style="margin-bottom:10px;padding:12px 14px;cursor:pointer;border-left:'+(m.baca?'3px solid var(--line)':'4px solid var(--violet,#7357ff)')+';background:'+(m.baca?'var(--card-bg)':'rgba(115,87,255,0.04)')+'" onclick="bukaPesanEmail(\''+m.id+'\')">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px">'+
+        '<b>'+esc(m.pengirim)+'</b>'+
+        '<small style="color:var(--ink2);font-size:11px">'+esc(m.tgl)+'</small>'+
       '</div>'+
-      '<div style="font-weight:600;font-size:13.5px;color:var(--navy);margin-bottom:4px;word-break:break-word">'+(m.baca?'':'<span class="tag tag-b" style="margin-right:6px">Baru</span>')+esc(m.subjek)+'</div>'+
-      '<p style="margin:0;font-size:12.5px;color:var(--ink2);line-height:1.45;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal">'+esc((m.isi||"").slice(0,140))+'...</p>'+
+      '<div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(m.subjek)+'</div>'+
+      '<div style="font-size:12px;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+esc(m.isi)+'</div>'+
+      '<div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center">'+
+        '<span style="font-size:11.5px;color:var(--ink2);word-break:break-all">&lt;'+esc(m.email)+'&gt;</span>'+
+        (m.baca ? '<span class="tag" style="font-size:10px;padding:1px 6px">Dibaca</span>' : '<span class="tag tag-b" style="font-size:10px;padding:1px 6px">Baru</span>')+
+      '</div>'+
     '</div>';
   }).join("");
 
-  return ph("Email Redaksi Google & Kotak Masuk", "Kelola kredensial dan baca langsung surat & email yang masuk ke redaksi tanpa membuka Gmail.")+
+  return ph("Email Redaksi Google & Kotak Masuk", "Kelola kredensial dan baca langsung surat & email yang masuk dari pembaca.", "")+
     '<div class="grid g2 email-grid" style="margin-bottom:20px;align-items:start;max-width:100%;box-sizing:border-box">'+
     /* Kolom Kiri: Kredensial Email & Pengaturan */
     '<div class="card" style="padding:18px 16px;max-width:100%;box-sizing:border-box;word-break:break-word">'+
-    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line);flex-wrap:wrap">'+
-      '<div style="width:40px;height:40px;border-radius:12px;background:var(--blue-s);color:var(--blue);display:grid;place-items:center;font-size:20px;flex-shrink:0">\u2709\ufe0f</div>'+
-      '<div style="min-width:0;flex:1"><b style="font-size:15px;color:var(--navy);display:block;word-break:break-word">Akun Gmail Redaksi REICHAS CHELEBES</b>'+
-      '<span style="font-size:12.5px;color:var(--ink2);word-break:break-word">Kredensial resmi redaksi untuk komunikasi luar.</span></div>'+
-    '</div>'+
-
-    '<div style="background:var(--soft);padding:14px;border-radius:12px;border:1px solid var(--line);margin-bottom:20px;word-break:break-word">'+
-      '<div style="margin-bottom:10px;word-break:break-word"><b>Email Redaksi:</b> <code style="font-size:13px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--blue);word-break:break-all;display:inline-block">'+esc(cred.email)+'</code></div>'+
-      '<div style="word-break:break-word"><b>Password Email:</b> <code id="passCodeTxt" style="font-size:13px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--navy);word-break:break-all;display:inline-block">'+passDisplay+'</code> '+
-      '<button type="button" class="btn btn-sm" onclick="salinPassEmail()" style="margin-top:6px;display:inline-block">\ud83d\udccb Salin</button></div>'+
-    '</div>'+
-
-    '<h4 style="margin:20px 0 10px;font-size:15px;color:var(--navy)">\u2699\ufe0f Kelola / Ganti Kredensial</h4>'+
-    '<form onsubmit="simpanEmailRedaksi(event)">'+
-      '<div class="f" style="margin-bottom:12px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Alamat Email Redaksi</label><input type="email" id="editRedaksiEmail" value="'+esc(cred.email)+'" required class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
-      '<div class="f" style="margin-bottom:16px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Kata Sandi / Password Baru</label><input type="text" id="editRedaksiPass" value="'+esc(passInputVal)+'" placeholder="Tulis password baru atau kosongkan untuk menghapus" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">'+
-        '<button type="button" class="btn" onclick="hapusPassEmail()" style="background:var(--red-s);color:var(--red);border:1px solid rgba(229,100,88,0.3)">\ud83d\uddd1\ufe0f Hapus Password</button>'+
-        '<button type="submit" class="btn btn-p" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff">\ud83d\udcbe Simpan</button>'+
+      '<b style="font-size:15.5px;color:var(--navy);display:block;margin-bottom:12px">📧 Akun Gmail Redaksi Resmi</b>'+
+      '<p style="font-size:13px;color:var(--ink2);margin:0 0 14px">Surel utama redaksi untuk menerima tanggapan, sanggahan, dan permohonan koreksi kliping dari publik.</p>'+
+      '<div style="background:var(--soft,#f8fafc);border-radius:10px;padding:12px;border:1px solid var(--line);margin-bottom:14px;font-size:13px">'+
+      '<div style="margin-bottom:10px;word-break:break-word"><b>Email Redaksi:</b> <code style="font-family:monospace;color:var(--violet,#7357ff);background:rgba(115,87,255,0.08);padding:2px 6px;border-radius:4px">'+esc(cred.email)+'</code></div>'+
+      '<div style="word-break:break-word"><b>Password Email:</b> <code id="passCodeTxt" style="font-family:monospace;background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px">'+(cred.pass ? esc(cred.pass) : '<i>(tanpa password tersimpan)</i>')+'</code></div>'+
+      (cred.pass ? '<button type="button" class="btn btn-sm" onclick="salinPassEmail()" style="margin-top:6px;display:inline-flex;align-items:center;gap:4px">📋 Salin Password</button>' : '')+
       '</div>'+
-    '</form>'+
+
+      '<form onsubmit="simpanEmailRedaksi(event)">'+
+      '<div class="f" style="margin-bottom:12px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Alamat Email Redaksi</label><input type="email" id="editRedaksiEmail" value="'+esc(cred.email)+'" required class="inp" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--line);font-size:13px;box-sizing:border-box" /></div>'+
+      '<div class="f" style="margin-bottom:16px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Password / Kata Sandi Gmail</label><input type="text" id="editRedaksiPass" value="'+esc(cred.pass)+'" placeholder="Kosongkan bila tidak ingin menampilkan password" class="inp" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--line);font-size:13px;box-sizing:border-box" /></div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+        '<button type="submit" class="btn btn-p btn-sm" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff">💾 Simpan Kredensial</button>'+
+        (cred.pass ? '<button type="button" class="btn btn-sm" onclick="hapusPassEmail()" style="background:var(--red-s);color:var(--red);border:1px solid rgba(229,100,88,0.25)">🗑️ Hapus Password</button>' : '')+
+      '</div>'+
+      '</form>'+
     '</div>'+
 
     /* Kolom Kanan: Kotak Masuk Surat & Email Pembaca */
     '<div class="card" style="padding:18px 16px;max-width:100%;box-sizing:border-box;word-break:break-word">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);flex-wrap:wrap">'+
-      '<div><b style="font-size:15.5px;color:var(--navy);display:flex;align-items:center;gap:6px">\ud83d\udce5 Kotak Masuk Email '+(unreadCount?'<span class="tag tag-b">'+unreadCount+' baru</span>':'')+'</b>'+
-      '<span style="font-size:12.5px;color:var(--ink2);word-break:break-all">Pesan &amp; Surat Pembaca ASLI yang masuk ke '+esc(cred.email)+'</span></div>'+
-      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="tambahEmailMasukManual()" style="background:var(--blue-s);color:var(--blue);border:1px solid rgba(39,131,222,0.25);font-weight:600">\ud83d\udce9 Input Email</button><button class="btn btn-sm" onclick="render()">\ud83d\udd04 Segarkan</button><button class="btn btn-sm" onclick="bersihkanKotakMasuk()" style="color:var(--coral)">\ud83d\uddd1\ufe0f Bersihkan</button></div>'+
+      '<div><b style="font-size:15.5px;color:var(--navy);display:flex;align-items:center;gap:6px">📥 Kotak Masuk Email '+(unreadCount?'<span class="tag tag-b">'+unreadCount+' baru</span>':'')+'</b>'+
+      '<span style="font-size:12.5px;color:var(--ink2);word-break:break-all">Pesan &amp; Surat Pembaca yang masuk ke '+esc(cred.email)+'</span></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="tambahEmailMasukManual()" style="background:var(--blue-s);color:var(--blue);border:1px solid rgba(39,131,222,0.25);font-weight:600">📩 Input Email</button><button class="btn btn-sm" onclick="render()">🔄 Segarkan</button><button class="btn btn-sm" onclick="bersihkanKotakMasuk()" style="color:var(--coral)">🗑️ Bersihkan</button></div>'+
     '</div>'+
 
-    (htmlPesan||'<p class="empty">Belum ada email atau surat pembaca asli yang masuk.</p>')+
+    (htmlPesan||'<p class="empty">Belum ada email atau surat pembaca yang masuk.</p>')+
     '</div>'+
     '</div>';
 }
@@ -2716,7 +2747,8 @@ function pPengaturan(){
    '<div class="f"><label>Penyangkalan edukasi</label><textarea id="sDis">'+esc(s.penyangkalan)+'</textarea></div>'+
    '<div class="f"><label><input type="checkbox" id="sWajib" '+(s.wajibTinjauan?"checked":"")+' /> Wajib tinjauan sebelum terbit untuk rubrik sensitif</label></div>'+
    '<div class="f"><label><input type="checkbox" id="sTipis" '+(s.sinyalTipis?"checked":"")+' /> Aktifkan mode sinyal tipis sebagai bawaan</label></div>'+
-   '<button class="btn btn-p" onclick="simpanSetting()">Simpan pengaturan</button></div>'+
+   '<div class="f" style="margin-top:10px;padding:12px;background:rgba(211,84,0,0.08);border:1px solid rgba(211,84,0,0.25);border-radius:10px"><label style="font-weight:700;color:var(--coral)"><input type="checkbox" id="sSiagaOn" '+(s.siagaAktif!==false?"checked":"")+' /> Aktifkan Banner Peringatan Siaga / Cuaca Ekstrem Lapangan</label><input type="text" id="sSiagaTeks" value="'+esc(s.siagaTeks||"BMKG Rilis Imbauan Angin Kencang & Hujan Lebat Jalur Pendakian Gunung Bawakaraeng-Latimojong. Harap Selalu Membawa Perlengkapan Darurat.")+'" placeholder="Tulis pesan siaga / cuaca ekstrem untuk pembaca" class="inp" style="width:100%;margin-top:8px;padding:8px 10px;border-radius:6px;border:1px solid var(--line);font-size:13px" /></div>'+
+   '<button class="btn btn-p" style="margin-top:14px" onclick="simpanSetting()">Simpan pengaturan</button></div>'+
    kartuAnalitik()+
    '<div class="card" style="margin-top:16px"><b style="font-size:14px">Pemeliharaan</b><p style="font-size:13px;color:var(--ink2);margin:6px 0 12px">Data utama tersimpan di Supabase. Dua tombol ini untuk mengatasi tampilan yang terasa basi atau macet di perangkatmu \u2014 tidak ada yang menghapus data server.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="reset()">Muat ulang data dari server</button><button class="btn btn-d" onclick="bersihkanTembolok()">Bersihkan tembolok aplikasi</button></div></div>';
 }
@@ -2728,6 +2760,10 @@ function simpanSetting(){
   s.penyangkalan=document.getElementById("sDis").value;
   s.wajibTinjauan=document.getElementById("sWajib").checked;
   s.sinyalTipis=document.getElementById("sTipis").checked;
+  const sOn=document.getElementById("sSiagaOn");
+  if(sOn) s.siagaAktif=sOn.checked;
+  const sTx=document.getElementById("sSiagaTeks");
+  if(sTx) s.siagaTeks=sTx.value.trim();
   const gaEl=document.getElementById("sGaId");
   if(gaEl) s.gaId=gaEl.value.trim();
   log("Memperbarui pengaturan situs",s.nama);
@@ -3774,35 +3810,98 @@ async function kirimSuratPembaca(e){
 
   var id="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   var konteksLengkap="[KIRIMAN PEMBACA - "+jenis+"]\nOleh: "+nama+(kontak?" ("+kontak+")":"")+"\n\n"+isi;
+  var today = new Date().toISOString().slice(0,10);
 
+  var newKlip = {
+    id: id,
+    judul: "["+jenis+"] "+judul,
+    lead: "Kiriman "+jenis+" dari pembaca: "+nama+(kontak?" ("+kontak+")":""),
+    rubrik: jenis==="Draf Buah Pikir"?"Rubrik Sampah":"Cek Fakta",
+    media: "Surat Pembaca",
+    tautan: "https://kliping-reichas.my.id/",
+    tglBerita: today,
+    tglKliping: today,
+    tgl_berita: today,
+    tgl_kliping: today,
+    wilayah: "Sulawesi",
+    lokasi: [],
+    topik: ["Surat Pembaca"],
+    potongan: isi.slice(0,250)+(isi.length>250?"...":""),
+    konteks: konteksLengkap,
+    pelajaran: ["Tanggapan pembaca terbuka untuk diskusi publik."],
+    materi: [],
+    status: "Ditinjau",
+    kurator: "u4",
+    kepekaan: "Biasa",
+    gambar: "Tanpa gambar"
+  };
+
+  /* 1. Tambahkan ke memori lokal db.kliping */
+  if (db && db.kliping) {
+    db.kliping.unshift(newKlip);
+  }
+
+  /* 2. Simpan ke rcs_inbox_emails (localStorage) agar langsung muncul di Kotak Masuk */
+  try {
+    var emailList = dapatkanPesanRedaksi();
+    if (!emailList.some(function(x){ return x.id === id; })) {
+      emailList.unshift({
+        id: id,
+        pengirim: nama,
+        email: kontak || "kliping.rcscbs@gmail.com",
+        subjek: "["+jenis+"] "+judul,
+        tgl: today,
+        isi: konteksLengkap,
+        baca: false
+      });
+      simpanPesanRedaksi(emailList);
+    }
+  } catch(err){}
+
+  /* 3. Simpan ke Supabase */
   try{
     await supa.from("kliping").insert({
       id: id,
-      judul: "["+jenis+"] "+judul,
-      lead: "Kiriman "+jenis+" dari pembaca: "+nama,
-      rubrik: jenis==="Draf Buah Pikir"?"Rubrik Sampah":"Cek Fakta",
-      media: "Surat Pembaca",
-      tautan: "https://kliping-reichas.my.id/",
-      tgl_berita: new Date().toISOString().slice(0,10),
-      tgl_kliping: new Date().toISOString().slice(0,10),
-      wilayah: "Sulawesi",
-      lokasi: [],
-      topik: ["Surat Pembaca"],
-      potongan: isi.slice(0,250)+(isi.length>250?"...":""),
-      konteks: konteksLengkap,
-      pelajaran: ["Tanggapan pembaca terbuka untuk diskusi publik."],
-      materi: [],
-      status: "Ditinjau",
-      kurator: "u4",
-      kepekaan: "Biasa",
-      gambar: "Tanpa gambar"
+      judul: newKlip.judul,
+      lead: newKlip.lead,
+      rubrik: newKlip.rubrik,
+      media: newKlip.media,
+      tautan: newKlip.tautan,
+      tgl_berita: newKlip.tgl_berita,
+      tgl_kliping: newKlip.tgl_kliping,
+      wilayah: newKlip.wilayah,
+      lokasi: newKlip.lokasi,
+      topik: newKlip.topik,
+      potongan: newKlip.potongan,
+      konteks: newKlip.konteks,
+      pelajaran: newKlip.pelajaran,
+      materi: newKlip.materi,
+      status: newKlip.status,
+      kurator: newKlip.kurator,
+      kepekaan: newKlip.kepekaan,
+      gambar: newKlip.gambar
     });
   }catch(err){
     console.warn("Surat pembaca insert:", err);
   }
 
+  /* 4. Kirim ke API inbox */
+  try {
+    fetch('/api/inbox', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        nama: nama,
+        email: kontak || 'kliping.rcscbs@gmail.com',
+        subjek: '['+jenis+'] '+judul,
+        isi: isi
+      })
+    }).catch(function(e){});
+  } catch(e){}
+
   tutupPortalSurat();
-  toast("\u2728 Surat Pembaca / Buah Pikir berhasil dikirim ke Meja Redaksi REICHAS CHELEBES! Terima kasih.");
+  toast("✨ Surat Pembaca / Buah Pikir berhasil dikirim ke Meja Redaksi REICHAS CHELEBES! Terima kasih.");
+  render();
 }
 (function(){
   var _clip=viewClip,_kartu=kartuKlip,_boot=bootstrap;

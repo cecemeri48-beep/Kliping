@@ -13,7 +13,7 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const url = `${SUPA}/rest/v1/kliping?select=*&or=(media.eq.Surat%20Pembaca,topik.cs.{"Surat Pembaca"})&order=id.desc&limit=50`;
+      const url = `${SUPA}/rest/v1/kliping?select=*&or=(media.eq.Surat%20Pembaca,topik.cs.{"Surat Pembaca"},judul.ilike.[%25)&order=id.desc&limit=50`;
       const r = await fetch(url, { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } });
       const data = await r.json();
       return res.status(200).json({ success: true, surelRedaksi: SUREL_REDAKSI, count: Array.isArray(data) ? data.length : 0, data: data });
