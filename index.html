@@ -349,6 +349,8 @@ body{background:#f6f3ed;background-image:radial-gradient(circle at 10% 8%,#fff 0
 .sh-wa{background:#25D366}
 .sh-fb{background:#1877F2}
 .sh-ig{background:linear-gradient(45deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888)}
+.sh-tw{background:#000000;color:#fff;border:1px solid rgba(255,255,255,0.18)}
+.sh-tk{background:linear-gradient(135deg,#010101 40%,#25F4EE 75%,#FE2C55 100%);color:#fff}
 @media(max-width:640px){.lit-inner{padding:24px}.lit-inner h2{font-size:24px}}
 
 /* ================= Mobile-first refresh (kekinian) ================= */
@@ -1738,10 +1740,12 @@ function mLepas(){
 function shareUrl(id){return location.origin+"/api/share?id="+encodeURIComponent(id)}
 function waLink(text,url){return "https://wa.me/?text="+encodeURIComponent(text+"\n"+url)}
 function fbLink(url){return "https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url)}
+function twLink(text,url){return "https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(url)}
 function salinIG(text,url){try{if(navigator.clipboard)navigator.clipboard.writeText(text+"\n"+url)}catch(e){}toast("Teks & tautan disalin — buka Instagram lalu tempel di caption/Stories");window.open("https://www.instagram.com/","_blank")}
-function bagiKlip(cara,id){const k=db.kliping.find(x=>x.id===id);if(!k)return;const url=shareUrl(id);const txt=k.judul+" — "+k.lead;if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url),"_blank");else salinIG(txt,url)}
-function bagiSitus(cara){const url=location.origin+location.pathname;const txt="\ud83d\udcda Gerakan Literasi REICHAS — baca, pahami, dan bagikan pengetahuan pendakian & alam bebas.";if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url),"_blank");else salinIG(txt,url)}
-function shBtns(kind){const call=c=>kind==="situs"?"bagiSitus('"+c+"')":"bagiKlip('"+c+"','"+kind+"')";return '<button class="sh sh-wa" onclick="'+call("wa")+'">WhatsApp</button><button class="sh sh-ig" onclick="'+call("ig")+'">Instagram</button><button class="sh sh-fb" onclick="'+call("fb")+'">Facebook</button>'}
+function salinTikTok(text,url){try{if(navigator.clipboard)navigator.clipboard.writeText(text+"\n"+url)}catch(e){}toast("Teks & tautan disalin — buka TikTok lalu tempel di postingan");window.open("https://www.tiktok.com/","_blank")}
+function bagiKlip(cara,id){const k=db.kliping.find(x=>x.id===id);if(!k)return;const url=shareUrl(id);const txt=k.judul+" — "+k.lead;if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url),"_blank");else if(cara==="tw")window.open(twLink(txt,url),"_blank");else if(cara==="tk")salinTikTok(txt,url);else salinIG(txt,url)}
+function bagiSitus(cara){const url=location.origin+location.pathname;const txt="\ud83d\udcda Gerakan Literasi REICHAS — baca, pahami, dan bagikan pengetahuan pendakian & alam bebas.";if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url),"_blank");else if(cara==="tw")window.open(twLink(txt,url),"_blank");else if(cara==="tk")salinTikTok(txt,url);else salinIG(txt,url)}
+function shBtns(kind){const call=c=>kind==="situs"?"bagiSitus('"+c+"')":"bagiKlip('"+c+"','"+kind+"')";return '<button class="sh sh-wa" onclick="'+call("wa")+'">WhatsApp</button><button class="sh sh-ig" onclick="'+call("ig")+'">Instagram</button><button class="sh sh-fb" onclick="'+call("fb")+'">Facebook</button><button class="sh sh-tw" onclick="'+call("tw")+'">X (Twitter)</button><button class="sh sh-tk" onclick="'+call("tk")+'">TikTok</button>'}
 function litBanner(){return '<section class="lit-banner"><div class="lit-inner"><span class="lit-badge">\ud83d\udcda Gerakan Literasi REICHAS</span><h2>Baca. Pahami. Bagikan.</h2><p>Satu kliping yang kamu baca hari ini bisa menyelamatkan langkah esok hari. Mari sebarkan budaya membaca — ilmu yang dibagikan tidak pernah habis.</p><div class="lit-share"><span>Sebarkan:</span>'+shBtns("situs")+'</div></div></section>'}
 
 /* ================= header ================= */
