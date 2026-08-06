@@ -1,5 +1,5 @@
-const CACHE='reichas-v34';
-const CORE=['/','/index.html','/manifest.webmanifest','/icon-180.png','/icon-192.png','/icon-512.png','/icon-maskable-512.png','/og-image.jpg','/logo.png','/hero.jpg','/paper.jpg'];
+const CACHE='reichas-v35';
+const CORE=['/','/index.html','/manifest.webmanifest','/favicon.ico','/favicon.png','/icon-180.png','/icon-192.png','/icon-512.png','/icon-maskable-512.png','/og-image.jpg','/logo.png','/hero.jpg','/paper.jpg'];
 self.addEventListener('install',function(e){e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(CORE)}).catch(function(){}));self.skipWaiting()});
 self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return k!==CACHE?caches.delete(k):null}))}));self.clients.claim()});
 self.addEventListener('fetch',function(e){

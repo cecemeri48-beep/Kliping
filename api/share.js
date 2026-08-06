@@ -183,7 +183,7 @@ module.exports = async function (req, res) {
     '<meta name="twitter:image" content="'+esc(img)+'" />'+
     '<script type="application/ld+json">'+JSON.stringify(ld).replace(/</g,'\\u003c')+'<\/script>'+
     '<style>'+GAYA+'</style></head><body>'+
-    '<header class="t"><div class="w"><a class="bm" href="'+esc(SITE)+'">'+'<img src="'+esc(SITE)+'/logo.png" alt="Logo REICHAS CHELEBES" width="38" height="46" />'+'<span><b>KLIPING RCS.CBS</b><i>Baca. Pahami. Bagikan.</i></span></a>'+
+    '<header class="t"><div class="w"><a class="bm" href="'+esc(SITE)+'">'+'<img src="'+esc(SITE)+'/logo.png" alt="Logo REICHAS CHELEBES" width="42" height="42" style="border-radius:50%;object-fit:cover" />'+'<span><b>KLIPING RCS.CBS</b><i>Baca. Pahami. Bagikan.</i></span></a>'+
     '<a href="'+esc(SITE)+'/#materi" style="font-size:14px">Materi belajar</a></div></header>'+
     '<div class="w"><article><h1>'+esc(k.judul)+'</h1>'+
     (k.lead?'<p class="lead">'+esc(k.lead)+'</p>':'')+
