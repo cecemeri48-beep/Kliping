@@ -872,11 +872,45 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
 .top:before {
   display: none !important;
 }
-.brand img {
-  width: 44px !important;
-  height: 44px !important;
-  object-fit: contain !important;
+/* 3D Embossed & Red Glowing Logo Emblem */
+.brand img, .pasang-bar img {
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  clip-path: circle(50% at 50% 50%) !important;
   flex: none !important;
+  border: 2px solid rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 
+    0 4px 14px rgba(0, 0, 0, 0.38),
+    0 0 16px rgba(229, 44, 44, 0.75),
+    0 0 30px rgba(229, 44, 44, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6) !important;
+  filter: drop-shadow(0 0 8px rgba(229, 44, 44, 0.6)) !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, filter 0.3s ease !important;
+  backface-visibility: hidden !important;
+}
+
+.brand img:hover, .pasang-bar img:hover {
+  transform: scale(1.12) rotate(4deg) !important;
+  box-shadow: 
+    0 8px 22px rgba(0, 0, 0, 0.5),
+    0 0 24px rgba(255, 60, 60, 0.95),
+    0 0 45px rgba(229, 44, 44, 0.7),
+    inset 0 3px 6px rgba(255, 255, 255, 0.7),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.7) !important;
+  filter: drop-shadow(0 0 16px rgba(255, 60, 60, 0.9)) !important;
+}
+
+[data-tema="gelap"] .brand img, [data-tema="gelap"] .pasang-bar img {
+  border-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(255, 60, 60, 0.85),
+    0 0 40px rgba(229, 44, 44, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.7) !important;
 }
 
 /* Ensure hero section renders background artwork hero.jpg cleanly */
@@ -985,8 +1019,8 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
 
   /* Brand logo size on small phone headers */
   .brand img {
-    width: 36px !important;
-    height: 36px !important;
+    width: 38px !important;
+    height: 38px !important;
   }
 }
 
@@ -4860,7 +4894,8 @@ bootstrap();
     "Literasi adalah senjata terbaik. 🗡️",
     "Membaca hari ini, melek fakta selamanya. 🌟",
     "Kamu ada karena aku ada, aku ada karena kamu ada. 🤝",
-    "Kapan kita ke Bivak lagi? ⛺"
+    "Kapan kita ke Bivak lagi? ⛺",
+    "Om Jon itu paling tua di rcs.cbs! 👴🏼"
   ];
 
   var wrap = document.getElementById('mascotWrap');
