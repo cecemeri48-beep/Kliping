@@ -2655,6 +2655,13 @@ function salinPassEmail(){
   }catch(e){toast("Gagal menyalin");}
 }
 
+/* ---- ph(): kepala panel (judul + keterangan + tombol aksi) ----
+   Dipakai oleh SEMUA halaman panel admin. Sebelumnya hilang, sehingga
+   setiap halaman panel gagal dirender (ReferenceError: ph is not defined). */
+function ph(judul,ket,aksi){
+  return '<div class="ph"><div><h2>'+esc(judul)+'</h2>'+(ket?'<p>'+esc(ket)+'</p>':'')+'</div>'+(aksi?'<div class="act">'+aksi+'</div>':'')+'</div>';
+}
+
 function pDasbor(){
   const t=terbit(),q=db.kliping.filter(k=>k.status==="Ditinjau");
   const lengkap=db.kliping.filter(k=>k.pelajaran.filter(x=>x&&x.trim()).length>=3&&k.materi.length>0).length;
