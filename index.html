@@ -290,7 +290,12 @@ body{background:#f6f3ed;background-image:radial-gradient(circle at 10% 8%,#fff 0
 .panel .tbl{border:0;border-radius:16px;box-shadow:0 8px 22px rgba(16,42,67,.08);overflow:hidden}
 .panel .tbl-scroll{overflow:visible;overflow-x:auto}
 .ph .act{flex:none}
-@media(max-width:640px){.panel{overflow-x:hidden}.panel .tbl-scroll table{min-width:600px}.ph .act{width:100%;margin-left:0}.ph .act .btn{width:100%;justify-content:center}}
+@media(max-width:900px){
+  .grid.g2, .grid.g3, .grid.g4, .email-grid { grid-template-columns: 1fr !important; }
+  .shell, .panel { max-width: 100% !important; box-sizing: border-box !important; }
+  .card { max-width: 100% !important; box-sizing: border-box !important; word-break: break-word !important; }
+}
+@media(max-width:640px){.panel{overflow-x:hidden;max-width:100%!important;padding:12px 8px!important}.panel .tbl-scroll table{min-width:600px}.ph .act{width:100%;margin-left:0}.ph .act .btn{width:100%;justify-content:center}}
 .panel .note{border-radius:14px}
 .panel .sticky{border:0;border-radius:16px;box-shadow:0 8px 22px rgba(16,42,67,.08)}
 
@@ -2148,50 +2153,32 @@ function ph(t,s,act){return '<div class="ph"><div><h2>'+esc(t)+"</h2><p>"+esc(s)
 
 /* ================= Panel Email Redaksi & Kotak Masuk (Hanya Admin / Super-Admin) ================= */
 function dapatkanPesanRedaksi(){
-  var bawaan = [
-    {
-      id: "m1",
-      pengirim: "Rahmat Hidayat",
-      email: "rahmat.pendaki@gmail.com",
-      subjek: "[Surat Pembaca] Tanggapan artikel Pematang Dua Pagi",
-      tgl: "2026-08-06 21:15",
-      isi: "Halo Meja Redaksi REICHAS CHELEBES,\n\nSaya sangat mengapresiasi tulisan 'Pematang, Pukul Dua Pagi'. Narasinya sangat menyentuh dan menggambarkan realitas anak muda di daerah. Semoga tulisan-tulisan inspiratif seperti ini terus direproduksi.\n\nSalam hangat,\nRahmat",
-      baca: false
-    },
-    {
-      id: "m2",
-      pengirim: "Dewi Anggraini",
-      email: "dewi.an@gmail.com",
-      subjek: "[Sanggahan Opini] Masukan perihal akurasi data jam perjalanan",
-      tgl: "2026-08-05 14:40",
-      isi: "Kepada Redaksi RCS.CBS,\n\nMenanggapi artikel riset tentang keputusan buruk pada jam keenam perjalanan, saya memiliki catatan statistik pendukung dari tim pos perizinan jalur selatan yang mungkin bisa dijadikan bahan rujukan tambahan.\n\nTerima kasih.",
-      baca: true
-    },
-    {
-      id: "m3",
-      pengirim: "Agus Subagyo",
-      email: "agus.subagyo@yahoo.com",
-      subjek: "[Usulan Kliping] Usulan liputan pemadaman listrik di Makassar",
-      tgl: "2026-08-04 10:05",
-      isi: "Yth. Kurator REICHAS,\n\nBerikut tautan berita lokal terkait dampak pemadaman listrik berkepanjangan terhadap UMKM digital di Makassar. Mohon dapat dibuatkan kliping dan bedah faktanya.\n\nLink: https://beritalokal.id/pemadaman-makassar-2026",
-      baca: true
-    }
-  ];
-
-  var lokal = [];
+  var emailReal = [];
   try {
-    lokal = JSON.parse(localStorage.getItem("rcs_inbox_emails")) || [];
+    emailReal = JSON.parse(localStorage.getItem("rcs_inbox_emails")) || [];
   } catch(e){}
 
-  var gabung = [].concat(lokal, bawaan);
-
+  /* Ambil kiriman ASLI dari database Supabase / kliping (Surat Pembaca / Tanggapan / Buah Pikir) */
   if (db && db.kliping) {
-    db.kliping.filter(function(k){ return k.media === "Surat Pembaca" || (k.topik && k.topik.indexOf("Surat Pembaca")>=0); }).forEach(function(k){
-      if (!gabung.some(function(x){ return x.id === k.id; })) {
-        gabung.unshift({
+    db.kliping.filter(function(k){ 
+      return k.media === "Surat Pembaca" || (k.topik && k.topik.indexOf("Surat Pembaca") >= 0); 
+    }).forEach(function(k){
+      if (!emailReal.some(function(x){ return x.id === k.id; })) {
+        var pengirimNama = "Pembaca Web";
+        var pengirimEmail = "kliping.rcscbs@gmail.com";
+        if (k.lead) {
+          var match = k.lead.match(/dari pembaca:\s*(.*?)(?:\s*\((.*?)\))?$/i);
+          if (match) {
+            if (match[1]) pengirimNama = match[1].trim();
+            if (match[2]) pengirimEmail = match[2].trim();
+          } else {
+            pengirimNama = k.lead.replace(/^Kiriman.*?dari pembaca:\s*/i, "").trim() || "Pembaca Web";
+          }
+        }
+        emailReal.unshift({
           id: k.id,
-          pengirim: k.lead ? k.lead.replace(/^Kiriman.*?dari pembaca:\s*/i, "") : "Pembaca Web",
-          email: "kliping.rcscbs@gmail.com",
+          pengirim: pengirimNama,
+          email: pengirimEmail,
           subjek: k.judul,
           tgl: k.tglKliping || new Date().toISOString().slice(0,10),
           isi: k.konteks || k.potongan || "-",
@@ -2201,13 +2188,22 @@ function dapatkanPesanRedaksi(){
     });
   }
 
-  return gabung;
+  return emailReal;
 }
 
 function simpanPesanRedaksi(list){
   try {
     localStorage.setItem("rcs_inbox_emails", JSON.stringify(list));
   } catch(e){}
+}
+
+function bersihkanKotakMasuk(){
+  if(!confirm("Kosongkan riwayat kotak masuk email redaksi?")) return;
+  try {
+    localStorage.removeItem("rcs_inbox_emails");
+  } catch(e){}
+  toast("\ud83d\uddd1\ufe0f Kotak masuk email redaksi telah dibersihkan.");
+  render();
 }
 
 function pEmailRedaksi(){
@@ -2234,37 +2230,40 @@ function pEmailRedaksi(){
   var unreadCount = daftarPesan.filter(function(m){ return !m.baca; }).length;
 
   var htmlPesan = daftarPesan.map(function(m){
-    return '<div class="card" style="margin-bottom:10px;padding:14px 16px;cursor:pointer;border-left:4px solid '+(m.baca?'var(--line)':'var(--blue)')+';background:'+(m.baca?'var(--paper)':'#f0f7ff')+'" onclick=\'bukaPesanEmail("'+m.id+'")\'>'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'+
-        '<div style="display:flex;align-items:center;gap:8px"><b style="font-size:14.5px;color:var(--navy)">'+esc(m.pengirim)+'</b> <span style="font-size:12px;color:var(--ink2)">&lt;'+esc(m.email)+'&gt;</span></div>'+
-        '<span style="font-size:12px;color:var(--ink2)">'+esc(m.tgl)+'</span>'+
+    return '<div class="card" style="margin-bottom:10px;padding:12px 14px;cursor:pointer;border-left:4px solid '+(m.baca?'var(--line)':'var(--blue)')+';background:'+(m.baca?'var(--paper)':'#f0f7ff')+';max-width:100%;box-sizing:border-box;overflow:hidden;word-break:break-word" onclick=\'bukaPesanEmail("'+m.id+'")\'>'+
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:6px;flex-wrap:wrap">'+
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;max-width:100%">'+
+          '<b style="font-size:14px;color:var(--navy);word-break:break-word">'+esc(m.pengirim)+'</b> '+
+          '<span style="font-size:11.5px;color:var(--ink2);word-break:break-all">&lt;'+esc(m.email)+'&gt;</span>'+
+        '</div>'+
+        '<span style="font-size:11.5px;color:var(--ink2);white-space:nowrap">'+esc(m.tgl)+'</span>'+
       '</div>'+
-      '<div style="font-weight:600;font-size:14px;color:var(--navy);margin-bottom:4px">'+(m.baca?'':'<span class="tag tag-b" style="margin-right:6px">Baru</span>')+esc(m.subjek)+'</div>'+
-      '<p style="margin:0;font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc((m.isi||"").slice(0,120))+'...</p>'+
+      '<div style="font-weight:600;font-size:13.5px;color:var(--navy);margin-bottom:4px;word-break:break-word">'+(m.baca?'':'<span class="tag tag-b" style="margin-right:6px">Baru</span>')+esc(m.subjek)+'</div>'+
+      '<p style="margin:0;font-size:12.5px;color:var(--ink2);line-height:1.45;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal">'+esc((m.isi||"").slice(0,140))+'...</p>'+
     '</div>';
   }).join("");
 
   return ph("Email Redaksi Google & Kotak Masuk", "Kelola kredensial dan baca langsung surat & email yang masuk ke redaksi tanpa membuka Gmail.")+
-    '<div class="grid g2" style="margin-bottom:20px;align-items:start">'+
+    '<div class="grid g2 email-grid" style="margin-bottom:20px;align-items:start;max-width:100%;box-sizing:border-box">'+
     /* Kolom Kiri: Kredensial Email & Pengaturan */
-    '<div class="card" style="padding:24px">'+
-    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line)">'+
-      '<div style="width:44px;height:44px;border-radius:12px;background:var(--blue-s);color:var(--blue);display:grid;place-items:center;font-size:22px">\u2709\ufe0f</div>'+
-      '<div><b style="font-size:16px;color:var(--navy);display:block">Akun Gmail Redaksi REICHAS CHELEBES</b>'+
-      '<span style="font-size:13px;color:var(--ink2)">Kredensial resmi redaksi untuk komunikasi luar.</span></div>'+
+    '<div class="card" style="padding:18px 16px;max-width:100%;box-sizing:border-box;word-break:break-word">'+
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line);flex-wrap:wrap">'+
+      '<div style="width:40px;height:40px;border-radius:12px;background:var(--blue-s);color:var(--blue);display:grid;place-items:center;font-size:20px;flex-shrink:0">\u2709\ufe0f</div>'+
+      '<div style="min-width:0;flex:1"><b style="font-size:15px;color:var(--navy);display:block;word-break:break-word">Akun Gmail Redaksi REICHAS CHELEBES</b>'+
+      '<span style="font-size:12.5px;color:var(--ink2);word-break:break-word">Kredensial resmi redaksi untuk komunikasi luar.</span></div>'+
     '</div>'+
 
-    '<div style="background:var(--soft);padding:16px;border-radius:12px;border:1px solid var(--line);margin-bottom:20px">'+
-      '<div style="margin-bottom:10px"><b>Email Redaksi:</b> <code style="font-size:14px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--blue)">'+esc(cred.email)+'</code></div>'+
-      '<div><b>Password Email:</b> <code id="passCodeTxt" style="font-size:14px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--navy)">'+passDisplay+'</code> '+
-      '<button type="button" class="btn btn-sm" onclick="salinPassEmail()" style="margin-left:8px">\ud83d\udccb Salin</button></div>'+
+    '<div style="background:var(--soft);padding:14px;border-radius:12px;border:1px solid var(--line);margin-bottom:20px;word-break:break-word">'+
+      '<div style="margin-bottom:10px;word-break:break-word"><b>Email Redaksi:</b> <code style="font-size:13px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--blue);word-break:break-all;display:inline-block">'+esc(cred.email)+'</code></div>'+
+      '<div style="word-break:break-word"><b>Password Email:</b> <code id="passCodeTxt" style="font-size:13px;background:#fff;padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--navy);word-break:break-all;display:inline-block">'+passDisplay+'</code> '+
+      '<button type="button" class="btn btn-sm" onclick="salinPassEmail()" style="margin-top:6px;display:inline-block">\ud83d\udccb Salin</button></div>'+
     '</div>'+
 
     '<h4 style="margin:20px 0 10px;font-size:15px;color:var(--navy)">\u2699\ufe0f Kelola / Ganti Kredensial</h4>'+
     '<form onsubmit="simpanEmailRedaksi(event)">'+
       '<div class="f" style="margin-bottom:12px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Alamat Email Redaksi</label><input type="email" id="editRedaksiEmail" value="'+esc(cred.email)+'" required class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
       '<div class="f" style="margin-bottom:16px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Kata Sandi / Password Baru</label><input type="text" id="editRedaksiPass" value="'+esc(passInputVal)+'" placeholder="Tulis password baru atau kosongkan untuk menghapus" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
-      '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">'+
         '<button type="button" class="btn" onclick="hapusPassEmail()" style="background:var(--red-s);color:var(--red);border:1px solid rgba(229,100,88,0.3)">\ud83d\uddd1\ufe0f Hapus Password</button>'+
         '<button type="submit" class="btn btn-p" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff">\ud83d\udcbe Simpan</button>'+
       '</div>'+
@@ -2272,14 +2271,14 @@ function pEmailRedaksi(){
     '</div>'+
 
     /* Kolom Kanan: Kotak Masuk Surat & Email Pembaca */
-    '<div class="card" style="padding:24px">'+
-    '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)">'+
-      '<div><b style="font-size:16px;color:var(--navy);display:flex;align-items:center;gap:6px">\ud83d\udce5 Kotak Masuk Email '+(unreadCount?'<span class="tag tag-b">'+unreadCount+' baru</span>':'')+'</b>'+
-      '<span style="font-size:13px;color:var(--ink2)">Pesan &amp; Surat Pembaca yang masuk ke '+esc(cred.email)+'</span></div>'+
-      '<button class="btn btn-sm" onclick="render()">\ud83d\udd04 Segarkan</button>'+
+    '<div class="card" style="padding:18px 16px;max-width:100%;box-sizing:border-box;word-break:break-word">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);flex-wrap:wrap">'+
+      '<div><b style="font-size:15.5px;color:var(--navy);display:flex;align-items:center;gap:6px">\ud83d\udce5 Kotak Masuk Email '+(unreadCount?'<span class="tag tag-b">'+unreadCount+' baru</span>':'')+'</b>'+
+      '<span style="font-size:12.5px;color:var(--ink2);word-break:break-all">Pesan &amp; Surat Pembaca ASLI yang masuk ke '+esc(cred.email)+'</span></div>'+
+      '<div style="display:flex;gap:6px"><button class="btn btn-sm" onclick="render()">\ud83d\udd04 Segarkan</button><button class="btn btn-sm" onclick="bersihkanKotakMasuk()" style="color:var(--coral)">\ud83d\uddd1\ufe0f Bersihkan</button></div>'+
     '</div>'+
 
-    (htmlPesan||'<p class="empty">Belum ada email atau surat pembaca yang masuk.</p>')+
+    (htmlPesan||'<p class="empty">Belum ada email atau surat pembaca asli yang masuk.</p>')+
     '</div>'+
     '</div>';
 }
@@ -2303,15 +2302,15 @@ function bukaPesanEmail(id){
   bg.style.zIndex = "320";
 
   bg.innerHTML =
-    '<div class="modal" style="max-width:620px;padding:24px;position:relative;animation:modalPop 0.25s cubic-bezier(0.16,1,0.3,1) both">'+
-    '<button type="button" onclick="tutupPesanEmail()" style="position:absolute;top:16px;right:16px;background:none;border:0;font-size:22px;cursor:pointer;color:var(--ink2);line-height:1">&times;</button>'+
+    '<div class="modal" style="max-width:620px;width:92vw;padding:20px 16px;position:relative;box-sizing:border-box;word-break:break-word;max-height:88vh;overflow-y:auto;animation:modalPop 0.25s cubic-bezier(0.16,1,0.3,1) both">'+
+    '<button type="button" onclick="tutupPesanEmail()" style="position:absolute;top:14px;right:14px;background:none;border:0;font-size:24px;cursor:pointer;color:var(--ink2);line-height:1">&times;</button>'+
     '<h3 style="margin-bottom:6px;display:flex;align-items:center;gap:8px">\ud83d\udce9 Baca Surat Email Redaksi</h3>'+
-    '<div style="font-size:13px;color:var(--ink2);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);line-height:1.6">'+
-      '<div><b>Pengirim:</b> '+esc(m.pengirim)+' &lt;<a href="mailto:'+esc(m.email)+'" style="color:var(--blue)">'+esc(m.email)+'</a>&gt;</div>'+
+    '<div style="font-size:13px;color:var(--ink2);margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line);line-height:1.6;word-break:break-word">'+
+      '<div><b>Pengirim:</b> '+esc(m.pengirim)+' &lt;<a href="mailto:'+esc(m.email)+'" style="color:var(--blue);word-break:break-all">'+esc(m.email)+'</a>&gt;</div>'+
       '<div><b>Waktu Masuk:</b> '+esc(m.tgl)+'</div>'+
       '<div><b>Subjek:</b> <span style="color:var(--navy);font-weight:600">'+esc(m.subjek)+'</span></div>'+
     '</div>'+
-    '<div style="background:var(--soft);padding:16px;border-radius:10px;border:1px solid var(--line);font-size:14px;line-height:1.6;white-space:pre-wrap;margin-bottom:20px;max-height:280px;overflow-y:auto;color:var(--navy)">'+
+    '<div style="background:var(--soft);padding:14px;border-radius:10px;border:1px solid var(--line);font-size:14px;line-height:1.6;white-space:pre-wrap;margin-bottom:20px;max-height:280px;overflow-y:auto;color:var(--navy);word-break:break-word">'+
       esc(m.isi)+
     '</div>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">'+
