@@ -1700,7 +1700,23 @@ const ICON={dasbor:"\u25F1",kliping:"\u2702",buahpikir:"\u270D",tinjauan:"\u2713
 const LBL={dasbor:"Dasbor",kliping:"Kliping",buahpikir:"Buah Pikir",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",emailredaksi:"Email Redaksi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs"};
 const STAG={"Calon":"tag","Ditulis":"tag tag-o","Ditinjau":"tag tag-b","Terbit":"tag tag-g","Diarsipkan":"tag"};
 
-function me(){return db.pengguna.find(u=>u.id===S.me)||null}
+function me(){
+  if(!db || !db.pengguna) return null;
+  var u = db.pengguna.find(function(p){ return p.id===S.me; });
+  if(u) return u;
+  /* S.me mungkin tidak cocok — coba pulihkan dari localStorage */
+  try {
+    var saved = localStorage.getItem("rcs_active_user");
+    if(saved){
+      var uSaved = db.pengguna.find(function(p){ return p.id === saved; });
+      if(uSaved && uSaved.aktif !== false){
+        S.me = uSaved.id;
+        return uSaved;
+      }
+    }
+  } catch(e){}
+  return null;
+}
 function can(k){const m=me();return m?PERM[m.peran].includes(k):false}
 function user(id){return db.pengguna.find(u=>u.id===id)}
 function nm(id){const u=user(id);return u?u.nama:"—"}
@@ -1712,7 +1728,27 @@ function jilid(s){return s?s.slice(0,7):""}
 function log(aksi,obj){const rec={ts:new Date().toISOString().slice(0,16).replace("T"," "),user:S.me||null,aksi:aksi,obj:obj};if(db&&db.audit)db.audit.unshift(rec);supa.from("audit").insert({ts:rec.ts,aktor:rec.user,aksi:aksi,obj:obj}).then(({error})=>{if(error)console.warn("audit",error.message)})}
 let tt;
 function toast(m){const el=document.getElementById("toast");el.innerHTML='<div class="toast">'+esc(m)+"</div>";clearTimeout(tt);tt=setTimeout(()=>{el.innerHTML=""},2600)}
-function go(o){if(o&&Object.prototype.hasOwnProperty.call(o,"draft")&&o.draft===null)hapusDrafLokal();Object.assign(S,o);try{if("speechSynthesis" in window)window.speechSynthesis.cancel();}catch(e){}TTS={id:null,on:false,paused:false};try{if(S.mode==="public"&&S.pv&&S.pv.n==="clip"){history.replaceState(null,"",location.pathname+"#klip="+S.pv.id)}else if(location.hash){history.replaceState(null,"",location.pathname)}}catch(e){}window.scrollTo(0,0);render()}
+function go(o){
+  console.log("[go] called with:",JSON.stringify(o),"S.me before:",S.me);
+  if(o&&Object.prototype.hasOwnProperty.call(o,"draft")&&o.draft===null)hapusDrafLokal();
+  Object.assign(S,o);
+  /* Jika pindah ke mode admin tapi S.me kosong, coba pulihkan dari localStorage */
+  if(S.mode==="admin" && !S.me){
+    try {
+      var _saved = localStorage.getItem("rcs_active_user");
+      if(_saved && db && db.pengguna){
+        var _u = db.pengguna.find(function(p){ return p.id === _saved; });
+        if(_u && _u.aktif !== false){ S.me = _u.id; console.log("[go] recovered S.me from localStorage:", S.me); }
+      }
+    } catch(e){}
+  }
+  console.log("[go] S after assign:", JSON.stringify({mode:S.mode,av:S.av,me:S.me}));
+  try{if("speechSynthesis" in window)window.speechSynthesis.cancel();}catch(e){}
+  TTS={id:null,on:false,paused:false};
+  try{if(S.mode==="public"&&S.pv&&S.pv.n==="clip"){history.replaceState(null,"",location.pathname+"#klip="+S.pv.id)}else if(location.hash){history.replaceState(null,"",location.pathname)}}catch(e){}
+  window.scrollTo(0,0);
+  render();
+}
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})}
 
 /* ===== pasang aplikasi ke layar utama ===== */
@@ -2252,7 +2288,24 @@ function emailRedaksiBadgeHtml(){
 }
 
 function viewAdmin(){
-  const m=me();if(!m)return viewLogin();
+  var m=me();
+  /* Jika me() null, coba pulihkan sesi dari localStorage */
+  if(!m){
+    console.warn("[viewAdmin] me() returned null. S.me=",S.me,"Trying recovery...");
+    try {
+      var _saved = localStorage.getItem("rcs_active_user");
+      console.log("[viewAdmin] rcs_active_user from localStorage:",_saved);
+      if(_saved && db && db.pengguna){
+        var _u = db.pengguna.find(function(p){ return p.id === _saved; });
+        if(_u && _u.aktif !== false){
+          S.me = _u.id;
+          m = _u;
+          console.log("[viewAdmin] Recovered user:",m.nama,m.peran);
+        }
+      }
+    } catch(e){ console.error("[viewAdmin] recovery error:",e); }
+  }
+  if(!m) return viewLogin();
   const keys=PERM[m.peran]||[];
   if(!S.av || !keys.includes(S.av)){
     S.av = keys[0] || "dasbor";
