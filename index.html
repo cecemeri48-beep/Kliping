@@ -1165,6 +1165,10 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
   bottom: 18px;
   z-index: 55;
   pointer-events: none;
+  touch-action: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .mascot-wrap.masuk {
@@ -1180,8 +1184,10 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
   pointer-events: auto;
   cursor: grab;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   -webkit-user-drag: none;
-  touch-action: none;
+  touch-action: none !important;
   filter: drop-shadow(0 8px 20px rgba(16, 42, 67, 0.28));
   transition: filter 0.3s ease;
 }
@@ -1195,6 +1201,11 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
   display: block;
   width: 160px;
   height: auto;
+  touch-action: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   animation: mascotIdle 4s ease-in-out infinite;
@@ -1308,7 +1319,11 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
   overflow: hidden;
   border: 3px solid #fff;
   box-shadow: 0 6px 20px rgba(16, 42, 67, 0.22), 0 0 0 2px rgba(115, 87, 255, 0.3);
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   display: none;
   animation: mascotMiniPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -1448,11 +1463,11 @@ body.admin-mode .mascot-mini { display: none !important; }
       <i style="--sx:-8px;--sy:15px;--ex:-18px;--ey:28px"></i>
       <i style="--sx:0px;--sy:-10px;--ex:2px;--ey:-20px"></i>
     </div>
-    <img class="mascot-img" id="mascotImg" src="mascot.png" alt="Mascot RCS — Si Kambing Pemberani" draggable="false" />
+    <img class="mascot-img" id="mascotImg" src="mascot.png" alt="Mascot RCS — Si Anoa Ganteng" draggable="false" />
   </div>
 </div>
 <div class="mascot-mini" id="mascotMini" title="Tampilkan mascot">
-  <img src="mascot.png" alt="Mascot RCS" draggable="false" />
+  <img src="mascot.png" alt="Mascot RCS — Si Anoa Ganteng" draggable="false" />
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -4833,6 +4848,7 @@ bootstrap();
   var SPEECH_INTERVAL_MAX = 14000;
   var SPEECH_DURATION = 4500;
   var SPEECH_MSGS = [
+    "Hey, Namaku Anoa Ganteng, Salam kenal yah! 🦬",
     "Sudah baca kliping hari ini? 📰",
     "Jangan lupa cek fakta dulu! ✅",
     "Baca dulu, baru bicara. 📖",
@@ -4840,7 +4856,7 @@ bootstrap();
     "Alam tidak butuh pendaki bodoh. 🏔️",
     "Fakta bukan opini. Bedakan! 🔍",
     "Satu kliping, seribu pelajaran. 💡",
-    "Siap naik gunung? Baca dulu! 🐐",
+    "Siap naik gunung? Baca dulu! 🦬",
     "Literasi adalah senjata terbaik. 🗡️",
     "Membaca hari ini, melek fakta selamanya. 🌟",
     "Kamu ada karena aku ada, aku ada karena kamu ada. 🤝",
@@ -4897,57 +4913,69 @@ bootstrap();
     }, SPEECH_DURATION);
   }
 
-  /* --- DRAG & DROP MASCOT --- */
+  /* --- DRAG & DROP MASCOT (HP & DESKTOP) --- */
   var isDragging = false;
   var startX = 0, startY = 0;
   var initialLeft = 0, initialTop = 0;
   var hasMoved = false;
 
-  /* Restitusi posisi yang tersimpan */
+  /* Restitusi posisi tersimpan */
   try {
     var savedPos = JSON.parse(localStorage.getItem('mascot-pos'));
     if (savedPos && typeof savedPos.left === 'number' && typeof savedPos.top === 'number') {
-      wrap.style.left = Math.max(10, Math.min(window.innerWidth - 170, savedPos.left)) + 'px';
-      wrap.style.top = Math.max(10, Math.min(window.innerHeight - 200, savedPos.top)) + 'px';
+      wrap.style.left = Math.max(5, Math.min(window.innerWidth - 130, savedPos.left)) + 'px';
+      wrap.style.top = Math.max(5, Math.min(window.innerHeight - 150, savedPos.top)) + 'px';
       wrap.style.right = 'auto';
       wrap.style.bottom = 'auto';
     }
   } catch(e) {}
 
-  function onPointerDown(e) {
+  function getClientXY(e) {
+    if (e.touches && e.touches.length > 0) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    }
+    return { x: e.clientX || 0, y: e.clientY || 0 };
+  }
+
+  function handleStart(e) {
     if (e.target === toggle) return;
     isDragging = true;
     hasMoved = false;
-    startX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-    startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+    var pt = getClientXY(e);
+    startX = pt.x;
+    startY = pt.y;
 
     var rect = wrap.getBoundingClientRect();
     initialLeft = rect.left;
     initialTop = rect.top;
 
     inner.classList.add('dragging');
-    window.addEventListener('pointermove', onPointerMove, { passive: false });
-    window.addEventListener('pointerup', onPointerUp);
-    window.addEventListener('touchmove', onPointerMove, { passive: false });
-    window.addEventListener('touchend', onPointerUp);
+
+    window.addEventListener('mousemove', handleMove, { passive: false });
+    window.addEventListener('mouseup', handleEnd);
+    window.addEventListener('touchmove', handleMove, { passive: false });
+    window.addEventListener('touchend', handleEnd);
+    window.addEventListener('touchcancel', handleEnd);
   }
 
-  function onPointerMove(e) {
+  function handleMove(e) {
     if (!isDragging) return;
-    var clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-    var clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
-    var dx = clientX - startX;
-    var dy = clientY - startY;
+    var pt = getClientXY(e);
+    var dx = pt.x - startX;
+    var dy = pt.y - startY;
 
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
       hasMoved = true;
     }
 
     if (hasMoved) {
       if (e.cancelable) e.preventDefault();
       var rect = wrap.getBoundingClientRect();
-      var newLeft = Math.max(10, Math.min(window.innerWidth - rect.width - 10, initialLeft + dx));
-      var newTop = Math.max(10, Math.min(window.innerHeight - rect.height - 10, initialTop + dy));
+      var newLeft = Math.max(5, Math.min(window.innerWidth - rect.width - 5, initialLeft + dx));
+      var newTop = Math.max(5, Math.min(window.innerHeight - rect.height - 5, initialTop + dy));
 
       wrap.style.left = newLeft + 'px';
       wrap.style.top = newTop + 'px';
@@ -4956,15 +4984,16 @@ bootstrap();
     }
   }
 
-  function onPointerUp() {
+  function handleEnd() {
     if (!isDragging) return;
     isDragging = false;
     inner.classList.remove('dragging');
 
-    window.removeEventListener('pointermove', onPointerMove);
-    window.removeEventListener('pointerup', onPointerUp);
-    window.removeEventListener('touchmove', onPointerMove);
-    window.removeEventListener('touchend', onPointerUp);
+    window.removeEventListener('mousemove', handleMove);
+    window.removeEventListener('mouseup', handleEnd);
+    window.removeEventListener('touchmove', handleMove);
+    window.removeEventListener('touchend', handleEnd);
+    window.removeEventListener('touchcancel', handleEnd);
 
     if (hasMoved) {
       var rect = wrap.getBoundingClientRect();
@@ -4972,7 +5001,7 @@ bootstrap();
         localStorage.setItem('mascot-pos', JSON.stringify({ left: Math.round(rect.left), top: Math.round(rect.top) }));
       } catch(err) {}
     } else {
-      /* Klik (tanpa geser) → lompat + sparkle + ucapan */
+      /* Tap/Klik tanpa digeser → lompat + sparkle + ucapan */
       inner.classList.remove('lompat');
       void inner.offsetWidth;
       inner.classList.add('lompat');
@@ -4988,8 +5017,8 @@ bootstrap();
   }
 
   if (inner) {
-    inner.addEventListener('pointerdown', onPointerDown);
-    inner.addEventListener('touchstart', onPointerDown, { passive: true });
+    inner.addEventListener('mousedown', handleStart);
+    inner.addEventListener('touchstart', handleStart, { passive: false });
   }
 
   /* Scroll parallax */
