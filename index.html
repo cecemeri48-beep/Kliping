@@ -265,7 +265,7 @@ body{background:#f6f3ed;background-image:radial-gradient(circle at 10% 8%,#fff 0
   .smenu{display:block;position:relative;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px;z-index:40}
   .smenu-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:11px 14px;font-size:15px;font-weight:600;color:var(--ink);min-height:44px}
   .smenu-caret{color:var(--ink2)}
-  .smenu-pop{display:none;position:absolute;left:16px;right:16px;top:calc(100% - 6px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 34px rgba(16,42,67,.16);padding:6px;max-height:70vh;overflow-y:auto}
+  .smenu-pop{display:none;position:absolute;left:16px;right:16px;top:calc(100% - 6px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 34px rgba(16,42,67,.16);padding:6px;max-height:70vh;overflow-y:auto;z-index:120}
   .smenu.open .smenu-pop{display:block}
   .smi{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:0;background:none;padding:11px 12px;border-radius:8px;color:var(--ink2);min-height:44px;font-size:15px}
   .smi:hover{background:var(--soft)}
@@ -1650,8 +1650,10 @@ function simpanDrafLokal(){try{if(S.draft)sessionStorage.setItem(DRAFT_KEY,JSON.
 function hapusDrafLokal(){try{sessionStorage.removeItem(DRAFT_KEY)}catch(e){}}
 function pulihkanDraf(){try{const t=sessionStorage.getItem(DRAFT_KEY);return t?JSON.parse(t):null}catch(e){return null}}
 document.addEventListener("input",function(e){if(S&&S.draft&&e.target&&e.target.closest&&e.target.closest(".f")){try{ambil()}catch(err){}}});
-function toggleSideMenu(e){try{e.stopPropagation()}catch(_){}var w=document.getElementById("sideMenu");if(w)w.classList.toggle("open")}
-document.addEventListener("click",function(e){var w=document.getElementById("sideMenu");if(w&&w.classList.contains("open")&&!(e.target&&w.contains(e.target)))w.classList.remove("open")});
+function tutupSideMenu(){var w=document.getElementById("sideMenu");if(w)w.classList.remove("open")}
+function tutupSemuaMenu(){try{tutupMenu()}catch(e){}try{tutupAkun()}catch(e){}try{tutupSideMenu()}catch(e){}}
+function toggleSideMenu(e){if(e&&e.stopPropagation)e.stopPropagation();var w=document.getElementById("sideMenu");if(!w)return;var o=w.classList.contains("open");tutupSemuaMenu();if(!o)w.classList.add("open")}
+document.addEventListener("click",function(e){var w=document.getElementById("sideMenu");if(w&&w.classList.contains("open")&&!w.contains(e.target))tutupSideMenu()});
 
 const PERM={
  "Super-Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","taksonomi","pedoman","emailredaksi","iklan","audit","pengaturan"],
@@ -1802,14 +1804,14 @@ async function keluar(){try{await supa.auth.signOut()}catch(e){}S.me=null;go({mo
 function _tema(){try{return localStorage.getItem("tema")||"terang"}catch(e){return "terang"}}
 function toggleTema(){var t=_tema()==="gelap"?"terang":"gelap";try{localStorage.setItem("tema",t)}catch(e){}try{document.documentElement.setAttribute("data-tema",t)}catch(e){}render()}
 function temaBtn(){return '<button class="btn btn-sm tema-btn" onclick="toggleTema()" title="Ganti tema terang/gelap" aria-label="Ganti tema">'+(_tema()==="gelap"?"☀️":"🌙")+'</button>'}
-function toggleMenu(e){if(e&&e.stopPropagation)e.stopPropagation();var w=document.getElementById("menuWrap");if(!w)return;tutupAkun();var o=w.classList.toggle("open");var b=w.querySelector(".menu-btn");if(b)b.setAttribute("aria-expanded",o?"true":"false")}
+function toggleMenu(e){if(e&&e.stopPropagation)e.stopPropagation();var w=document.getElementById("menuWrap");if(!w)return;var o=w.classList.contains("open");tutupSemuaMenu();if(!o){w.classList.add("open");var b=w.querySelector(".menu-btn");if(b)b.setAttribute("aria-expanded","true")}}
 function tutupMenu(){var w=document.getElementById("menuWrap");if(!w)return;w.classList.remove("open");var b=w.querySelector(".menu-btn");if(b)b.setAttribute("aria-expanded","false")}
 document.addEventListener("click",function(e){var w=document.getElementById("menuWrap");if(w&&w.classList.contains("open")&&!w.contains(e.target))tutupMenu()});
-document.addEventListener("keydown",function(e){if(e.key==="Escape")tutupMenu()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")tutupSemuaMenu()});
 var _hintAkunOn=(function(){try{return !localStorage.getItem("hintAkun")}catch(e){return false}})();
 function _matikanHint(){if(!_hintAkunOn)return;_hintAkunOn=false;try{localStorage.setItem("hintAkun","1")}catch(e){}var el=document.getElementById("akunHint");if(el&&el.parentNode)el.parentNode.removeChild(el)}
 setTimeout(_matikanHint,9000);
-function toggleAkun(e){if(e&&e.stopPropagation)e.stopPropagation();var w=document.getElementById("akunWrap");if(!w)return;tutupMenu();_matikanHint();var o=w.classList.toggle("open");var b=w.querySelector(".avat-btn");if(b)b.setAttribute("aria-expanded",o?"true":"false")}
+function toggleAkun(e){if(e&&e.stopPropagation)e.stopPropagation();var w=document.getElementById("akunWrap");if(!w)return;var o=w.classList.contains("open");tutupSemuaMenu();_matikanHint();if(!o){w.classList.add("open");var b=w.querySelector(".avat-btn");if(b)b.setAttribute("aria-expanded","true")}}
 function tutupAkun(){var w=document.getElementById("akunWrap");if(!w)return;w.classList.remove("open");var b=w.querySelector(".avat-btn");if(b)b.setAttribute("aria-expanded","false")}
 document.addEventListener("click",function(e){var w=document.getElementById("akunWrap");if(w&&w.classList.contains("open")&&!w.contains(e.target))tutupAkun()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape")tutupAkun()});
@@ -2129,7 +2131,7 @@ async function masukGoogle(){
 function viewAdmin(){
   const m=me();if(!m)return viewLogin();
   const keys=PERM[m.peran];
-  const tabBtn=(k,cls)=>'<button class="'+cls+(S.av===k?" on":"")+'" onclick=\'go({av:"'+k+'",draft:null,err:[]})\'><i class="ic">'+ICON[k]+"</i>"+LBL[k]+(k==="tinjauan"&&db.kliping.filter(x=>x.status==="Ditinjau").length?' <span class="tag tag-b" style="margin-left:auto">'+db.kliping.filter(x=>x.split===undefined&&x.status==="Ditinjau").length+"</span>":"")+"</button>";
+  const tabBtn=(k,cls)=>'<button class="'+cls+(S.av===k?" on":"")+'" onclick=\'tutupSideMenu();go({av:"'+k+'",draft:null,err:[]})\'><i class="ic">'+ICON[k]+"</i>"+LBL[k]+(k==="tinjauan"&&db.kliping.filter(x=>x.status==="Ditinjau").length?' <span class="tag tag-b" style="margin-left:auto">'+db.kliping.filter(x=>x.split===undefined&&x.status==="Ditinjau").length+"</span>":"")+"</button>";
   const side='<aside class="side"><div class="lbl">Panel '+esc(m.peran)+"</div>"+keys.map(k=>tabBtn(k,"")).join("")+"</aside>";
   const smenu='<div class="smenu" id="sideMenu"><button type="button" class="smenu-btn" onclick="toggleSideMenu(event)"><span>'+(ICON[S.av]||"")+" "+esc(LBL[S.av]||"Menu")+'</span><span class="smenu-caret">\u25BE</span></button><div class="smenu-pop">'+keys.map(k=>tabBtn(k,"smi")).join("")+"</div></div>";
   let body;
@@ -2275,12 +2277,78 @@ function pEmailRedaksi(){
     '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);flex-wrap:wrap">'+
       '<div><b style="font-size:15.5px;color:var(--navy);display:flex;align-items:center;gap:6px">\ud83d\udce5 Kotak Masuk Email '+(unreadCount?'<span class="tag tag-b">'+unreadCount+' baru</span>':'')+'</b>'+
       '<span style="font-size:12.5px;color:var(--ink2);word-break:break-all">Pesan &amp; Surat Pembaca ASLI yang masuk ke '+esc(cred.email)+'</span></div>'+
-      '<div style="display:flex;gap:6px"><button class="btn btn-sm" onclick="render()">\ud83d\udd04 Segarkan</button><button class="btn btn-sm" onclick="bersihkanKotakMasuk()" style="color:var(--coral)">\ud83d\uddd1\ufe0f Bersihkan</button></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="tambahEmailMasukManual()" style="background:var(--blue-s);color:var(--blue);border:1px solid rgba(39,131,222,0.25);font-weight:600">\ud83d\udce9 Input Email</button><button class="btn btn-sm" onclick="render()">\ud83d\udd04 Segarkan</button><button class="btn btn-sm" onclick="bersihkanKotakMasuk()" style="color:var(--coral)">\ud83d\uddd1\ufe0f Bersihkan</button></div>'+
     '</div>'+
 
     (htmlPesan||'<p class="empty">Belum ada email atau surat pembaca asli yang masuk.</p>')+
     '</div>'+
     '</div>';
+}
+
+function tambahEmailMasukManual(){
+  var old = document.getElementById("modalAddMailBg");
+  if(old) old.remove();
+
+  var bg = document.createElement("div");
+  bg.id = "modalAddMailBg";
+  bg.className = "modal-bg";
+  bg.style.display = "grid";
+  bg.style.placeItems = "center";
+  bg.style.zIndex = "330";
+
+  bg.innerHTML =
+    '<div class="modal" style="max-width:520px;width:92vw;padding:20px 16px;position:relative;box-sizing:border-box;animation:modalPop 0.25s cubic-bezier(0.16,1,0.3,1) both">'+
+    '<button type="button" onclick="tutupAddMailModal()" style="position:absolute;top:14px;right:14px;background:none;border:0;font-size:24px;cursor:pointer;color:var(--ink2);line-height:1">&times;</button>'+
+    '<h3 style="margin-bottom:6px;display:flex;align-items:center;gap:8px">\ud83d\udce9 Tambah / Salin Email dari Gmail</h3>'+
+    '<p class="msub" style="margin-bottom:14px">Salin atau masukkan isi email yang masuk ke kliping.rcscbs@gmail.com agar tercatat di kotak masuk situs.</p>'+
+    '<form onsubmit="simpanEmailManualSubmit(event)">'+
+    '<div class="f" style="margin-bottom:12px"><label class="req" style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Nama Pengirim</label><input type="text" id="mAddNama" required placeholder="Contoh: Budi Santoso" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+    '<div class="f" style="margin-bottom:12px"><label class="req" style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Alamat Email Pengirim</label><input type="email" id="mAddEmail" required placeholder="budi@domain.com" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+    '<div class="f" style="margin-bottom:12px"><label class="req" style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Subjek / Perihal Email</label><input type="text" id="mAddSubjek" required placeholder="Subjek email dari Gmail" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
+    '<div class="f" style="margin-bottom:16px"><label class="req" style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Isi Lengkap Email</label><textarea id="mAddIsi" rows="4" required placeholder="Tempelkan isi surat/email dari Gmail di sini..." class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;font-family:inherit;line-height:1.5;box-sizing:border-box"></textarea></div>'+
+    '<div class="end" style="display:flex;gap:8px;justify-content:flex-end">'+
+      '<button type="button" class="btn" onclick="tutupAddMailModal()">Batal</button>'+
+      '<button type="submit" class="btn btn-p" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff">\ud83d\udcbe Simpan ke Kotak Masuk</button>'+
+    '</div>'+
+    '</form>'+
+    '</div>';
+
+  document.body.appendChild(bg);
+}
+
+function tutupAddMailModal(){
+  var bg = document.getElementById("modalAddMailBg");
+  if(bg) bg.remove();
+}
+
+function simpanEmailManualSubmit(e){
+  if(e) e.preventDefault();
+  var nama = (document.getElementById("mAddNama").value||"").trim();
+  var email = (document.getElementById("mAddEmail").value||"").trim();
+  var subjek = (document.getElementById("mAddSubjek").value||"").trim();
+  var isi = (document.getElementById("mAddIsi").value||"").trim();
+
+  if(!nama || !email || !subjek || !isi){
+    toast("Mohon isi semua bidang.");
+    return;
+  }
+
+  var daftar = dapatkanPesanRedaksi();
+  var newItem = {
+    id: "m" + Date.now().toString(36),
+    pengirim: nama,
+    email: email,
+    subjek: subjek,
+    tgl: new Date().toISOString().slice(0, 16).replace("T", " "),
+    isi: isi,
+    baca: false
+  };
+
+  daftar.unshift(newItem);
+  simpanPesanRedaksi(daftar);
+  tutupAddMailModal();
+  toast("\u2728 Email berhasil ditambahkan ke Kotak Masuk Situs!");
+  render();
 }
 
 function bukaPesanEmail(id){
@@ -3546,25 +3614,31 @@ function reaksiToggle(id,emo){
 }
 function reaksiBar(k){
   if(!k||k.status!=="Terbit")return "";
-  var tomb=Object.keys(RKS_EMO).map(function(emo){
+  var opi = (typeof isOpini==="function"?isOpini(k):(k.rubrik==="Buah Pikir"||k.jenis==="opini"));
+  var keys = opi ? ["roket","bom"] : ["api","kopi"];
+
+  var tomb=keys.map(function(emo){
     var on=rksSayaPunya(k.id,emo),n=rksJumlah(k.id,emo);
     return '<button class="rks-b'+(on?" on":"")+'" onclick=\'reaksiToggle("'+k.id+'","'+emo+'")\' '+
       'aria-pressed="'+(on?"true":"false")+'" title="'+esc(RKS_KET[emo])+'">'+
       '<span class="rks-e">'+RKS_EMO[emo]+'</span><span class="rks-t">'+esc(RKS_LBL[emo])+'</span>'+
       '<span class="rks-n">'+n+'</span></button>';
   }).join("");
-  var arti='<ul class="rks-arti">'+Object.keys(RKS_EMO).map(function(emo){
+  var arti='<ul class="rks-arti">'+keys.map(function(emo){
     return '<li><span class="rks-arti-e">'+RKS_EMO[emo]+'</span><span><b>'+esc(RKS_LBL[emo])+'</b> \u2014 '+esc(RKS_KET[emo])+'</span></li>';
   }).join("")+'</ul>';
   return '<div class="rks"><span class="rks-h">Tanggapan pembaca</span><div class="rks-row">'+tomb+'</div>'+arti+
     '<p class="rks-k">Tanpa akun, tanpa komentar. Satu tanggapan per perangkat, bisa dibatalkan dengan menekan lagi.</p>'+
     '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'+
     '<span style="font-size:12.5px;color:var(--ink2)">Punya sanggahan atau gagasan sendiri?</span>'+
-    '<button class="btn btn-sm" onclick=\'bukaPortalSurat("Sanggahan Opini","'+esc(k.judul)+'")\' style="background:var(--blue-s);color:var(--blue);border:1px solid rgba(39,131,222,0.25);font-weight:600">\u2709\ufe0f Kirim Surat Pembaca</button></div></div>';
+    '<button class="btn btn-sm" onclick=\'bukaPortalSurat("'+(opi?'Sanggahan Opini':'Surat Pembaca')+'","'+esc(k.judul)+'")\' style="background:var(--blue-s);color:var(--blue);border:1px solid rgba(39,131,222,0.25);font-weight:600">\u2709\ufe0f Kirim Surat Pembaca</button></div></div>';
 }
 function rksMini(k){
+  if(!k)return "";
+  var opi = (typeof isOpini==="function"?isOpini(k):(k.rubrik==="Buah Pikir"||k.jenis==="opini"));
+  var keys = opi ? ["roket","bom"] : ["api","kopi"];
   var res=[];
-  Object.keys(RKS_EMO).forEach(function(emo){
+  keys.forEach(function(emo){
     var n=rksJumlah(k.id,emo);
     if(n)res.push(RKS_EMO[emo]+" "+n);
   });
