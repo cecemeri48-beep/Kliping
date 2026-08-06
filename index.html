@@ -5445,6 +5445,12 @@ function viewOpini(k){
     70% { transform: scale(0.60); opacity: 0.08; }
   }
 
+  #reichasMascotWidget.hidden-auto {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(20px) scale(0.9) !important;
+  }
+
   @keyframes mascotBounce {
     0%, 100% { transform: translateY(0) scale(1); }
     30% { transform: translateY(-20px) scale(1.12) rotate(-6deg); }
@@ -5532,6 +5538,50 @@ function viewOpini(k){
     fallback.style.display = "block";
   }
 
+  // Auto Visibility Cycles:
+  // - 3 Menit Idle -> Menghilang jika tidak disentuh
+  // - 5 Menit Kemudian -> Muncul kembali secara otomatis
+  var IDLE_HIDE_MS = 3 * 60 * 1000;       // 3 menit
+  var REAPPEAR_CYCLE_MS = 5 * 60 * 1000;  // 5 menit
+  var idleTimer = null;
+  var reappearTimer = null;
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    clearTimeout(reappearTimer);
+
+    // If mascot was hidden, show it when user touches/interacts
+    if (widget.classList.contains("hidden-auto")) {
+      showMascotAuto();
+      return;
+    }
+
+    idleTimer = setTimeout(function() {
+      hideMascotAuto();
+    }, IDLE_HIDE_MS);
+  }
+
+  function hideMascotAuto() {
+    closeMascotBubble();
+    widget.classList.add("hidden-auto");
+    clearTimeout(idleTimer);
+    
+    // Schedule reappear in 5 minutes
+    reappearTimer = setTimeout(function() {
+      showMascotAuto();
+    }, REAPPEAR_CYCLE_MS);
+  }
+
+  function showMascotAuto() {
+    widget.classList.remove("hidden-auto");
+    widget.classList.remove("minimized");
+    quoteIdx = (quoteIdx + 1) % quotes.length;
+    showMascotQuote(quotes[quoteIdx]);
+    
+    // Start 3-minute idle countdown again
+    resetIdleTimer();
+  }
+
   // Drag and Drop Engine (Mouse + Touch)
   var avatarWrap = document.getElementById("mascotAvatarWrap");
   var isDragging = false;
@@ -5540,6 +5590,8 @@ function viewOpini(k){
   var hasMoved = false;
 
   function onPointerStart(e) {
+    resetIdleTimer(); // User touched -> reset 3-min timer
+
     var clientX = e.touches ? e.touches[0].clientX : e.clientX;
     var clientY = e.touches ? e.touches[0].clientY : e.clientY;
     
@@ -5564,6 +5616,8 @@ function viewOpini(k){
   }
 
   function onPointerMove(e) {
+    resetIdleTimer(); // User moving -> reset 3-min timer
+
     var clientX = e.touches ? e.touches[0].clientX : e.clientX;
     var clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -5627,6 +5681,7 @@ function viewOpini(k){
   };
 
   window.onMascotClick = function() {
+    resetIdleTimer();
     var avatar = document.getElementById("mascotAvatarWrap");
     if (avatar) {
       avatar.classList.remove("mascot-bounce");
@@ -5638,16 +5693,17 @@ function viewOpini(k){
   };
 
   window.restoreMascot = function() {
-    widget.classList.remove("minimized");
-    showMascotQuote("Halo lagi! Senang kamu kembali membaca. 🦬");
+    showMascotAuto();
   };
 
+  // Initial welcome greeting
   setTimeout(function() {
     showMascotQuote(quotes[0]);
+    resetIdleTimer(); // Start 3-min countdown on initial load
   }, 2200);
 
   setInterval(function() {
-    if (!widget.classList.contains("minimized") && !isDragging) {
+    if (!widget.classList.contains("minimized") && !widget.classList.contains("hidden-auto") && !isDragging) {
       quoteIdx = (quoteIdx + 1) % quotes.length;
       showMascotQuote(quotes[quoteIdx]);
     }
