@@ -1663,7 +1663,8 @@ async function bootstrap(){
     if(session&&tolak){toast(tolak.sebab==="nonaktif"?"Akun "+tolak.email+" dinonaktifkan. Hubungi Super-Admin.":"Email "+tolak.email+" belum terdaftar sebagai pengelola")}
     const _h=(location.hash.match(/klip=([A-Za-z0-9_-]+)/)||[])[1];
     if(_h&&db.kliping.some(k=>k.id===_h)){S.mode="public";S.pv={n:"clip",id:_h}}
-    if(S.me&&!S.draft&&!_h){const _dr=pulihkanDraf();if(_dr){S.draft=_dr;S.av="kliping";S.mode="admin";toast("Draf kliping dipulihkan — lanjutkan mengisi");}}
+    else if(location.hash.indexOf("admin") >= 0 && S.me){S.mode="admin";S.av=S.av||"dasbor"}
+    if(S.me&&!S.draft&&!_h&&S.mode!=="admin"){const _dr=pulihkanDraf();if(_dr){S.draft=_dr;S.av="kliping";S.mode="admin";toast("Draf kliping dipulihkan — lanjutkan mengisi");}}
   }catch(e){console.error(e);toast("Gagal memuat data: "+(e.message||e));if(!db)db=seed()}
   try{initGA()}catch(e){}
   try{catatTrafik(S.pv&&S.pv.id)}catch(e){}
@@ -1855,24 +1856,44 @@ function litBanner(){
   '</section>';
 }
 
-/* ================= masukPanel — navigasi ke panel admin ================= */
-function masukPanel(){
+/* ================= masukPanel & keluarPanel — navigasi panel admin ================= */
+function masukPanel(targetAv){
   try { tutupAkun(); } catch(e){}
   var m = me();
   if(!m){
-    /* Belum login, arahkan ke halaman login */
     S.mode = "login";
     render();
     return;
   }
   var keys = PERM[m.peran] || [];
   S.mode = "admin";
-  S.av = (S.av && keys.includes(S.av)) ? S.av : (keys[0] || "dasbor");
+  var av = targetAv || S.av;
+  S.av = (av && keys.includes(av)) ? av : (keys[0] || "dasbor");
   S.draft = null;
   S.err = [];
+  try { if(location.hash.indexOf("admin") < 0) history.replaceState(null, "", location.pathname + "#admin"); } catch(e){}
   window.scrollTo(0,0);
   render();
 }
+
+function keluarPanel(){
+  try { tutupAkun(); } catch(e){}
+  S.mode = "public";
+  S.pv = S.pv || { n: "board" };
+  try { if(location.hash.indexOf("admin") >= 0) history.replaceState(null, "", location.pathname); } catch(e){}
+  window.scrollTo(0,0);
+  render();
+}
+
+try {
+  window.addEventListener("hashchange", function(){
+    if(location.hash.indexOf("admin") >= 0){
+      if(me() && S.mode !== "admin"){ masukPanel(); }
+    } else if(S.mode === "admin" && location.hash.indexOf("klip=") < 0){
+      keluarPanel();
+    }
+  });
+} catch(e){}
 
 /* ================= header ================= */
 function header(){
@@ -1892,23 +1913,23 @@ function header(){
     var _unCount = (m.peran==="Admin" || m.peran==="Super-Admin") ? unreadEmailCount() : 0;
     var _defAv = (PERM[m.peran] && PERM[m.peran][0]) || "dasbor";
     var _targetAv = (S.av && PERM[m.peran] && PERM[m.peran].includes(S.av)) ? S.av : _defAv;
-    var _act=S.mode==="public"?'<button class="btn btn-sm btn-p" onclick="masukPanel()">Panel</button>':'<button class="btn btn-sm" onclick="go({mode:\'public\',pv:{n:\'board\'}})">Lihat situs</button>';
-    var _pact=S.mode==="public"?'<button class="ai" role="menuitem" onclick="masukPanel()"><span class="ai-ic">\ud83d\udee0\ufe0f</span>'+esc(_panelLbl)+'</button>':'<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'public\',pv:{n:\'board\'}})"><span class="ai-ic">\ud83c\udf10</span>Lihat situs</button>';
-    var _emailItem = (_unCount > 0) ? '<button class="ai" role="menuitem" onclick="tutupAkun();go({mode:\'admin\',av:\'emailredaksi\',draft:null,err:[]})"><span class="ai-ic">\ud83d\udce9</span>Email Redaksi <span class="tag tag-r" style="margin-left:auto;background:#ff6b5d;color:#fff;font-weight:700;padding:1px 6px;font-size:10px">'+_unCount+' baru</span></button>' : '';
-    var _tmi='<button class="ai ai-tema" role="menuitem" onclick="tutupAkun();toggleTema()"><span class="ai-ic">'+(_tema()==="gelap"?"\u2600\ufe0f":"\ud83c\udf19")+'</span>'+(_tema()==="gelap"?"Mode terang":"Mode gelap")+'</button>';
+    var _act=S.mode==="public"?'<button type="button" class="btn btn-sm btn-p" onclick="masukPanel()">Panel</button>':'<button type="button" class="btn btn-sm" onclick="keluarPanel()">Lihat situs</button>';
+    var _pact=S.mode==="public"?'<button type="button" class="ai" role="menuitem" onclick="masukPanel()"><span class="ai-ic">\ud83d\udee0\ufe0f</span>'+esc(_panelLbl)+'</button>':'<button type="button" class="ai" role="menuitem" onclick="keluarPanel()"><span class="ai-ic">\ud83c\udf10</span>Lihat situs</button>';
+    var _emailItem = (_unCount > 0) ? '<button type="button" class="ai" role="menuitem" onclick="masukPanel(\'emailredaksi\')"><span class="ai-ic">\ud83d\udce9</span>Email Redaksi <span class="tag tag-r" style="margin-left:auto;background:#ff6b5d;color:#fff;font-weight:700;padding:1px 6px;font-size:10px">'+_unCount+' baru</span></button>' : '';
+    var _tmi='<button type="button" class="ai ai-tema" role="menuitem" onclick="tutupAkun();toggleTema()"><span class="ai-ic">'+(_tema()==="gelap"?"\u2600\ufe0f":"\ud83c\udf19")+'</span>'+(_tema()==="gelap"?"Mode terang":"Mode gelap")+'</button>';
     right='<div class="who akunwrap" id="akunWrap">'
       +'<button class="avat avat-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Menu akun" onclick="toggleAkun(event)" style="position:relative">'+_ini+(_unCount > 0 ? '<span style="position:absolute;top:-2px;right:-2px;width:10px;height:10px;background:#ff6b5d;border-radius:50%;border:2px solid #fff"></span>' : '')+'</button>'
       +'<span class="avat-caret" aria-hidden="true">\u25be</span>'
       +(_hintAkunOn?'<div class="akun-hint" id="akunHint" onclick="toggleAkun(event)">Ketuk untuk menu &amp; mode gelap</div>':'')
       +'<div class="akun-meta"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+'</small><div class="lcn-wrap">'+lencanaHTML(rksTotalKurator(m.id).total)+'</div></div>'
       +_act
-      +'<button class="btn btn-sm" onclick="keluar()">Keluar</button>'
-      +'<div class="akun-pop" role="menu"><div class="akun-head"><div class="avat">'+_ini+'</div><div class="akun-id"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+(m.divisi?" \u00b7 "+esc(m.divisi):"")+'</small></div></div>'+_tmi+_pact+_emailItem+'<button class="ai ai-out" role="menuitem" onclick="tutupAkun();keluar()"><span class="ai-ic">\ud83d\udeaa</span>Keluar</button></div>'
+      +'<button type="button" class="btn btn-sm" onclick="keluar()">Keluar</button>'
+      +'<div class="akun-pop" role="menu"><div class="akun-head"><div class="avat">'+_ini+'</div><div class="akun-id"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+(m.divisi?" \u00b7 "+esc(m.divisi):"")+'</small></div></div>'+_tmi+_pact+_emailItem+'<button type="button" class="ai ai-out" role="menuitem" onclick="tutupAkun();keluar()"><span class="ai-ic">\ud83d\udeaa</span>Keluar</button></div>'
       +'</div>';
   }
   return '<header class="top"><div class="top-in'+(m?" auth":"")+'"><div class="brand"><img src="'+LOGO+'" alt="Logo REICHAS CHELEBES"'+(m?'':' onclick=\'go({mode:"login"})\' style="cursor:pointer"')+' /><div><h1>KLIPING RCS.CBS</h1><p>'+esc(db.settings.tagline)+'</p></div></div><nav class="nav">'+nav+"</nav>"+temaBtn()+right+"</div></header>";
 }
-async function keluar(){try{await supa.auth.signOut()}catch(e){}try{localStorage.removeItem("rcs_active_user")}catch(e){}S.me=null;go({mode:"public",pv:{n:"board"},draft:null});toast("Sesi diakhiri")}
+async function keluar(){try{await supa.auth.signOut()}catch(e){}try{localStorage.removeItem("rcs_active_user")}catch(e){}S.me=null;try{if(location.hash.indexOf("admin")>=0)history.replaceState(null,"",location.pathname)}catch(e){}go({mode:"public",pv:{n:"board"},draft:null});toast("Sesi diakhiri")}
 
 /* ================= public ================= */
 function _tema(){try{return localStorage.getItem("tema")||"terang"}catch(e){return "terang"}}
