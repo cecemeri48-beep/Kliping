@@ -1,15 +1,166 @@
-const CACHE='reichas-v34';
-const CORE=['/','/index.html','/manifest.webmanifest','/icon-180.png','/icon-192.png','/icon-512.png','/icon-maskable-512.png','/og-image.jpg','/logo.png','/hero.jpg','/paper.jpg'];
-self.addEventListener('install',function(e){e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(CORE)}).catch(function(){}));self.skipWaiting()});
-self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return k!==CACHE?caches.delete(k):null}))}));self.clients.claim()});
-self.addEventListener('fetch',function(e){
-  var req=e.request;
-  if(req.method!=='GET')return;
-  var url=new URL(req.url);
-  if(url.origin!==location.origin||url.pathname.indexOf('/api/')===0)return;
-  if(req.mode==='navigate'){
-    e.respondWith(fetch(req).then(function(r){var cp=r.clone();caches.open(CACHE).then(function(c){c.put('/',cp)}).catch(function(){});return r}).catch(function(){return caches.match('/').then(function(r){return r||caches.match('/index.html')})}));
-    return;
+const SUPA='https://nfeexstvdjgywonbtxtb.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E';
+const SITE='https://kliping-reichas.my.id';
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function cdata(s){return '<![CDATA['+String(s==null?'':s).replace(/\]\]>/g,']]&gt;')+']]>';}
+function hariRFC(tgl){
+  try{var d=new Date(String(tgl)+'T07:00:00+08:00');if(isNaN(d))return new Date().toUTCString();return d.toUTCString();}
+  catch(e){return new Date().toUTCString();}
+}
+// Ambil apa adanya: tanpa filter kolom, tanpa order, tanpa select bernama.
+// PostgREST membalas 400 kalau satu saja nama kolom tidak cocok huruf besar
+// kecilnya, dan galat itu dulu tertelan diam-diam sehingga sitemap kosong.
+async function ambilTabel(tabel){
+  const url=SUPA+'/rest/v1/'+tabel+'?select=*&limit=300';
+  const r=await fetch(url,{headers:{apikey:KEY,Authorization:'Bearer '+KEY,Accept:'application/json'}});
+  const teks=await r.text();
+  let data=null;
+  try{data=JSON.parse(teks);}catch(e){}
+  return {
+    ok:r.ok&&Array.isArray(data),
+    kode:r.status,
+    baris:Array.isArray(data)?data:[],
+    pesan:Array.isArray(data)?'':String(teks).slice(0,400)
+  };
+}
+// Nama kolom dicari lentur supaya tahan kalau Postgres melipat huruf besar.
+function ambilNilai(o,nama){
+  if(!o)return undefined;
+  if(o[nama]!==undefined)return o[nama];
+  const cari=String(nama).toLowerCase().replace(/[^a-z0-9]/g,'');
+  for(const k in o){
+    if(String(k).toLowerCase().replace(/[^a-z0-9]/g,'')===cari)return o[k];
   }
-  e.respondWith(caches.match(req).then(function(r){return r||fetch(req).then(function(res){var cp=res.clone();caches.open(CACHE).then(function(c){c.put(req,cp)}).catch(function(){});return res}).catch(function(){return r})}));
-});
+  return undefined;
+}
+function tglKlip(k){return ambilNilai(k,'tglKliping')||ambilNilai(k,'tglBerita')||'';}
+function daftar(x){
+  if(typeof x==='string'){
+    const t=x.trim();
+    if(t.charAt(0)==='['){try{x=JSON.parse(t);}catch(e){x=t.split(/\n|\|/);}}
+    else x=t?t.split(/\n|\|/):[];
+  }
+  return Array.isArray(x)?x.filter(function(v){return v&&String(v).trim();}).map(function(v){return String(v).trim();}):[];
+}
+async function ambilKliping(){
+  const h=await ambilTabel('kliping');
+  return h.baris
+    .filter(function(k){
+      const s=String(ambilNilai(k,'status')||'').trim().toLowerCase();
+      return s==='terbit' && ambilNilai(k,'id');
+    })
+    .sort(function(a,b){return String(tglKlip(b)).localeCompare(String(tglKlip(a)));})
+    .slice(0,200);
+}
+async function ambilMateri(){
+  const h=await ambilTabel('materi');
+  return h.baris;
+}
+async function cek(res){
+  const out=[];
+  for(const t of ['kliping','materi','profiles']){
+    let h;
+    try{h=await ambilTabel(t);}catch(e){h={ok:false,kode:0,baris:[],pesan:String(e&&e.message||e)};}
+    const satu=h.baris[0]||null;
+    const status={};
+    h.baris.forEach(function(r){
+      const s=String(ambilNilai(r,'status')||'(kosong)');
+      status[s]=(status[s]||0)+1;
+    });
+    out.push({
+      tabel:t,
+      httpKode:h.kode,
+      berhasil:h.ok,
+      jumlahBaris:h.baris.length,
+      sebaranStatus:status,
+      namaKolom:satu?Object.keys(satu):[],
+      contohId:satu?ambilNilai(satu,'id'):null,
+      contohTanggal:satu?tglKlip(satu):null,
+      contohKurator:satu?(ambilNilai(satu,'kurator')||null):null,
+      pesanGalat:h.pesan||null
+    });
+  }
+  let n=0;
+  try{n=(await ambilKliping()).length;}catch(e){}
+  res.setHeader('Content-Type','application/json; charset=utf-8');
+  res.setHeader('Cache-Control','no-store');
+  res.status(200).send(JSON.stringify({klipingTerbitTerbaca:n,tabel:out},null,2));
+}
+
+async function sitemap(res){
+  let kl=[],mt=[];
+  try{kl=await ambilKliping();}catch(e){}
+  try{mt=await ambilMateri();}catch(e){}
+  // Hanya URL sungguhan. Google mengabaikan bagian setelah tanda #, jadi
+  // alamat seperti /#materi dibaca sebagai duplikat beranda dan memicu
+  // peringatan "duplicate, submitted URL not selected as canonical".
+  const tetap=[['/',1.0,'daily']];
+  const now=new Date().toISOString().slice(0,10);
+  let x='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  tetap.forEach(function(t){
+    x+='<url><loc>'+esc(SITE+t[0])+'</loc><lastmod>'+now+'</lastmod><changefreq>'+t[2]+'</changefreq><priority>'+t[1].toFixed(1)+'</priority></url>\n';
+  });
+  kl.forEach(function(k){
+    x+='<url><loc>'+esc(SITE+'/klip/'+encodeURIComponent(ambilNilai(k,'id')))+'</loc>'+
+       (tglKlip(k)?'<lastmod>'+esc(String(tglKlip(k)).slice(0,10))+'</lastmod>':'')+
+       '<changefreq>monthly</changefreq><priority>0.8</priority></url>\n';
+  });
+  x+='</urlset>\n';
+  // Jangan pernah menembolok hasil kosong. Kalau Supabase sedang tersendat,
+  // sitemap berisi beranda saja bisa membeku di tepi jaringan dan terlihat
+  // seperti situs satu halaman padahal kliping ada.
+  res.setHeader('Content-Type','application/xml; charset=utf-8');
+  res.setHeader('Cache-Control', kl.length
+    ? 'public, max-age=300, s-maxage=300, stale-while-revalidate=600'
+    : 'no-store');
+  res.status(200).send(x);
+}
+
+async function rss(res){
+  let kl=[];
+  try{kl=await ambilKliping();}catch(e){}
+  kl=kl.slice(0,50);
+  const now=new Date().toUTCString();
+  let x='<?xml version="1.0" encoding="UTF-8"?>\n'+
+   '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">\n<channel>\n'+
+   '<title>Kliping RCS.CBS</title>\n'+
+   '<link>'+esc(SITE)+'</link>\n'+
+   '<description>Propaganda literasi. Kliping dan telaah kegiatan alam bebas dari REICHAS CHELEBES, Makassar.</description>\n'+
+   '<language>id-ID</language>\n'+
+   '<lastBuildDate>'+now+'</lastBuildDate>\n'+
+   '<generator>Kliping RCS.CBS</generator>\n'+
+   '<image><url>'+esc(SITE+'/icon-512.png')+'</url><title>Kliping RCS.CBS</title><link>'+esc(SITE)+'</link></image>\n'+
+   '<atom:link href="'+esc(SITE+'/rss.xml')+'" rel="self" type="application/rss+xml" />\n';
+  kl.forEach(function(k){
+    const tautan=SITE+'/klip/'+encodeURIComponent(ambilNilai(k,'id'));
+    const isi=(ambilNilai(k,'lead')||'')+(ambilNilai(k,'media')?' \u2014 disarikan dari '+ambilNilai(k,'media')+'.':'');
+    x+='<item>\n<title>'+cdata(ambilNilai(k,'judul'))+'</title>\n'+
+       '<link>'+esc(tautan)+'</link>\n'+
+       '<guid isPermaLink="true">'+esc(tautan)+'</guid>\n'+
+       '<pubDate>'+hariRFC(String(tglKlip(k)).slice(0,10))+'</pubDate>'+'\n'+
+       (ambilNilai(k,'rubrik')?'<category>'+cdata(ambilNilai(k,'rubrik'))+'</category>\n':'')+
+       daftar(ambilNilai(k,'topik')).map(function(t){return '<category>'+cdata(t)+'</category>\n';}).join('')+
+       '<description>'+cdata(isi)+'</description>\n'+
+       (/^https?:\/\//.test(String(ambilNilai(k,'gambar')||''))?'<enclosure url="'+esc(ambilNilai(k,'gambar'))+'" type="image/jpeg" />\n':'')+
+       '</item>\n';
+  });
+  x+='</channel>\n</rss>\n';
+  res.setHeader('Content-Type','application/rss+xml; charset=utf-8');
+  res.setHeader('Cache-Control', kl.length
+    ? 'public, max-age=300, s-maxage=300, stale-while-revalidate=600'
+    : 'no-store');
+  res.status(200).send(x);
+}
+
+module.exports = async function (req, res) {
+  const jenis = (req.query && req.query.jenis) || 'rss';
+  try {
+    if (jenis === 'cek') return await cek(res);
+    if (jenis === 'sitemap') return await sitemap(res);
+    return await rss(res);
+  } catch (e) {
+    res.setHeader('Content-Type','text/plain; charset=utf-8');
+    res.status(500).send('Gagal menyusun umpan.');
+  }
+};
