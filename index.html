@@ -5270,24 +5270,78 @@ function viewOpini(k){
 
 
 
-/* ---------- REICHAS Living Mascot Widget Styles & Engine ---------- */
+/* ---------- REICHAS Living Mascot Widget (Anoa Gunung RCS.CES) ---------- */
 (function() {
   var mascotStyle = document.createElement('style');
   mascotStyle.textContent = `
+  /* Mobile Header Responsive Optimization (Fire Streak Badge & Title) */
+  @media (max-width: 640px) {
+    .top-in {
+      padding: 8px 12px !important;
+      gap: 6px !important;
+      justify-content: space-between !important;
+    }
+    .brand {
+      gap: 8px !important;
+      flex: 0 0 auto !important;
+      min-width: 0 !important;
+    }
+    .brand img {
+      width: 34px !important;
+      height: 34px !important;
+    }
+    .brand h1 {
+      font-size: 13.5px !important;
+      white-space: nowrap !important;
+      letter-spacing: 0.01em !important;
+      line-height: 1.1 !important;
+    }
+    .brand p {
+      display: none !important;
+    }
+    .streak-chip {
+      padding: 4px 7px !important;
+      font-size: 11px !important;
+      gap: 3px !important;
+      border-radius: 20px !important;
+      flex: 0 0 auto !important;
+    }
+    .menuwrap .menu-btn {
+      padding: 6px 10px !important;
+      font-size: 11px !important;
+      gap: 5px !important;
+      min-height: 34px !important;
+    }
+  }
+  @media (max-width: 400px) {
+    .top-in {
+      padding: 6px 8px !important;
+      gap: 4px !important;
+    }
+    .brand h1 {
+      font-size: 12px !important;
+    }
+    .streak-chip {
+      padding: 3px 5px !important;
+      font-size: 10.5px !important;
+    }
+    .streak-chip .streak-n {
+      font-size: 10px !important;
+    }
+  }
+
   #reichasMascotWidget {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    z-index: 99999;
+    z-index: 999999;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     font-family: var(--sans);
-    pointer-events: none;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  #reichasMascotWidget * {
-    pointer-events: auto;
+    user-select: none;
+    touch-action: none;
+    transition: transform 0.2s ease, opacity 0.3s ease;
   }
   .mascot-bubble {
     position: relative;
@@ -5295,7 +5349,7 @@ function viewOpini(k){
     color: #ffffff;
     padding: 12px 20px 12px 16px;
     border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25), 0 0 0 2px rgba(255,255,255,0.15);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,255,255,0.2);
     font-size: 13px;
     line-height: 1.45;
     max-width: 260px;
@@ -5313,7 +5367,7 @@ function viewOpini(k){
     content: "";
     position: absolute;
     bottom: -8px;
-    right: 28px;
+    right: 32px;
     width: 0;
     height: 0;
     border-left: 8px solid transparent;
@@ -5343,71 +5397,98 @@ function viewOpini(k){
   }
   .mascot-avatar-wrap {
     position: relative;
-    cursor: pointer;
-    user-select: none;
+    cursor: grab;
     display: flex;
     flex-direction: column;
     align-items: center;
+    pointer-events: auto;
+  }
+  .mascot-avatar-wrap:active {
+    cursor: grabbing;
   }
   .mascot-canvas-img {
-    height: 145px;
+    height: 165px;
     width: auto;
-    filter: drop-shadow(0 12px 18px rgba(0,0,0,0.25));
-    animation: mascotFloat 3.5s ease-in-out infinite;
-    transition: transform 0.2s ease;
+    filter: drop-shadow(0 12px 20px rgba(0,0,0,0.35));
+    animation: mascotGifMotion 4s ease-in-out infinite;
+    transition: transform 0.2s ease, filter 0.2s ease;
   }
   .mascot-avatar-wrap:hover .mascot-canvas-img {
-    transform: scale(1.08) rotate(3deg);
+    filter: drop-shadow(0 15px 25px rgba(39,131,222,0.4));
   }
-  .mascot-avatar-wrap:active .mascot-canvas-img {
-    transform: scale(0.95) rotate(-3deg);
+  .mascot-dragging .mascot-canvas-img {
+    transform: scale(1.06) rotate(6deg) !important;
+    animation: none !important;
   }
   .mascot-shadow {
-    width: 60px;
+    width: 65px;
     height: 10px;
-    background: rgba(0,0,0,0.18);
+    background: rgba(0,0,0,0.2);
     border-radius: 50%;
     margin-top: -6px;
-    animation: mascotShadow 3.5s ease-in-out infinite;
+    animation: mascotShadowPulse 4s ease-in-out infinite;
   }
-  @keyframes mascotFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-9px); }
+
+  /* Animated GIF-like Living Keyframes */
+  @keyframes mascotGifMotion {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    20% { transform: translateY(-7px) rotate(-1.5deg) scale(1.01); }
+    40% { transform: translateY(-12px) rotate(1deg) scale(1.02); }
+    60% { transform: translateY(-5px) rotate(-1deg) scale(1.01); }
+    80% { transform: translateY(-9px) rotate(1.5deg) scale(1.015); }
+    100% { transform: translateY(0) rotate(0deg) scale(1); }
   }
-  @keyframes mascotShadow {
+
+  @keyframes mascotShadowPulse {
     0%, 100% { transform: scale(1); opacity: 0.25; }
-    50% { transform: scale(0.75); opacity: 0.12; }
+    40% { transform: scale(0.7); opacity: 0.12; }
+    80% { transform: scale(0.8); opacity: 0.16; }
   }
+
   @keyframes mascotBounce {
     0%, 100% { transform: translateY(0) scale(1); }
-    30% { transform: translateY(-16px) scale(1.1) rotate(-5deg); }
-    60% { transform: translateY(-6px) scale(1.05) rotate(4deg); }
+    30% { transform: translateY(-20px) scale(1.12) rotate(-6deg); }
+    60% { transform: translateY(-8px) scale(1.06) rotate(5deg); }
   }
   .mascot-bounce {
     animation: mascotBounce 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
   }
 
-  #reichasMascotWidget.minimized .mascot-bubble {
-    display: none !important;
+  /* Hint Drag Indicator */
+  .mascot-drag-hint {
+    font-size: 10px;
+    background: rgba(0,0,0,0.65);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 4px;
+    opacity: 0.8;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
   }
+  .mascot-avatar-wrap:hover .mascot-drag-hint {
+    opacity: 1;
+  }
+
+  #reichasMascotWidget.minimized .mascot-bubble,
   #reichasMascotWidget.minimized .mascot-avatar-wrap {
-    display: none;
+    display: none !important;
   }
   .mascot-badge {
     display: none;
     background: #102a43;
     color: #fff;
-    border: 1px solid rgba(255,255,255,0.2);
-    padding: 8px 14px;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 8px 15px;
     border-radius: 999px;
     font-size: 13px;
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.3);
     cursor: pointer;
     pointer-events: auto;
     align-items: center;
     gap: 6px;
-    transition: transform 0.2s ease;
   }
   .mascot-badge:hover {
     transform: scale(1.05);
@@ -5423,10 +5504,10 @@ function viewOpini(k){
       right: 16px;
     }
     .mascot-canvas-img {
-      height: 105px;
+      height: 120px;
     }
     .mascot-bubble {
-      max-width: 210px;
+      max-width: 220px;
       font-size: 12px;
     }
   }
@@ -5438,6 +5519,7 @@ function viewOpini(k){
     "Jangan gampang percaya hoaks ya! Saring dulu sebelum sharing. 🔎",
     "Membaca hari ini, melek fakta selamanya! 📚",
     "Punya masukan atau temuan hoaks? Kirim ke tim REICHAS! 🛡️",
+    "Geser saya ke mana saja kalau menutupi layar ya! 🤏",
     "Tetap kritis & bijak membaca informasi! 💡"
   ];
   
@@ -5450,10 +5532,11 @@ function viewOpini(k){
       '<button class="bubble-close" title="Sembunyikan pesan" onclick="event.stopPropagation(); closeMascotBubble();">&times;</button>' +
       '<p class="bubble-text" id="mascotText"></p>' +
     '</div>' +
-    '<div class="mascot-avatar-wrap" id="mascotAvatarWrap" onclick="onMascotClick()">' +
+    '<div class="mascot-avatar-wrap" id="mascotAvatarWrap">' +
       '<canvas id="mascotCanvas" class="mascot-canvas-img" style="display:none;"></canvas>' +
       '<img id="mascotFallbackImg" class="mascot-canvas-img" src="' + mascotSrc + '" alt="Maskot Anoa Gunung RCS.CES" />' +
       '<div class="mascot-shadow"></div>' +
+      '<span class="mascot-drag-hint">⇄ Tahan & Geser</span>' +
     '</div>' +
     '<div class="mascot-badge" onclick="restoreMascot()">' +
       '<span>🦬 Anoa Gunung RCS.CES</span>' +
@@ -5461,6 +5544,7 @@ function viewOpini(k){
 
   document.body.appendChild(widget);
 
+  // Black Background Removal Engine
   var img = new Image();
   img.crossOrigin = "Anonymous";
   img.onload = function() {
@@ -5477,10 +5561,11 @@ function viewOpini(k){
       var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       var data = imgData.data;
 
+      // Filter black background (RGB <= 35) while preserving the white outline & mascot
       for (var i = 0; i < data.length; i += 4) {
         var r = data[i], g = data[i+1], b = data[i+2];
-        if (r >= 230 && g >= 230 && b >= 230) {
-          data[i+3] = 0;
+        if (r <= 38 && g <= 38 && b <= 38) {
+          data[i+3] = 0; // Make transparent
         }
       }
 
@@ -5493,6 +5578,78 @@ function viewOpini(k){
   };
   img.src = mascotSrc;
 
+  // Drag and Drop Engine (Mouse + Touch)
+  var avatarWrap = document.getElementById("mascotAvatarWrap");
+  var isDragging = false;
+  var startX = 0, startY = 0;
+  var initialLeft = 0, initialTop = 0;
+  var hasMoved = false;
+
+  function onPointerStart(e) {
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    startX = clientX;
+    startY = clientY;
+    
+    var rect = widget.getBoundingClientRect();
+    initialLeft = rect.left;
+    initialTop = rect.top;
+    hasMoved = false;
+
+    // Switch to absolute inline positioning on drag
+    widget.style.right = "auto";
+    widget.style.bottom = "auto";
+    widget.style.left = initialLeft + "px";
+    widget.style.top = initialTop + "px";
+
+    document.addEventListener("mousemove", onPointerMove);
+    document.addEventListener("mouseup", onPointerEnd);
+    document.addEventListener("touchmove", onPointerMove, { passive: false });
+    document.addEventListener("touchend", onPointerEnd);
+  }
+
+  function onPointerMove(e) {
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    var dx = clientX - startX;
+    var dy = clientY - startY;
+
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      if (!isDragging) {
+        isDragging = true;
+        widget.classList.add("mascot-dragging");
+      }
+      hasMoved = true;
+      if (e.cancelable) e.preventDefault();
+
+      var newLeft = Math.max(10, Math.min(window.innerWidth - 140, initialLeft + dx));
+      var newTop = Math.max(10, Math.min(window.innerHeight - 180, initialTop + dy));
+
+      widget.style.left = newLeft + "px";
+      widget.style.top = newTop + "px";
+    }
+  }
+
+  function onPointerEnd() {
+    document.removeEventListener("mousemove", onPointerMove);
+    document.removeEventListener("mouseup", onPointerEnd);
+    document.removeEventListener("touchmove", onPointerMove);
+    document.removeEventListener("touchend", onPointerEnd);
+
+    if (isDragging) {
+      isDragging = false;
+      widget.classList.remove("mascot-dragging");
+    } else if (!hasMoved) {
+      onMascotClick();
+    }
+  }
+
+  avatarWrap.addEventListener("mousedown", onPointerStart);
+  avatarWrap.addEventListener("touchstart", onPointerStart, { passive: true });
+
+  // Quote & Interactivity
   var quoteIdx = 0;
   var bubbleTimer = null;
 
@@ -5536,7 +5693,7 @@ function viewOpini(k){
   }, 2200);
 
   setInterval(function() {
-    if (!widget.classList.contains("minimized")) {
+    if (!widget.classList.contains("minimized") && !isDragging) {
       quoteIdx = (quoteIdx + 1) % quotes.length;
       showMascotQuote(quotes[quoteIdx]);
     }
@@ -5547,4 +5704,5 @@ bootstrap();
 </script>
 </body>
 </html>
+
 
