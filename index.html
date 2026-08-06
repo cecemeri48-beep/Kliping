@@ -1634,11 +1634,25 @@ async function fetchAll(){
 }
 function setMeFromSession(session){
   const email=session&&session.user&&session.user.email;
-  if(!email){S.me=null;return null}
+  if(!email){
+    try {
+      var savedMe = localStorage.getItem("rcs_active_user");
+      if (savedMe && db && db.pengguna) {
+        var uSaved = db.pengguna.find(function(p){ return p.id === savedMe || p.email === savedMe; });
+        if (uSaved && uSaved.aktif !== false) {
+          S.me = uSaved.id;
+          return null;
+        }
+      }
+    } catch(e){}
+    S.me=null;
+    return null;
+  }
   const u=db.pengguna.find(p=>p.email&&p.email.toLowerCase()===email.toLowerCase());
   if(!u){S.me=null;return {email:email,sebab:"asing"}}
   if(u.aktif===false||u.aktif===0||u.aktif==="false"){S.me=null;return {email:email,sebab:"nonaktif"}}
   S.me=u.id;
+  try { localStorage.setItem("rcs_active_user", u.id); } catch(e){}
   return null;
 }
 async function bootstrap(){
@@ -1839,7 +1853,7 @@ function header(){
   }
   return '<header class="top"><div class="top-in'+(m?" auth":"")+'"><div class="brand"><img src="'+LOGO+'" alt="Logo REICHAS CHELEBES"'+(m?'':' onclick=\'go({mode:"login"})\' style="cursor:pointer"')+' /><div><h1>KLIPING RCS.CBS</h1><p>'+esc(db.settings.tagline)+'</p></div></div><nav class="nav">'+nav+"</nav>"+temaBtn()+right+"</div></header>";
 }
-async function keluar(){try{await supa.auth.signOut()}catch(e){}S.me=null;go({mode:"public",pv:{n:"board"},draft:null});toast("Sesi diakhiri")}
+async function keluar(){try{await supa.auth.signOut()}catch(e){}try{localStorage.removeItem("rcs_active_user")}catch(e){}S.me=null;go({mode:"public",pv:{n:"board"},draft:null});toast("Sesi diakhiri")}
 
 /* ================= public ================= */
 function _tema(){try{return localStorage.getItem("tema")||"terang"}catch(e){return "terang"}}
@@ -2192,7 +2206,9 @@ async function masukPassword(e){
       }
       S.me=u.id;
       S.mode="admin";
-      toast("\u2728 Berhasil masuk sebagai "+u.nama+" ("+u.peran+")");
+      S.av="dasbor";
+      try { localStorage.setItem("rcs_active_user", u.id); } catch(e){}
+      toast("✨ Berhasil masuk sebagai "+u.nama+" ("+u.peran+")");
       render();
       return;
     }
@@ -2202,7 +2218,9 @@ async function masukPassword(e){
     if(adminNama && (email.toLowerCase().indexOf("admin")>=0 || email.toLowerCase().indexOf("nietche")>=0)){
       S.me=adminNama.id;
       S.mode="admin";
-      toast("\u2728 Berhasil masuk sebagai "+adminNama.nama+" ("+adminNama.peran+")");
+      S.av="dasbor";
+      try { localStorage.setItem("rcs_active_user", adminNama.id); } catch(e){}
+      toast("✨ Berhasil masuk sebagai "+adminNama.nama+" ("+adminNama.peran+")");
       render();
       return;
     }
