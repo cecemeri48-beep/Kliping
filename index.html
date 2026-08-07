@@ -1730,12 +1730,12 @@ function toggleSideMenu(e){if(e&&e.stopPropagation)e.stopPropagation();var w=doc
 document.addEventListener("click",function(e){var w=document.getElementById("sideMenu");if(w&&w.classList.contains("open")&&!w.contains(e.target))tutupSideMenu()});
 
 const PERM={
- "Super-Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","taksonomi","pedoman","emailredaksi","iklan","audit","pengaturan"],
+ "Super-Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","taksonomi","pedoman","emailredaksi","iklan","audit","pengaturan","maskot"],
  "Admin":["dasbor","kliping","buahpikir","tinjauan","materi","pengguna","pedoman","emailredaksi","iklan"],
  "Kurator":["dasbor","kliping","buahpikir"]
 };
-const ICON={dasbor:"\u25F1",kliping:"\u2702",buahpikir:"\u270D",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",emailredaksi:"\u2709",audit:"\u2261",iklan:"\u25B1",pengaturan:"\u2699"};
-const LBL={dasbor:"Dasbor",kliping:"Kliping",buahpikir:"Buah Pikir",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",emailredaksi:"Email Redaksi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs"};
+const ICON={dasbor:"\u25F1",kliping:"\u2702",buahpikir:"\u270D",tinjauan:"\u2713",materi:"\u25A4",pengguna:"\u25CB",taksonomi:"\u25C7",pedoman:"\u00A7",emailredaksi:"\u2709",audit:"\u2261",iklan:"\u25B1",pengaturan:"\u2699",maskot:"🦬"};
+const LBL={dasbor:"Dasbor",kliping:"Kliping",buahpikir:"Buah Pikir",tinjauan:"Antrean Tinjauan",materi:"Materi",pengguna:"Pengguna & Peran",taksonomi:"Rubrik & Sumber",pedoman:"Pedoman Kurasi",emailredaksi:"Email Redaksi",audit:"Jurnal Audit",iklan:"Sponsor & Iklan",pengaturan:"Pengaturan Situs",maskot:"Kata Maskot"};
 const STAG={"Calon":"tag","Ditulis":"tag tag-o","Ditinjau":"tag tag-b","Terbit":"tag tag-g","Diarsipkan":"tag"};
 
 function me(){
@@ -2404,6 +2404,7 @@ function viewAdmin(){
   else if(S.av==="audit")body=pAudit();
   else if(S.av==="iklan")body=pIklan();
   else if(S.av==="pengaturan")body=pPengaturan();
+  else if(S.av==="maskot")body=pMaskot();
   else body='<div class="panel"><p class="empty">Tidak tersedia untuk peran ini.</p></div>';
   return '<div class="shell">'+smenu+side+'<div class="panel">'+body+"</div></div>";
 }
@@ -2971,6 +2972,55 @@ function simpanSetting(){
   initGA();
   render();
   toast("Pengaturan disimpan");
+}
+
+/* ---------- kata-kata maskot Anoa Ganteng (Super-Admin) ---------- */
+function pMaskot(){
+  var list=(window.kataMaskotEfektif?kataMaskotEfektif():[])||[];
+  var kustom=db.settings&&Array.isArray(db.settings.maskotKata)&&db.settings.maskotKata.length>0;
+  var rows=list.map(function(t,i){
+    return '<div class="kata-row" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px">'+
+      '<span style="flex:1;font-size:13px">'+esc(t)+'</span>'+
+      '<button class="btn btn-sm btn-d" onclick="hapusKataMaskot('+i+')">Hapus</button></div>';
+  }).join("");
+  return ph("Kata-kata Maskot","Anoa Ganteng membacakan salah satu kata-kata ini secara acak. Berlaku untuk semua pengunjung situs.","")+
+   '<div class="card">'+
+   '<div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" id="kataBaru" maxlength="120" placeholder="Tulis kata-kata baru untuk Anoa Ganteng\u2026" style="flex:1;min-width:220px" onkeydown="if(event.key===\'Enter\'){event.preventDefault();tambahKataMaskot()}" /><button class="btn btn-p" onclick="tambahKataMaskot()">Tambah</button></div>'+
+   '<p style="font-size:12px;color:var(--ink2);margin:10px 0 12px">'+(kustom?"Daftar kustom aktif \u2014 "+list.length+" kata-kata.":"Belum ada daftar kustom \u2014 maskot memakai "+list.length+" kata-kata bawaan. Menambah atau menghapus akan membuat daftar kustom.")+'</p>'+
+   '<div id="kataList">'+(rows||'<p style="color:var(--ink2);font-size:13px">Daftar kosong.</p>')+'</div>'+
+   (kustom?'<button class="btn" style="margin-top:4px" onclick="pulihkanKataMaskot()">Pulihkan kata-kata bawaan</button>':'')+
+   '</div>';
+}
+function _kataMaskotList(){
+  if(!db.settings)db.settings={};
+  if(!Array.isArray(db.settings.maskotKata))db.settings.maskotKata=(window.kataMaskotAsli||[]).slice();
+  return db.settings.maskotKata;
+}
+function tambahKataMaskot(){
+  var inp=document.getElementById("kataBaru");
+  var t=(inp&&inp.value||"").trim();
+  if(!t){toast("Tulis dulu kata-katanya");return;}
+  var list=_kataMaskotList();
+  if(list.some(function(x){return String(x).toLowerCase()===t.toLowerCase()})){toast("Kata-kata itu sudah ada");return;}
+  list.push(t);
+  _simpanKataMaskot("Kata-kata ditambah");
+}
+function hapusKataMaskot(i){
+  var list=_kataMaskotList();
+  if(i<0||i>=list.length)return;
+  list.splice(i,1);
+  _simpanKataMaskot("Kata-kata dihapus");
+}
+function pulihkanKataMaskot(){
+  if(!db.settings)db.settings={};
+  db.settings.maskotKata=[];
+  _simpanKataMaskot("Kembali ke kata-kata bawaan");
+}
+function _simpanKataMaskot(pesan){
+  log("Mengubah kata-kata maskot","maskot");
+  supa.from("app_settings").upsert({id:"situs",data:db.settings}).then(function(r){
+    if(!pErr(r&&r.error,"kata maskot")){toast(pesan);render();}
+  });
 }
 
 /* ================= editor ================= */
@@ -5798,9 +5848,21 @@ bootstrap();
     }, SPEECH_INTERVAL_MIN + Math.random() * (SPEECH_INTERVAL_MAX - SPEECH_INTERVAL_MIN));
   }
 
+  function kataMaskot() {
+    try {
+      var k = (typeof db !== 'undefined' && db && db.settings && Array.isArray(db.settings.maskotKata))
+        ? db.settings.maskotKata.filter(function(x){ return typeof x === 'string' && x.trim(); })
+        : [];
+      return k.length ? k : SPEECH_MSGS;
+    } catch(e) { return SPEECH_MSGS; }
+  }
+  window.kataMaskotAsli = SPEECH_MSGS.slice();
+  window.kataMaskotEfektif = kataMaskot;
+
   function tampilSpeech() {
     if (isMini || wrap.style.display === 'none') return;
-    var msg = SPEECH_MSGS[Math.floor(Math.random() * SPEECH_MSGS.length)];
+    var daftar = kataMaskot();
+    var msg = daftar[Math.floor(Math.random() * daftar.length)];
     speech.textContent = msg;
     speech.classList.add('tampil');
     clearTimeout(hideTimer);
