@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Kliping RCS.CBS — Propaganda Literasi &amp; Cek Fakta</title>
-<meta name="description" content="Membaca hari ini, melek fakta selamanya. Galeri kliping literasi & cek fakta REICHAS — baca, telaah, dan bagikan." />
+<meta name="description" content="Membaca hari ini, melek fakta selamanya. Galeri kliping literasi & cek fakta RCS.CBS — baca, telaah, dan bagikan." />
 <link rel="canonical" href="https://kliping-reichas.my.id/" />
 <link rel="preconnect" href="https://nfeexstvdjgywonbtxtb.supabase.co" crossorigin />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
@@ -19,7 +19,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Kliping RCS.CBS" />
 <meta property="og:title" content="Membaca Hari Ini, Melek Fakta Selamanya" />
-<meta property="og:description" content="Galeri kliping literasi & cek fakta REICHAS — baca, telaah, dan bagikan." />
+<meta property="og:description" content="Galeri kliping literasi & cek fakta RCS.CBS — baca, telaah, dan bagikan." />
 <meta property="og:url" content="https://kliping-reichas.my.id/" />
 <meta property="og:image" content="https://kliping-reichas.my.id/og-image.jpg?v=6" />
 <meta property="og:image:secure_url" content="https://kliping-reichas.my.id/og-image.jpg?v=6" />
@@ -31,7 +31,7 @@
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Membaca Hari Ini, Melek Fakta Selamanya" />
-<meta name="twitter:description" content="Galeri kliping literasi & cek fakta REICHAS — baca, telaah, dan bagikan." />
+<meta name="twitter:description" content="Galeri kliping literasi & cek fakta RCS.CBS — baca, telaah, dan bagikan." />
 <meta name="twitter:image" content="https://kliping-reichas.my.id/og-image.jpg?v=6" />
 <link rel="manifest" href="manifest.webmanifest?v=6" />
 <meta name="theme-color" content="#102a43" />
@@ -1880,9 +1880,9 @@ function shBtns(kind){const call=c=>kind==="situs"?"bagiSitus('"+c+"')":"bagiKli
 function litBanner(){
   return '<section class="lit-banner">'+
     '<div class="lit-inner">'+
-      '<span class="lit-badge">\ud83d\udcda Gerakan Literasi REICHAS \u00b7 Para Pencinta Alam &amp; Penggiat Adventure \u26fa</span>'+
+      '<span class="lit-badge">\ud83d\udcda Gerakan Literasi RCS.CBS \u00b7 Para Pencinta Alam &amp; Penggiat Alam Bebas-Adventure \u26fa</span>'+
       '<h2>Baca. Pahami. Bagikan.</h2>'+
-      '<p>Kliping ini didedikasikan untuk Para Pencinta Alam dan Para Penggiat Adventure ( Alam Bebas ). Satu kliping yang kamu baca hari ini bisa menyelamatkan langkah esok hari.</p>'+
+      '<p>Kliping ini didedikasikan untuk Para Pencinta Alam dan Para Penggiat Alam Bebas-Adventure. Satu kliping yang kamu baca hari ini bisa menyelamatkan langkah esok hari.</p>'+
       '<div class="lit-quotes">'+
         '<div class="lit-qitem"><span class="lit-qitem-ic">\ud83d\uddfa\ufe0f</span><div class="lit-qitem-tx"><b>Menemukan Jalan</b>Membaca adalah cara kita menemukan jalan, berbagi informasi adalah cara kita memastikan tidak ada yang tersesat.</div></div>'+
         '<div class="lit-qitem"><span class="lit-qitem-ic">\ud83c\udf92</span><div class="lit-qitem-tx"><b>Kompas Pikiran</b>Membaca mengisi ransel pikiran kita dengan ilmu, berbagi informasi adalah kompas yang mengarahkan sesama.</div></div>'+
@@ -2263,10 +2263,10 @@ function viewArsip(){
 function viewPedomanPublik(){
   return '<div class="art"><h2 style="margin-top:0">Pedoman Kurasi</h2><p class="lead">Kami bekerja dari meja, bukan dari lapangan. Karena itu batas kerja kami harus terbuka untuk dibaca siapa pun.</p>'+
    '<div class="sec">'+db.pedoman.split("\n").map(l=>"<p>"+esc(l)+"</p>").join("")+"</div>"+
-   '<div class="note r">Menemukan kekeliruan atau ingin materinya dicabut? Sampaikan kepada Divisi Komunikasi dan Publikasi REICHAS CHELEBES. Kami menanggapi dalam tiga hari kalender.</div></div>'+foot();
+   '<div class="note r">Menemukan kekeliruan atau ingin materinya dicabut? Sampaikan kepada Divisi Komunikasi dan Publikasi RCS.CBS. Kami menanggapi dalam tiga hari kalender.</div></div>'+foot();
 }
 function foot(){
-  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · REICHAS CHELEBES, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="bukaPortalSurat()" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);color:#fff;border:0">\u2709\ufe0f Kirim Surat Pembaca</button><button class="btn btn-sm" onclick="bukaPanduanDarurat()">🎒 Panduan Darurat Lapangan</button><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
+  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · RCS.CBS. </div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="bukaPortalSurat()" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);color:#fff;border:0">\u2709\ufe0f Kirim Surat Pembaca</button><button class="btn btn-sm" onclick="bukaPanduanDarurat()">🎒 Panduan Darurat Lapangan</button><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
 }
 function tipis(){db.settings.sinyalTipis=!db.settings.sinyalTipis;save();render();toast(db.settings.sinyalTipis?"Mode sinyal tipis aktif":"Mode sinyal tipis nonaktif")}
 
@@ -4154,7 +4154,7 @@ async function kirimSuratPembaca(e){
 
   tutupPortalSurat();
   if(_tersimpan){
-    toast("✨ Surat Pembaca / Buah Pikir berhasil dikirim ke Meja Redaksi REICHAS CHELEBES! Terima kasih.");
+    toast("✨ Surat Pembaca / Buah Pikir berhasil dikirim ke Meja Redaksi RCS.CBS! Terima kasih.");
   }else{
     toast("⚠️ Surat GAGAL tersimpan ke server"+(_galat?": "+_galat:"")+". Mohon kirim ulang, atau surel langsung ke kliping.rcscbs@gmail.com");
   }
