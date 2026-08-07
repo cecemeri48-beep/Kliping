@@ -2436,7 +2436,7 @@ function pEmailRedaksi(){
   }
 
   var defaultEmail = "kliping.rcscbs@gmail.com";
-  var defaultPass = "klipingrcscbs2026";
+  var defaultPass = "";
   var cred = { email: defaultEmail, pass: defaultPass };
   try {
     var stored = JSON.parse(localStorage.getItem("rcs_email_redaksi"));
@@ -2472,13 +2472,13 @@ function pEmailRedaksi(){
       '<p style="font-size:13px;color:var(--ink2);margin:0 0 14px">Surel utama redaksi untuk menerima tanggapan, sanggahan, dan permohonan koreksi kliping dari publik.</p>'+
       '<div style="background:var(--soft,#f8fafc);border-radius:10px;padding:12px;border:1px solid var(--line);margin-bottom:14px;font-size:13px">'+
       '<div style="margin-bottom:10px;word-break:break-word"><b>Email Redaksi:</b> <code style="font-family:monospace;color:var(--violet,#7357ff);background:rgba(115,87,255,0.08);padding:2px 6px;border-radius:4px">'+esc(cred.email)+'</code></div>'+
-      '<div style="word-break:break-word"><b>Password Email:</b> <code id="passCodeTxt" style="font-family:monospace;background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px">'+(cred.pass ? esc(cred.pass) : '<i>(tanpa password tersimpan)</i>')+'</code></div>'+
-      (cred.pass ? '<button type="button" class="btn btn-sm" onclick="salinPassEmail()" style="margin-top:6px;display:inline-flex;align-items:center;gap:4px">📋 Salin Password</button>' : '')+
+      '<div style="word-break:break-word"><b>Kata sandi:</b> <span style="color:var(--ink2)">tidak disimpan di halaman ini lagi. Kredensial Gmail hanya boleh berada di sisi server (App Password / OAuth).</span></div>'+
+      ''+
       '</div>'+
 
       '<form onsubmit="simpanEmailRedaksi(event)">'+
       '<div class="f" style="margin-bottom:12px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Alamat Email Redaksi</label><input type="email" id="editRedaksiEmail" value="'+esc(cred.email)+'" required class="inp" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--line);font-size:13px;box-sizing:border-box" /></div>'+
-      '<div class="f" style="margin-bottom:16px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Password / Kata Sandi Gmail</label><input type="text" id="editRedaksiPass" value="'+esc(cred.pass)+'" placeholder="Kosongkan bila tidak ingin menampilkan password" class="inp" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--line);font-size:13px;box-sizing:border-box" /></div>'+
+      '<div class="f" style="margin-bottom:16px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Password / Kata Sandi Gmail</label><input type="password" id="editRedaksiPass" value="" autocomplete="new-password" placeholder="Jangan simpan sandi Gmail di sini" class="inp" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--line);font-size:13px;box-sizing:border-box" /></div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
         '<button type="submit" class="btn btn-p btn-sm" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff">💾 Simpan Kredensial</button>'+
         (cred.pass ? '<button type="button" class="btn btn-sm" onclick="hapusPassEmail()" style="background:var(--red-s);color:var(--red);border:1px solid rgba(229,100,88,0.25)">🗑️ Hapus Password</button>' : '')+
@@ -2491,12 +2491,52 @@ function pEmailRedaksi(){
     '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);flex-wrap:wrap">'+
       '<div><b style="font-size:15.5px;color:var(--navy);display:flex;align-items:center;gap:6px">📥 Kotak Masuk Email '+(unreadCount?'<span class="tag tag-b">'+unreadCount+' baru</span>':'')+'</b>'+
       '<span style="font-size:12.5px;color:var(--ink2);word-break:break-all">Pesan &amp; Surat Pembaca yang masuk ke '+esc(cred.email)+'</span></div>'+
-      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="tambahEmailMasukManual()" style="background:var(--blue-s);color:var(--blue);border:1px solid rgba(39,131,222,0.25);font-weight:600">📩 Input Email</button><button class="btn btn-sm" onclick="render()">🔄 Segarkan</button><button class="btn btn-sm" onclick="bersihkanKotakMasuk()" style="color:var(--coral)">🗑️ Bersihkan</button></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button id="btnTarikGmail" class="btn btn-sm btn-p" onclick="muatEmailGmail()" style="background:var(--blue-s);color:var(--blue);border:1px solid rgba(39,131,222,0.25);font-weight:600">📥 Tarik dari Gmail</button><button class="btn btn-sm" onclick="tambahEmailMasukManual()">✍ Input Manual</button><button class="btn btn-sm" onclick="render()">🔄 Segarkan</button><button class="btn btn-sm" onclick="bersihkanKotakMasuk()" style="color:var(--coral)">🗑️ Bersihkan</button></div>'+
     '</div>'+
 
     (htmlPesan||'<p class="empty">Belum ada email atau surat pembaca yang masuk.</p>')+
     '</div>'+
     '</div>';
+}
+
+/* Tarik email sungguhan dari Gmail lewat /api/inbox-gmail (IMAP di sisi server) */
+async function muatEmailGmail(){
+  var btn = document.getElementById("btnTarikGmail");
+  var labelAsli = btn ? btn.innerHTML : "";
+  if(btn){ btn.disabled = true; btn.innerHTML = "\u23f3 Menarik\u2026"; }
+  try{
+    var sesi = await supa.auth.getSession();
+    var token = (sesi && sesi.data && sesi.data.session) ? sesi.data.session.access_token : null;
+    if(!token){ toast("\u26a0\ufe0f Sesi sudah habis. Silakan masuk ulang."); return; }
+
+    var r = await fetch("/api/inbox-gmail", { headers: { Authorization: "Bearer " + token } });
+    var j = null;
+    try{ j = await r.json(); }catch(e){}
+
+    if(!r.ok || !j || !j.success){
+      toast("\u26a0\ufe0f " + ((j && j.error) ? j.error : ("Server menjawab " + r.status + ".")));
+      return;
+    }
+
+    var lama = [];
+    try{ lama = JSON.parse(localStorage.getItem("rcs_inbox_emails")) || []; }catch(e){}
+    var sudahAda = {};
+    lama.forEach(function(p){ if(p && p.id) sudahAda[p.id] = true; });
+
+    var baru = (j.data || []).filter(function(p){ return p && p.id && !sudahAda[p.id]; });
+    if(!baru.length){
+      toast("\u2705 Sudah mutakhir. Tidak ada email baru di " + (j.akun || "Gmail") + ".");
+      return;
+    }
+
+    simpanPesanRedaksi(baru.concat(lama));
+    toast("\ud83d\udce5 " + baru.length + " email baru ditarik dari Gmail.");
+    render();
+  }catch(e){
+    toast("\u26a0\ufe0f Gagal menarik email: " + ((e && e.message) ? e.message : e));
+  }finally{
+    if(btn){ btn.disabled = false; btn.innerHTML = labelAsli || "\ud83d\udce5 Tarik dari Gmail"; }
+  }
 }
 
 function tambahEmailMasukManual(){
@@ -2651,7 +2691,7 @@ function hapusPassEmail(){
 function salinPassEmail(){
   try{
     var stored = JSON.parse(localStorage.getItem("rcs_email_redaksi"));
-    var pass = (stored && stored.pass !== undefined) ? stored.pass : "klipingrcscbs2026";
+    var pass = (stored && stored.pass !== undefined) ? stored.pass : "";
     if(!pass){toast("Password kosong / telah dihapus.");return;}
     if(navigator.clipboard)navigator.clipboard.writeText(pass);
     toast("\ud83d\udccb Password email disalin ke clipboard!");
@@ -3985,8 +4025,9 @@ async function kirimSuratPembaca(e){
   } catch(err){}
 
   /* 3. Simpan ke Supabase */
+  var _tersimpan=false,_galat="";
   try{
-    await supa.from("kliping").insert({
+    var _hasil=await supa.from("kliping").insert({
       id: id,
       judul: newKlip.judul,
       lead: newKlip.lead,
@@ -4007,7 +4048,9 @@ async function kirimSuratPembaca(e){
       kepekaan: newKlip.kepekaan,
       gambar: newKlip.gambar
     });
+    if(_hasil&&_hasil.error){_galat=_hasil.error.message||String(_hasil.error);}else{_tersimpan=true;}
   }catch(err){
+    _galat=(err&&err.message)?err.message:String(err);
     console.warn("Surat pembaca insert:", err);
   }
 
@@ -4026,7 +4069,11 @@ async function kirimSuratPembaca(e){
   } catch(e){}
 
   tutupPortalSurat();
-  toast("✨ Surat Pembaca / Buah Pikir berhasil dikirim ke Meja Redaksi REICHAS CHELEBES! Terima kasih.");
+  if(_tersimpan){
+    toast("✨ Surat Pembaca / Buah Pikir berhasil dikirim ke Meja Redaksi REICHAS CHELEBES! Terima kasih.");
+  }else{
+    toast("⚠️ Surat GAGAL tersimpan ke server"+(_galat?": "+_galat:"")+". Mohon kirim ulang, atau surel langsung ke kliping.rcscbs@gmail.com");
+  }
   render();
 }
 (function(){
