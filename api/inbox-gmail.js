@@ -31,7 +31,7 @@ async function periksaAkses(req) {
   const token = auth.replace(/^Bearer\s+/i, '').trim();
   if (!token) return { ok: false, kode: 401, pesan: 'Token tidak ada. Silakan masuk sebagai Admin.' };
 
-  let uid = null;
+  let uid = null, email = null;
   try {
     const r = await fetch(SUPA + '/auth/v1/user', {
       headers: { apikey: ANON, Authorization: 'Bearer ' + token }
@@ -39,26 +39,50 @@ async function periksaAkses(req) {
     if (!r.ok) return { ok: false, kode: 401, pesan: 'Sesi tidak sah atau sudah kedaluwarsa.' };
     const u = await r.json();
     uid = u && u.id;
+    email = u && u.email;
   } catch (e) {
     return { ok: false, kode: 503, pesan: 'Gagal memverifikasi sesi: ' + e.message };
   }
   if (!uid) return { ok: false, kode: 401, pesan: 'Sesi tidak sah.' };
+  if (!email) return { ok: false, kode: 401, pesan: 'Sesi tidak memuat alamat email.' };
 
-  let peran = null;
-  try {
-    const r = await fetch(SUPA + '/rest/v1/profiles?select=peran&id=eq.' + encodeURIComponent(uid), {
-      headers: { apikey: ANON, Authorization: 'Bearer ' + token }
-    });
+  /* Cocokkan lewat EMAIL, bukan uid.
+     profiles.id di situs ini berformat "u<timestamp>" (lihat simpanPengguna di
+     index.html), jadi id dari Supabase Auth tidak akan pernah cocok. */
+  const cariProfil = async (nilai) => {
+    const r = await fetch(
+      SUPA + '/rest/v1/profiles?select=peran,aktif,nama,email&email=eq.' + encodeURIComponent(nilai),
+      { headers: { apikey: ANON, Authorization: 'Bearer ' + token } }
+    );
+    if (!r.ok) throw new Error('profiles HTTP ' + r.status);
     const rows = await r.json();
-    peran = Array.isArray(rows) && rows[0] ? rows[0].peran : null;
+    return Array.isArray(rows) && rows[0] ? rows[0] : null;
+  };
+
+  let profil = null;
+  try {
+    profil = await cariProfil(String(email).toLowerCase());
+    if (!profil && email !== String(email).toLowerCase()) profil = await cariProfil(email);
   } catch (e) {
-    return { ok: false, kode: 503, pesan: 'Gagal membaca peran pengguna: ' + e.message };
+    return { ok: false, kode: 503, pesan: 'Gagal membaca tabel profiles: ' + e.message };
   }
 
-  if (PERAN_BOLEH.indexOf(peran) === -1) {
-    return { ok: false, kode: 403, pesan: 'Akses ditolak. Hanya Admin & Super-Admin yang boleh membuka kotak masuk redaksi.' };
+  if (!profil) {
+    return {
+      ok: false, kode: 403,
+      pesan: 'Email ' + email + ' tidak ditemukan di tabel profiles. Tambahkan akun ini lewat menu Pengguna, atau periksa kebijakan RLS tabel profiles.'
+    };
   }
-  return { ok: true, uid: uid, peran: peran };
+  if (profil.aktif === false) {
+    return { ok: false, kode: 403, pesan: 'Akun ' + email + ' berstatus nonaktif.' };
+  }
+  if (PERAN_BOLEH.indexOf(profil.peran) === -1) {
+    return {
+      ok: false, kode: 403,
+      pesan: 'Akses ditolak. Peran akun ini "' + (profil.peran || 'kosong') + '", sedangkan yang boleh hanya Admin & Super-Admin.'
+    };
+  }
+  return { ok: true, uid: uid, email: email, peran: profil.peran };
 }
 
 /* ------------------------------------------------------------------ *
@@ -395,3 +419,4 @@ module.exports.uraikanEmail = uraikanEmail;
 module.exports.ambilEmailIMAP = ambilEmailIMAP;
 module.exports.ambilLiteral = ambilLiteral;
 module.exports.cariAkhirTag = cariAkhirTag;
+module.exports.periksaAkses = periksaAkses;
