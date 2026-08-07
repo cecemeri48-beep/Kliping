@@ -1846,9 +1846,9 @@ function shBtns(kind){const call=c=>kind==="situs"?"bagiSitus('"+c+"')":"bagiKli
 function litBanner(){
   return '<section class="lit-banner">'+
     '<div class="lit-inner">'+
-      '<span class="lit-badge">\ud83d\udcda Gerakan Literasi REICHAS \u00b7 Para Pencinta Alam &amp; Penggiat Alam Bebas - Adventure \u26fa</span>'+
+      '<span class="lit-badge">\ud83d\udcda Gerakan Literasi REICHAS \u00b7 Para Pencinta Alam &amp; Penggiat Adventure \u26fa</span>'+
       '<h2>Baca. Pahami. Bagikan.</h2>'+
-      '<p>Kliping ini didedikasikan untuk Para Pencinta Alam dan Penggiat Alam Bebas (Adventure). Satu kliping yang kamu baca hari ini bisa menyelamatkan langkah esok hari.</p>'+
+      '<p>Kliping ini didedikasikan untuk Para Pencinta Alam dan Para Penggiat Adventure ( Alam Bebas ). Satu kliping yang kamu baca hari ini bisa menyelamatkan langkah esok hari.</p>'+
       '<div class="lit-quotes">'+
         '<div class="lit-qitem"><span class="lit-qitem-ic">\ud83d\uddfa\ufe0f</span><div class="lit-qitem-tx"><b>Menemukan Jalan</b>Membaca adalah cara kita menemukan jalan, berbagi informasi adalah cara kita memastikan tidak ada yang tersesat.</div></div>'+
         '<div class="lit-qitem"><span class="lit-qitem-ic">\ud83c\udf92</span><div class="lit-qitem-tx"><b>Kompas Pikiran</b>Membaca mengisi ransel pikiran kita dengan ilmu, berbagi informasi adalah kompas yang mengarahkan sesama.</div></div>'+
@@ -2731,11 +2731,11 @@ function pDasbor(){
 function pKliping(){
   const m=me();
   let list=db.kliping.filter(k=>!isOpini(k)).sort((a,b)=>b.tglKliping.localeCompare(a.tglKliping));
-  if(m.peran==="Kurator")list=list.filter(k=>k.kurator===m.id);
   const rows=list.map(k=>{
     const ok=(k.pelajaran||[]).filter(x=>x&&x.trim()).length>=3&&(k.materi||[]).length>0&&k.tautan;
-    return "<tr><td><b>"+esc(k.judul)+'</b><br /><span style="color:var(--ink2);font-size:13px">'+esc(k.media)+" \u00b7 "+tglID(k.tglBerita)+'</span></td><td><span class="tag">'+esc(k.rubrik)+'</span></td><td><span class="'+STAG[k.status]+'">'+k.status+"</span></td><td>"+esc(nm(k.kurator))+'</td><td>'+(ok?'<span class="tag tag-g">Lengkap</span>':'<span class="tag tag-r">Belum</span>')+'</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="sunting(\''+k.id+'\')">Sunting</button>'+((m.peran==="Super-Admin"||m.peran==="Admin")?' <button class="btn btn-sm btn-d" onclick="hapus(\''+k.id+'\')">Hapus</button>':"")+"</td></tr>"}).join("");
-  return ph("Kliping",m.peran==="Kurator"?"Menampilkan kliping yang kamu kurasi.":"Seluruh entri, dari calon sampai terbit.",'<button class="btn btn-p" onclick="baru()">+ Kliping baru</button>')+
+    const bisaSunting=(m.peran!=="Kurator")||k.status!=="Terbit";
+    return "<tr><td><b>"+esc(k.judul)+'</b><br /><span style="color:var(--ink2);font-size:13px">'+esc(k.media)+" \u00b7 "+tglID(k.tglBerita)+'</span></td><td><span class="tag">'+esc(k.rubrik)+'</span></td><td><span class="'+STAG[k.status]+'">'+k.status+"</span></td><td>"+esc(nm(k.kurator))+'</td><td>'+(ok?'<span class="tag tag-g">Lengkap</span>':'<span class="tag tag-r">Belum</span>')+'</td><td style="white-space:nowrap">'+(bisaSunting?'<button class="btn btn-sm" onclick="sunting(\''+k.id+'\')">Sunting</button>':'<span style="color:var(--ink2);font-size:12px">Terkunci</span>')+((m.peran==="Super-Admin"||m.peran==="Admin")?' <button class="btn btn-sm btn-d" onclick="hapus(\''+k.id+'\')">Hapus</button>':"")+"</td></tr>"}).join("");
+  return ph("Kliping",m.peran==="Kurator"?"Seluruh kliping redaksi. Kamu bisa menyunting yang belum terbit.":"Seluruh entri, dari calon sampai terbit.",'<button class="btn btn-p" onclick="baru()">+ Kliping baru</button>')+
    '<div class="tbl tbl-scroll"><table><thead><tr><th>Judul</th><th>Rubrik</th><th>Status</th><th>Kurator</th><th>Anotasi</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">Belum ada entri.</td></tr>')+"</tbody></table></div>";
 }
 
@@ -2941,7 +2941,7 @@ function simpanSetting(){
 
 /* ================= editor ================= */
 function baru(){S.av="kliping";S.draft={id:"",judul:"",lead:"",rubrik:db.rubrik[0],media:db.media[0],tautan:"",tglBerita:"2026-07-30",tglKliping:"2026-07-30",wilayah:"Sulawesi Selatan",lokasi:[],topik:[],potongan:"",konteks:"",pelajaran:["","",""],materi:[],status:"Calon",kurator:S.me,peninjau:"",kepekaan:"Biasa",gambar:"Tanpa gambar",gbrKet:"",vonis:"",catatan:""};S.err=[];go({})}
-function sunting(id){const _k0=db.kliping.find(x=>x.id===id);S.av=(_k0&&isOpini(_k0))?"buahpikir":"kliping";const k=_k0;S.draft=JSON.parse(JSON.stringify(k));while(S.draft.pelajaran.length<3)S.draft.pelajaran.push("");S.err=[];go({})}
+function sunting(id){const _k0=db.kliping.find(x=>x.id===id);var _mp=me();if(_mp&&_mp.peran==="Kurator"&&_k0&&_k0.status==="Terbit"){toast("Kliping yang sudah terbit hanya bisa disunting Admin");return}S.av=(_k0&&isOpini(_k0))?"buahpikir":"kliping";const k=_k0;S.draft=JSON.parse(JSON.stringify(k));while(S.draft.pelajaran.length<3)S.draft.pelajaran.push("");S.err=[];go({})}
 function hapus(id){var mp=me();if(!mp||(mp.peran!=="Super-Admin"&&mp.peran!=="Admin")){toast("Hanya Admin atau Super-Admin yang dapat menghapus kliping");return}if(!confirm("Hapus kliping ini?"))return;const k=db.kliping.find(x=>x.id===id);db.kliping=db.kliping.filter(x=>x.id!==id);log("Menghapus kliping",k.judul);supa.from("kliping").delete().eq("id",id).then(({error})=>pErr(error,"kliping"));render();toast("Kliping dihapus")}
 
 /* ============ gambar (Supabase Storage) ============ */
@@ -5529,16 +5529,16 @@ kartuKlip=function(k){
 function pBuahPikir(){
   var m=me();
   var list=db.kliping.filter(function(k){return isOpini(k)});
-  if(m.peran==="Kurator")list=list.filter(function(k){return k.kurator===m.id});
   list=list.sort(function(a,b){return String(b.tglKliping||"").localeCompare(String(a.tglKliping||""))});
   var boleh=(m.peran==="Super-Admin"||m.peran==="Admin");
   var rows=list.map(function(k){
     var isi=String(k.konteks||"").trim();
     var kata=isi?isi.split(/\s+/).length:0;
     var siap=!!k.judul&&!!k.lead&&kata>0;
-    return "<tr><td><b>"+esc(k.judul)+'</b><br /><span style="color:var(--ink2);font-size:13px">'+kata+" kata \u00b7 "+tglID(k.tglKliping)+'</span></td><td><span class="tag">'+esc(k.rubrik)+'</span></td><td><span class="'+STAG[k.status]+'">'+k.status+"</span></td><td>"+esc(nm(k.kurator))+'</td><td>'+(siap?'<span class="tag tag-g">Lengkap</span>':'<span class="tag tag-r">Belum</span>')+'</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="sunting(\''+k.id+'\')">Sunting</button>'+(boleh?' <button class="btn btn-sm btn-d" onclick="hapus(\''+k.id+'\')">Hapus</button>':"")+"</td></tr>";
+    var bisaSunting=(m.peran!=="Kurator")||k.status!=="Terbit";
+    return "<tr><td><b>"+esc(k.judul)+'</b><br /><span style="color:var(--ink2);font-size:13px">'+kata+" kata \u00b7 "+tglID(k.tglKliping)+'</span></td><td><span class="tag">'+esc(k.rubrik)+'</span></td><td><span class="'+STAG[k.status]+'">'+k.status+"</span></td><td>"+esc(nm(k.kurator))+'</td><td>'+(siap?'<span class="tag tag-g">Lengkap</span>':'<span class="tag tag-r">Belum</span>')+'</td><td style="white-space:nowrap">'+(bisaSunting?'<button class="btn btn-sm" onclick="sunting(\''+k.id+'\')">Sunting</button>':'<span style="color:var(--ink2);font-size:12px">Terkunci</span>')+(boleh?' <button class="btn btn-sm btn-d" onclick="hapus(\''+k.id+'\')">Hapus</button>':"")+"</td></tr>";
   }).join("");
-  return ph("Buah Pikir",m.peran==="Kurator"?"Tulisanmu sendiri, terpisah dari kliping.":"Tulisan sendiri anggota. Terbit tetap lewat persetujuan admin.",'<button class="btn btn-rasta" onclick="tulisOpini()">\u270D Tulis Buah Pikir</button>')+
+  return ph("Buah Pikir",m.peran==="Kurator"?"Seluruh Buah Pikir anggota. Kamu bisa menyunting yang belum terbit.":"Tulisan sendiri anggota. Terbit tetap lewat persetujuan admin.",'<button class="btn btn-rasta" onclick="tulisOpini()">\u270D Tulis Buah Pikir</button>')+
    '<div class="tbl tbl-scroll"><table><thead><tr><th>Judul</th><th>Rubrik</th><th>Status</th><th>Penulis</th><th>Anotasi</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">Belum ada Buah Pikir.</td></tr>')+"</tbody></table></div>";
 }
 function _opiRubrik(){
