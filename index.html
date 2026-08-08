@@ -1548,6 +1548,46 @@ h1, h2, h3, .brand h1, .hero h2, .paper-copy h2, .clip h3, .art h2, .sorot .sr-t
 body.admin-mode .mascot-wrap,
 body.admin-mode .mascot-mini { display: none !important; }
 
+
+/* ---------- Panduan Darurat Lapangan ---------- */
+.pdl-modal{max-width:640px;position:relative;padding:22px 22px 16px;display:flex;flex-direction:column;max-height:86vh}
+.pdl-tutup{position:absolute;top:12px;right:12px;width:44px;height:44px;background:none;border:0;font-size:24px;line-height:1;cursor:pointer;color:var(--ink2);border-radius:10px}
+.pdl-tutup:hover{background:var(--soft2)}
+.pdl-tajuk{flex:0 0 auto;margin:0 48px 4px 0;font-size:20px}
+.pdl-sub{flex:0 0 auto;margin:0 0 14px;font-size:13.5px;color:var(--ink2);line-height:1.55}
+.pdl-tabs{display:flex;flex:0 0 auto;flex-wrap:wrap;gap:8px;padding-bottom:10px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.pdl-chip{flex:none;min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink2);font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .16s ease,color .16s ease,border-color .16s ease}
+.pdl-chip:hover{background:var(--soft2);color:var(--ink)}
+.pdl-chip.on{background:var(--violet);border-color:var(--violet);color:#fff}
+.pdl-chip:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+.pdl-body{flex:1 1 auto;min-height:0;overflow:auto;padding-right:4px}
+.pdl-judul{margin:0 0 6px;font-size:17px;color:var(--ink)}
+.pdl-lead{margin:0 0 18px;font-size:14px;color:var(--ink2);line-height:1.6}
+.pdl-blok{margin-bottom:18px}
+.pdl-blok h5{margin:0 0 7px;font-size:14px;color:var(--ink)}
+.pdl-list{margin:0;padding-left:20px}
+.pdl-list li{font-size:14px;line-height:1.6;margin:6px 0;color:var(--ink)}
+.pdl-warn,.pdl-ok{border-radius:10px;padding:12px 14px;margin-top:18px}
+.pdl-warn{background:rgba(229,100,88,.10);border:1px solid rgba(229,100,88,.34)}
+.pdl-ok{background:rgba(70,161,113,.10);border:1px solid rgba(70,161,113,.34)}
+.pdl-warn>b,.pdl-ok>b{display:block;font-size:13px;margin-bottom:7px;color:var(--ink)}
+.pdl-kontak{display:grid;gap:8px;margin-bottom:12px}
+.pdl-nomor{display:flex;align-items:baseline;gap:12px;min-height:44px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;text-decoration:none;box-sizing:border-box}
+.pdl-nomor:hover{background:var(--soft2)}
+.pdl-nomor b{flex:none;min-width:44px;font-size:17px;color:var(--violet)}
+.pdl-nomor span{font-size:13px;color:var(--ink2);line-height:1.45}
+.pdl-gps{margin-top:18px;padding:14px;border:1px dashed var(--line);border-radius:10px}
+.pdl-gps>b{font-size:13.5px;color:var(--ink)}
+.pdl-gps p{margin:5px 0 12px}
+.pdl-gps-aksi{display:flex;gap:8px;flex-wrap:wrap}
+.pdl-mini{font-size:12.5px;color:var(--ink2);line-height:1.5}
+.pdl-koor{margin-top:12px;font-size:13px}
+.pdl-koor-ok b{font-size:15px;color:var(--ink)}
+.pdl-gagal{color:#e56458;font-size:13px;line-height:1.5}
+.pdl-foot{display:flex;flex:0 0 auto;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.pdl-foot .pdl-mini{flex:1 1 240px}
+.pdl-foot-aksi{display:flex;gap:8px;margin-left:auto}
+@media (max-width:560px){.pdl-modal{max-height:92vh;padding:18px 16px 14px}.pdl-tajuk{font-size:18px;margin-right:44px}.pdl-tabs{gap:6px;padding-bottom:8px;margin-bottom:12px}.pdl-chip{min-height:36px;padding:6px 11px;font-size:12.5px}.pdl-foot-aksi{margin-left:0;width:100%}.pdl-foot-aksi .btn{flex:1}}
 </style>
 </head>
 <body>
@@ -1613,7 +1653,7 @@ function seed(){return{
  ],
  materi:[
   {id:"m1",judul:"Hipotermia",rumpun:"Keselamatan",tingkat:"Dasar",acuan:"Wilderness Medical Society, 2019",isi:"Hipotermia terjadi saat suhu inti tubuh turun di bawah 35 derajat Celsius. Pada gunung tropis pemicunya bukan suhu ekstrem, melainkan kombinasi pakaian basah, angin, dan kelelahan. Tanda awal: menggigil hebat, bicara melambat, langkah goyah, keputusan mulai kacau."},
-  {id:"m2",judul:"Navigasi Peta dan Kompas",rumpun:"Navigasi",tingkat:"Menengah",acuan:"Modul Pendidikan Dasar REICHAS CHELEBES",isi:"Kompas tidak pernah kehabisan baterai. Kemampuan membaca kontur, menentukan azimuth, dan melakukan resection adalah dasar yang tidak boleh digantikan oleh telepon pintar."},
+  {id:"m2",judul:"Navigasi Peta dan Kompas",rumpun:"Navigasi",tingkat:"Menengah",acuan:"Modul Pendidikan Dasar RCS.CBS",isi:"Kompas tidak pernah kehabisan baterai. Kemampuan membaca kontur, menentukan azimuth, dan melakukan resection adalah dasar yang tidak boleh digantikan oleh telepon pintar."},
   {id:"m3",judul:"Manajemen Air di Jalur Kering",rumpun:"Logistik",tingkat:"Dasar",acuan:"Kompilasi catatan lapangan anggota",isi:"Hitung kebutuhan 3 sampai 4 liter per orang per hari untuk jalur terbuka. Catat titik sumber air terakhir sebelum punggungan, dan jangan pernah bergantung pada satu sumber saja."},
   {id:"m4",judul:"Prosedur Lapor SAR",rumpun:"Keselamatan",tingkat:"Dasar",acuan:"Basarnas",isi:"Laporan yang baik memuat lima hal: siapa, berapa orang, di mana titik terakhir diketahui, kondisi terkini, dan perlengkapan yang dibawa. Semakin cepat lima hal ini tersampaikan, semakin sempit area pencarian."},
   {id:"m5",judul:"Membaca Badai Gunung",rumpun:"Cuaca",tingkat:"Menengah",acuan:"BMKG dan literatur meteorologi gunung",isi:"Awan cumulonimbus yang tumbuh cepat sebelum tengah hari adalah tanda paling jelas untuk membatalkan pendakian menuju puncak terbuka."},
@@ -1875,14 +1915,14 @@ function twLink(text,url){return "https://x.com/intent/post?text="+encodeURIComp
 function salinIG(text,url){try{if(navigator.clipboard)navigator.clipboard.writeText(text+"\n"+url)}catch(e){}toast("Teks & tautan disalin — buka Instagram lalu tempel di caption/Stories");window.open("https://www.instagram.com/","_blank")}
 function salinTikTok(text,url){try{if(navigator.clipboard)navigator.clipboard.writeText(text+"\n"+url)}catch(e){}toast("Teks & tautan disalin — buka TikTok lalu tempel di postingan");window.open("https://www.tiktok.com/","_blank")}
 function bagiKlip(cara,id){const k=db.kliping.find(x=>x.id===id);if(!k)return;const url=shareUrl(id);const txt=k.judul+" — "+k.lead;if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url),"_blank");else if(cara==="tw")window.open(twLink(txt,url),"_blank");else if(cara==="tk")salinTikTok(txt,url);else salinIG(txt,url)}
-function bagiSitus(cara){const url=location.origin+location.pathname;const txt="\ud83d\udcda Gerakan Literasi REICHAS — baca, pahami, dan bagikan pengetahuan pendakian & alam bebas.";if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url),"_blank");else if(cara==="tw")window.open(twLink(txt,url),"_blank");else if(cara==="tk")salinTikTok(txt,url);else salinIG(txt,url)}
+function bagiSitus(cara){const url=location.origin+location.pathname;const txt="\ud83d\udcda Gerakan Literasi RCS.CBS — baca, pahami, dan bagikan pengetahuan pendakian & alam bebas.";if(cara==="wa")window.open(waLink(txt,url),"_blank");else if(cara==="fb")window.open(fbLink(url),"_blank");else if(cara==="tw")window.open(twLink(txt,url),"_blank");else if(cara==="tk")salinTikTok(txt,url);else salinIG(txt,url)}
 function shBtns(kind){const call=c=>kind==="situs"?"bagiSitus('"+c+"')":"bagiKlip('"+c+"','"+kind+"')";return '<button class="sh sh-wa" onclick="'+call("wa")+'">WhatsApp</button><button class="sh sh-ig" onclick="'+call("ig")+'">Instagram</button><button class="sh sh-fb" onclick="'+call("fb")+'">Facebook</button><button class="sh sh-tw" onclick="'+call("tw")+'">X (Twitter)</button><button class="sh sh-tk" onclick="'+call("tk")+'">TikTok</button>'}
 function litBanner(){
   return '<section class="lit-banner">'+
     '<div class="lit-inner">'+
-      '<span class="lit-badge">\ud83d\udcda Gerakan Literasi RCS.CBS \u00b7 Para Pencinta Alam &amp; Penggiat Alam Bebas-Adventure \u26fa</span>'+
+      '<span class="lit-badge">\ud83d\udcda Gerakan Literasi RCS.CBS \u00b7 Para Pencinta Alam &amp; Penggiat Adventure \u26fa</span>'+
       '<h2>Baca. Pahami. Bagikan.</h2>'+
-      '<p>Kliping ini didedikasikan untuk Para Pencinta Alam dan Para Penggiat Alam Bebas-Adventure. Satu kliping yang kamu baca hari ini bisa menyelamatkan langkah esok hari.</p>'+
+      '<p>Kliping ini didedikasikan untuk Para Pencinta Alam dan Para Penggiat Adventure ( Alam Bebas ). Satu kliping yang kamu baca hari ini bisa menyelamatkan langkah esok hari.</p>'+
       '<div class="lit-quotes">'+
         '<div class="lit-qitem"><span class="lit-qitem-ic">\ud83d\uddfa\ufe0f</span><div class="lit-qitem-tx"><b>Menemukan Jalan</b>Membaca adalah cara kita menemukan jalan, berbagi informasi adalah cara kita memastikan tidak ada yang tersesat.</div></div>'+
         '<div class="lit-qitem"><span class="lit-qitem-ic">\ud83c\udf92</span><div class="lit-qitem-tx"><b>Kompas Pikiran</b>Membaca mengisi ransel pikiran kita dengan ilmu, berbagi informasi adalah kompas yang mengarahkan sesama.</div></div>'+
@@ -1964,7 +2004,7 @@ function header(){
       +'<div class="akun-pop" role="menu"><div class="akun-head"><div class="avat">'+_ini+'</div><div class="akun-id"><b>'+esc(m.nama)+'</b><small>'+esc(m.peran)+(m.divisi?" \u00b7 "+esc(m.divisi):"")+'</small></div></div>'+_tmi+_pact+_emailItem+'<button type="button" class="ai ai-out" role="menuitem" onclick="tutupAkun();keluar()"><span class="ai-ic">\ud83d\udeaa</span>Keluar</button></div>'
       +'</div>';
   }
-  return '<header class="top"><div class="top-in'+(m?" auth":"")+'"><div class="brand"><img src="'+LOGO+'" alt="Logo REICHAS CHELEBES"'+(m?'':' onclick=\'go({mode:"login"})\' style="cursor:pointer"')+' /><div><h1>KLIPING RCS.CBS</h1><p>'+esc(db.settings.tagline)+'</p></div></div><nav class="nav">'+nav+"</nav>"+temaBtn()+right+"</div></header>";
+  return '<header class="top"><div class="top-in'+(m?" auth":"")+'"><div class="brand"><img src="'+LOGO+'" alt="Logo RCS.CBS"'+(m?'':' onclick=\'go({mode:"login"})\' style="cursor:pointer"')+' /><div><h1>KLIPING RCS.CBS</h1><p>'+esc(db.settings.tagline)+'</p></div></div><nav class="nav">'+nav+"</nav>"+temaBtn()+right+"</div></header>";
 }
 async function keluar(){try{await supa.auth.signOut()}catch(e){}try{localStorage.removeItem("rcs_active_user")}catch(e){}S.me=null;try{if(location.hash.indexOf("admin")>=0)history.replaceState(null,"",location.pathname)}catch(e){}go({mode:"public",pv:{n:"board"},draft:null});toast("Sesi diakhiri")}
 
@@ -2266,7 +2306,7 @@ function viewPedomanPublik(){
    '<div class="note r">Menemukan kekeliruan atau ingin materinya dicabut? Sampaikan kepada Divisi Komunikasi dan Publikasi RCS.CBS. Kami menanggapi dalam tiga hari kalender.</div></div>'+foot();
 }
 function foot(){
-  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · RCS.CBS. </div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="bukaPortalSurat()" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);color:#fff;border:0">\u2709\ufe0f Kirim Surat Pembaca</button><button class="btn btn-sm" onclick="bukaPanduanDarurat()">🎒 Panduan Darurat Lapangan</button><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
+  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · RCS.CBS, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="bukaPortalSurat()" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);color:#fff;border:0">\u2709\ufe0f Kirim Surat Pembaca</button><button class="btn btn-sm" onclick="bukaPanduanDarurat()">🎒 Panduan Darurat Lapangan</button><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
 }
 function tipis(){db.settings.sinyalTipis=!db.settings.sinyalTipis;save();render();toast(db.settings.sinyalTipis?"Mode sinyal tipis aktif":"Mode sinyal tipis nonaktif")}
 
@@ -3494,6 +3534,15 @@ function _menuRak(){
   b.onclick=function(){tutupMenu();go({pv:{n:"rak"}})};
   var ref=pop.children[2]||null;pop.insertBefore(b,ref);
 }
+function _menuDarurat(){
+  if(S.mode!=="public")return;
+  var pop=document.querySelector(".menu-pop");if(!pop||pop.querySelector("[data-darurat]"))return;
+  var b=document.createElement("button");
+  b.className="mi";b.setAttribute("role","menuitem");b.setAttribute("data-darurat","1");
+  b.innerHTML='<span class="mi-ic">\ud83c\udf92</span><span class="mi-tx">Panduan Darurat</span>';
+  b.onclick=function(){tutupMenu();bukaPanduanDarurat()};
+  pop.appendChild(b);
+}
 function _progresBaca(){
   var el=document.getElementById("bacaProg");
   if(!el){el=document.createElement("div");el.id="bacaProg";el.innerHTML="<i></i>";document.body.appendChild(el);
@@ -3514,6 +3563,7 @@ function _luring(){
 }
 function pasangEkstra(){
   try{_menuRak()}catch(e){}
+  try{_menuDarurat()}catch(e){}
   try{_progresBaca()}catch(e){}
   try{_terapkanBaca()}catch(e){}
   try{_luring()}catch(e){}
@@ -3619,7 +3669,7 @@ function afiliasiBox(k){
     '<div class="afl-list">'+list.map(function(a){
       return '<a href="'+esc(a.tautan)+'" target="_blank" rel="sponsored nofollow noopener"><b>'+esc(a.nama)+'</b>'+(a.catatan?'<small>'+esc(a.catatan)+'</small>':'')+'<span>Lihat \u2197</span></a>';
     }).join("")+'</div>'+
-    '<p class="afl-note">Tautan afiliasi. Pembelian lewat tautan ini memberi komisi kecil untuk kas REICHAS tanpa menambah harga, dan tidak memengaruhi isi penilaian alat.</p></div>';
+    '<p class="afl-note">Tautan afiliasi. Pembelian lewat tautan ini memberi komisi kecil untuk kas RCS.CBS tanpa menambah harga, dan tidak memengaruhi isi penilaian alat.</p></div>';
 }
 function _kKlip(id){return (typeof db!=="undefined"&&db&&db.kliping)?db.kliping.find(function(x){return x.id===id}):null}
 function _sisipSebelumFooter(html,tambah){
@@ -3996,6 +4046,428 @@ function rksMini(k){
   return '<span class="rks-mini">'+res.join(" \u00b7 ")+"</span>";
 }
 
+/* ============ PANDUAN DARURAT LAPANGAN ============ */
+var PDL_TAB = "stop";
+var PDL_SEKSI = [
+  {k:"stop", ikon:"\uD83E\uDDED", nama:"Tersesat"},
+  {k:"cedera", ikon:"\uD83E\uDE79", nama:"Cedera"},
+  {k:"dingin", ikon:"\u2744\uFE0F", nama:"Hipotermia"},
+  {k:"cuaca", ikon:"\u26C8\uFE0F", nama:"Cuaca ekstrem"},
+  {k:"bekal", ikon:"\uD83C\uDF92", nama:"Perlengkapan"},
+  {k:"lapor", ikon:"\uD83D\uDCDE", nama:"Lapor & kontak"}
+];
+
+var PDL_ISI = {
+  stop: {
+    judul: "Tersesat \u2014 jalankan protokol STOP",
+    lead: "Begitu sadar tidak mengenali jalur, berhenti saat itu juga. Sebagian besar korban hilang bertambah jauh justru karena terus berjalan sambil panik.",
+    blok: [
+      {t:"S \u2014 Stop (berhenti)", b:[
+        "Berhenti total. Duduk, minum, atur napas selama lima menit sebelum memutuskan apa pun.",
+        "Kumpulkan seluruh anggota rombongan. Hitung jumlah orang dan pastikan tidak ada yang terpisah."
+      ]},
+      {t:"T \u2014 Think (berpikir)", b:[
+        "Kapan terakhir kali kamu yakin berada di jalur yang benar? Berapa lama sejak saat itu?",
+        "Cek sisa air, makanan, baterai, jam matahari terbenam, dan kondisi anggota terlemah."
+      ]},
+      {t:"O \u2014 Observe (amati)", b:[
+        "Buka peta dan kompas, cocokkan dengan bentang alam: punggungan, lembah, sungai, puncak.",
+        "Catat koordinat sekarang selagi sinyal atau GPS masih hidup, lalu tandai lokasi dengan penanda mencolok."
+      ]},
+      {t:"P \u2014 Plan (rencanakan)", b:[
+        "Bila masih terang dan yakin arah balik: telusuri kembali jejak sendiri, jangan mencari jalan pintas baru.",
+        "Bila ragu sedikit pun, atau hari mulai gelap: tetap di tempat, siapkan bivak, dan tunggu pertolongan."
+      ]}
+    ],
+    bahaya: [
+      "Jangan menuruni jurang atau menyusuri sungai ke bawah untuk \u201Cmencari jalan turun\u201D. Di pegunungan Sulawesi Selatan pola ini berakhir di air terjun dan tebing buntu.",
+      "Jangan berpencar untuk mencari jalur. Rombongan yang terpecah membuat operasi pencarian berlipat sulit."
+    ],
+    aman: [
+      "Tiga kali bunyi atau tiga kali kedip cahaya, diulang berkala, adalah isyarat internasional minta tolong.",
+      "Pindahkan telepon ke mode pesawat dan matikan layar. Nyalakan berkala saja untuk menghemat baterai bagi panggilan darurat.",
+      "Pilih tempat terbuka yang mudah terlihat dari udara: tepi punggungan, padang terbuka, tepi danau."
+    ]
+  },
+
+  cedera: {
+    judul: "Cedera di jalur \u2014 penanganan pertama",
+    lead: "Amankan dulu penolong dan lokasi, baru tangani korban. Satu penolong yang ikut cedera mengubah satu masalah menjadi dua.",
+    blok: [
+      {t:"Pendarahan", b:[
+        "Tekan langsung pada luka dengan kasa atau kain bersih selama 5\u201310 menit penuh, tanpa mengintip.",
+        "Bila kasa tembus darah, tumpuk di atasnya. Jangan dilepas karena bekuan yang sudah terbentuk ikut terangkat.",
+        "Tinggikan bagian yang terluka di atas jantung bila tidak ada dugaan patah tulang."
+      ]},
+      {t:"Terkilir dan patah tulang", b:[
+        "Terapkan RICE: istirahatkan, kompres dingin, balut elastis, tinggikan.",
+        "Bidai patah tulang memakai trekking pole, ranting lurus, atau matras gulung. Ikat di atas dan di bawah titik patah, bukan tepat di atasnya.",
+        "Cek ujung jari setelah membidai: masih hangat, berwarna normal, dan terasa. Bila membiru, longgarkan ikatan."
+      ]},
+      {t:"Gigitan ular", b:[
+        "Tenangkan korban, batasi gerak, dan posisikan bagian yang tergigit lebih rendah dari jantung.",
+        "Lepas cincin, jam, dan apa pun yang menjepit sebelum bengkak. Tandai batas bengkak dengan pena beserta jamnya.",
+        "Evakuasi secepat mungkin ke fasilitas kesehatan. Antivenom adalah satu-satunya penanganan definitif."
+      ]},
+      {t:"Luka bakar kompor dan api unggun", b:[
+        "Alirkan air bersih bersuhu biasa selama 20 menit. Jangan pakai es, odol, kecap, atau mentega.",
+        "Tutup longgar dengan kasa steril non-lengket, lalu jaga korban tetap hangat."
+      ]}
+    ],
+    bahaya: [
+      "Pada gigitan ular: jangan disedot, jangan disayat, jangan diikat kencang seperti torniket, dan jangan diberi es. Semua tindakan itu memperparah kerusakan jaringan.",
+      "Jangan memberi minum kepada korban yang tidak sadar penuh atau muntah-muntah."
+    ],
+    aman: [
+      "Catat waktu kejadian, keluhan, dan tindakan yang sudah diberikan. Catatan ini sangat menolong tim medis di bawah.",
+      "Nyeri dada, sesak berat, kejang, penurunan kesadaran, atau cedera kepala berarti evakuasi segera, bukan diobati di tenda."
+    ]
+  },
+
+  dingin: {
+    judul: "Hipotermia \u2014 pembunuh senyap di ketinggian",
+    lead: "Suhu tidak perlu ekstrem. Basah, angin, dan lelah pada 15\u201320 \u00B0C sudah cukup menjatuhkan pendaki. Ini kejadian paling sering di Bawakaraeng dan Latimojong.",
+    blok: [
+      {t:"Kenali tandanya sejak awal", b:[
+        "Ringan: menggigil hebat, tangan kaku, sulit membuka resleting, mulai diam dan menarik diri.",
+        "Sedang: bicara pelo, langkah sempoyongan, bingung, mengambil keputusan aneh seperti melepas jaket.",
+        "Berat: menggigil justru berhenti, otot kaku, napas dan nadi melambat, kesadaran menurun."
+      ]},
+      {t:"Tindakan segera", b:[
+        "Hentikan perjalanan. Cari tempat terlindung dari angin dan hujan sebelum melakukan apa pun.",
+        "Lepas seluruh pakaian basah, ganti dengan lapisan kering. Ini langkah yang paling menentukan.",
+        "Beri alas isolasi dari tanah. Tanah dingin menyedot panas tubuh jauh lebih cepat daripada udara.",
+        "Bungkus tubuh dan kepala dengan sleeping bag, emergency blanket, atau flysheet. Sisakan celah untuk bernapas.",
+        "Bila korban sadar penuh dan mampu menelan: beri minuman hangat manis dan makanan berkalori."
+      ]}
+    ],
+    bahaya: [
+      "Menggigil yang berhenti padahal tubuh masih dingin bukan tanda membaik. Itu tanda hipotermia berat dan wajib evakuasi darurat.",
+      "Jangan beri alkohol, jangan memijat atau menggosok kasar, dan jangan mendekatkan api langsung ke kulit. Ketiganya bisa memicu henti jantung."
+    ],
+    aman: [
+      "Pencegahan terbaik: satu setel pakaian kering yang disimpan kedap air dan tidak pernah dipakai kecuali darurat.",
+      "Makan dan minum teratur sepanjang perjalanan. Tubuh tanpa bahan bakar tidak bisa menghasilkan panas."
+    ]
+  },
+
+  cuaca: {
+    judul: "Cuaca ekstrem, petir, dan sungai",
+    lead: "Cuaca gunung berubah dalam hitungan menit. Keputusan mundur yang diambil satu jam lebih awal hampir selalu lebih murah daripada evakuasi.",
+    blok: [
+      {t:"Badai petir", b:[
+        "Segera turun dari puncak, punggungan terbuka, dan padang tanpa naungan.",
+        "Jauhi pohon tunggal tertinggi, tiang, dan benda logam panjang. Lepaskan dan jauhkan trekking pole serta rangka carrier.",
+        "Bila petir sudah sangat dekat: jongkok dengan kedua kaki rapat di atas matras, tangan menutup telinga, jangan berbaring di tanah.",
+        "Beri jarak beberapa meter antaranggota rombongan agar satu sambaran tidak melumpuhkan semua orang."
+      ]},
+      {t:"Kabut tebal dan jarak pandang nol", b:[
+        "Berhenti dan tunggu. Jangan berimprovisasi membuat jalur baru dalam kabut.",
+        "Bila harus bergerak, tetap dalam satu tali pandang, saling menyebut nama secara berkala."
+      ]},
+      {t:"Sungai meluap dan hujan deras", b:[
+        "Jangan menyeberang bila air melewati lutut atau arus cukup kuat menggeser batu.",
+        "Air keruh yang naik cepat menandakan hujan di hulu. Menjauh dari alur sungai dan naik ke tempat lebih tinggi.",
+        "Banjir bandang gunung biasanya surut dalam beberapa jam. Menunggu jauh lebih aman daripada memaksa menyeberang."
+      ]},
+      {t:"Angin kencang", b:[
+        "Jangan mendirikan tenda di punggungan terbuka atau di bawah pohon lapuk dan dahan mati.",
+        "Turunkan profil tenda, tambah pasak dan tali badai, arahkan sisi sempit menghadap angin."
+      ]}
+    ],
+    bahaya: [
+      "Bila jeda antara kilat dan guntur kurang dari 30 detik, badai berada dalam radius berbahaya. Cari perlindungan sekarang, bukan setelah foto terakhir."
+    ],
+    aman: [
+      "Tentukan batas waktu balik sebelum berangkat. Bila jam itu terlewat, turun apa pun keadaannya.",
+      "Puncak akan tetap ada minggu depan. Cuaca buruk tidak bisa dinegosiasikan."
+    ]
+  },
+
+  bekal: {
+    judul: "Sepuluh perlengkapan yang menentukan",
+    lead: "Daftar ini bukan soal gaya. Setiap butir menjawab satu skenario yang benar-benar pernah menewaskan pendaki.",
+    blok: [
+      {t:"Wajib dibawa perorangan", n:[
+        "Navigasi: peta jalur dan kompas, plus GPS di telepon sebagai cadangan. Jangan bergantung pada telepon saja.",
+        "Headlamp beserta baterai cadangan. Senter telepon habis dalam dua jam dan mengorbankan alat komunikasi.",
+        "Perlindungan matahari: topi, kacamata, tabir surya. Radiasi di ketinggian jauh lebih keras.",
+        "Kotak P3K pribadi berisi kasa, plester, perban elastis, dan obat rutin masing-masing.",
+        "Pisau atau multitool serta tali paracord untuk perbaikan darurat.",
+        "Korek tahan air atau pemantik cadangan, disimpan dalam wadah kedap.",
+        "Bivak darurat: emergency blanket atau flysheet ringan. Beratnya di bawah 300 gram dan bisa menyelamatkan nyawa.",
+        "Air minimal dua liter serta cara memurnikan: tablet, filter, atau kemampuan merebus.",
+        "Makanan berkalori untuk satu hari lebih lama daripada rencana perjalanan.",
+        "Satu setel pakaian kering dalam dry bag, khusus untuk keadaan darurat saja."
+      ]},
+      {t:"Sangat dianjurkan", b:[
+        "Peluit. Tenaga meniup peluit bertahan jauh lebih lama daripada berteriak, dan suaranya menembus hujan.",
+        "Power bank terisi penuh beserta kabelnya.",
+        "Kantong sampah besar: pelapis carrier, jas hujan darurat, sekaligus wadah sampah rombongan.",
+        "Salinan rencana perjalanan dan kontak darurat di kertas, bukan hanya di telepon."
+      ]}
+    ],
+    bahaya: [
+      "Telepon genggam bukan perlengkapan keselamatan. Sinyal di banyak titik jalur Sulawesi Selatan kosong, dan baterai habis paling cepat justru saat dingin."
+    ],
+    aman: [
+      "Periksa perlengkapan sehari sebelum berangkat, bukan di pos pendaftaran. Tali, jahitan, dan tabung kompor perlu diuji terlebih dahulu.",
+      "Sesuai catatan kurasi kami: perlengkapan yang tersimpan dua tahun tanpa uji jalan tidak boleh dianggap siap pakai."
+    ]
+  },
+
+  lapor: {
+    judul: "Melapor, meminta bantuan, dan koordinat",
+    lead: "Laporan yang baik memangkas waktu pencarian secara drastis. Sampaikan informasi terstruktur, jangan hanya berteriak minta tolong.",
+    blok: [
+      {t:"Nomor darurat nasional", kontak:[
+        {n:"112", d:"Panggilan darurat nasional. Bisa dihubungi tanpa pulsa dan tanpa kartu SIM."},
+        {n:"115", d:"Basarnas \u2014 pencarian dan pertolongan, termasuk kecelakaan gunung."},
+        {n:"110", d:"Kepolisian."},
+        {n:"119", d:"Layanan gawat darurat kesehatan."}
+      ]},
+      {t:"Delapan hal yang harus disebutkan", n:[
+        "Siapa kamu dan nomor yang bisa dihubungi balik.",
+        "Di mana lokasinya: koordinat, nama jalur, dan pos terakhir yang dilewati.",
+        "Apa yang terjadi dan pukul berapa kejadiannya.",
+        "Berapa jumlah orang dan berapa yang terdampak.",
+        "Kondisi korban: sadar atau tidak, bernapas atau tidak, jenis cedera.",
+        "Perlengkapan yang masih dimiliki: tenda, air, makanan, pakaian hangat.",
+        "Cuaca dan medan di lokasi saat ini.",
+        "Rencana rombongan: bertahan di tempat atau bergerak, dan ke arah mana."
+      ]},
+      {t:"Sebelum berangkat", b:[
+        "Daftar resmi di pos registrasi jalur. Pendataan ini yang membuat kamu dicari saat tidak turun tepat waktu.",
+        "Tinggalkan rencana perjalanan tertulis kepada keluarga: jalur, jadwal, titik camp, dan jam batas turun.",
+        "Sepakati satu nomor kontak darat yang akan menghubungi tim penyelamat bila kamu tidak mengabari sampai jam tertentu."
+      ]}
+    ],
+    bahaya: [],
+    aman: [
+      "Simpan nomor pos pendakian dan basecamp setempat di telepon sebelum berangkat, karena nomornya berbeda tiap jalur.",
+      "Kirim koordinat dalam bentuk teks. Pesan teks sering tetap terkirim pada sinyal lemah ketika panggilan suara gagal."
+    ]
+  }
+};
+
+function _pdlDaftar(arr, urut){
+  if(!arr || !arr.length) return "";
+  var tag = urut ? "ol" : "ul";
+  var h = "<" + tag + ' class="pdl-list">';
+  for(var i=0;i<arr.length;i++){ h += "<li>" + esc(arr[i]) + "</li>"; }
+  return h + "</" + tag + ">";
+}
+
+function _pdlIsiHTML(k){
+  var s = PDL_ISI[k];
+  if(!s) return "";
+  var h = '<h4 class="pdl-judul">' + esc(s.judul) + "</h4>";
+  h += '<p class="pdl-lead">' + esc(s.lead) + "</p>";
+
+  for(var i=0;i<s.blok.length;i++){
+    var b = s.blok[i];
+    h += '<div class="pdl-blok"><h5>' + esc(b.t) + "</h5>";
+    if(b.kontak){
+      h += '<div class="pdl-kontak">';
+      for(var j=0;j<b.kontak.length;j++){
+        var kk = b.kontak[j];
+        h += '<a class="pdl-nomor" href="tel:' + esc(kk.n) + '"><b>' + esc(kk.n) + "</b><span>" + esc(kk.d) + "</span></a>";
+      }
+      h += "</div>";
+    }
+    h += _pdlDaftar(b.b, false);
+    h += _pdlDaftar(b.n, true);
+    h += "</div>";
+  }
+
+  if(s.bahaya && s.bahaya.length){
+    h += '<div class="pdl-warn"><b>\u26A0\uFE0F Jangan dilakukan</b>' + _pdlDaftar(s.bahaya, false) + "</div>";
+  }
+  if(s.aman && s.aman.length){
+    h += '<div class="pdl-ok"><b>\u2705 Ingat ini</b>' + _pdlDaftar(s.aman, false) + "</div>";
+  }
+
+  if(k === "lapor"){
+    h += '<div class="pdl-gps">' +
+      '<b>\uD83D\uDCCD Koordinat posisi kamu sekarang</b>' +
+      '<p class="pdl-mini">Ambil titik GPS lalu salin sebagai pesan siap kirim ke tim penyelamat atau keluarga.</p>' +
+      '<div class="pdl-gps-aksi">' +
+        '<button type="button" class="btn btn-sm" onclick="_pdlKoordinat()">Ambil koordinat GPS</button>' +
+        '<button type="button" class="btn btn-sm" id="pdlSalinBtn" onclick="_pdlSalinKoordinat()" style="display:none">Salin pesan darurat</button>' +
+      "</div>" +
+      '<div id="pdlKoor" class="pdl-koor" aria-live="polite"></div>' +
+      "</div>";
+  }
+  return h;
+}
+
+function _pdlTab(k){
+  PDL_TAB = k;
+  var body = document.getElementById("pdlBody");
+  if(body){ body.innerHTML = _pdlIsiHTML(k); body.scrollTop = 0; }
+  var chips = document.querySelectorAll("#modalDaruratBg .pdl-chip");
+  for(var i=0;i<chips.length;i++){
+    var on = chips[i].getAttribute("data-k") === k;
+    chips[i].className = "pdl-chip" + (on ? " on" : "");
+    chips[i].setAttribute("aria-selected", on ? "true" : "false");
+  }
+}
+
+var _pdlTeksDarurat = "";
+
+function _pdlKoordinat(){
+  var out = document.getElementById("pdlKoor");
+  if(!out) return;
+  if(!navigator.geolocation){
+    out.innerHTML = '<span class="pdl-gagal">Perangkat ini tidak mendukung GPS. Catat nama jalur dan pos terakhir secara manual.</span>';
+    return;
+  }
+  out.innerHTML = '<span class="pdl-mini">Mengambil posisi\u2026 pastikan izin lokasi diizinkan.</span>';
+  navigator.geolocation.getCurrentPosition(function(p){
+    var la = p.coords.latitude.toFixed(6);
+    var lo = p.coords.longitude.toFixed(6);
+    var ak = Math.round(p.coords.accuracy || 0);
+    var peta = "https://maps.google.com/?q=" + la + "," + lo;
+    _pdlTeksDarurat =
+      "DARURAT PENDAKIAN\n" +
+      "Posisi: " + la + ", " + lo + " (akurasi \u00B1" + ak + " m)\n" +
+      "Peta: " + peta + "\n" +
+      "Waktu: " + new Date().toLocaleString("id-ID") + "\n" +
+      "Jumlah orang: \nKondisi: \nPerlengkapan: \nCuaca: ";
+    out.innerHTML =
+      '<div class="pdl-koor-ok"><b>' + esc(la) + ", " + esc(lo) + '</b> <span class="pdl-mini">akurasi \u00B1' + ak + ' m</span></div>' +
+      '<a class="pdl-mini" href="' + peta + '" target="_blank" rel="noopener">Buka titik ini di peta</a>';
+    var tb = document.getElementById("pdlSalinBtn");
+    if(tb) tb.style.display = "";
+  }, function(err){
+    var pesan = (err && err.code === 1)
+      ? "Izin lokasi ditolak. Aktifkan izin lokasi di pengaturan browser lalu coba lagi."
+      : "Posisi belum didapat. Pindah ke tempat yang lebih terbuka, tunggu sebentar, lalu coba lagi.";
+    out.innerHTML = '<span class="pdl-gagal">' + esc(pesan) + "</span>";
+  }, {enableHighAccuracy:true, timeout:20000, maximumAge:0});
+}
+
+function _pdlSalinKoordinat(){
+  if(!_pdlTeksDarurat) return;
+  var sudah = function(){ toast("\uD83D\uDCCD Pesan darurat disalin. Tempel ke SMS atau WhatsApp."); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(_pdlTeksDarurat).then(sudah, function(){ _pdlSalinCadangan(sudah); });
+  } else {
+    _pdlSalinCadangan(sudah);
+  }
+}
+
+function _pdlSalinCadangan(cb){
+  try{
+    var ta = document.createElement("textarea");
+    ta.value = _pdlTeksDarurat;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    cb();
+  }catch(e){
+    toast("Gagal menyalin otomatis. Salin manual teks koordinat di atas.");
+  }
+}
+
+function _pdlEsc(e){
+  if(e.key === "Escape" || e.keyCode === 27) tutupPanduanDarurat();
+}
+
+function bukaPanduanDarurat(tabDef){
+  var old = document.getElementById("modalDaruratBg");
+  if(old) old.remove();
+
+  PDL_TAB = tabDef || "stop";
+
+  var bg = document.createElement("div");
+  bg.id = "modalDaruratBg";
+  bg.className = "modal-bg";
+  bg.style.zIndex = "300";
+  bg.onclick = function(ev){ if(ev.target === bg) tutupPanduanDarurat(); };
+
+  var chips = "";
+  for(var i=0;i<PDL_SEKSI.length;i++){
+    var s = PDL_SEKSI[i];
+    var on = s.k === PDL_TAB;
+    chips += '<button type="button" role="tab" aria-selected="' + (on ? "true" : "false") + '" data-k="' + s.k +
+      '" class="pdl-chip' + (on ? " on" : "") + '" onclick="_pdlTab(\'' + s.k + '\')">' +
+      '<span aria-hidden="true">' + s.ikon + "</span> " + esc(s.nama) + "</button>";
+  }
+
+  bg.innerHTML =
+    '<div class="modal pdl-modal" role="dialog" aria-modal="true" aria-labelledby="pdlTajuk">' +
+      '<button type="button" class="pdl-tutup" aria-label="Tutup panduan" onclick="tutupPanduanDarurat()">&times;</button>' +
+      '<h3 id="pdlTajuk" class="pdl-tajuk">\uD83C\uDF92 Panduan Darurat Lapangan</h3>' +
+      '<p class="pdl-sub">Rujukan cepat untuk keadaan darurat di jalur pendakian. Halaman ini tersimpan di perangkat dan tetap terbuka tanpa sinyal.</p>' +
+      '<div class="pdl-tabs" role="tablist">' + chips + "</div>" +
+      '<div class="pdl-body" id="pdlBody">' + _pdlIsiHTML(PDL_TAB) + "</div>" +
+      '<div class="pdl-foot">' +
+        '<span class="pdl-mini">Panduan ringkas, bukan pengganti pelatihan pertolongan pertama dan navigasi. Dalam keadaan darurat, hubungi 112 atau 115.</span>' +
+        '<div class="pdl-foot-aksi">' +
+          '<button type="button" class="btn btn-sm" onclick="_pdlCetak()">\uD83D\uDDA8\uFE0F Cetak</button>' +
+          '<button type="button" class="btn btn-sm btn-p" onclick="tutupPanduanDarurat()">Tutup</button>' +
+        "</div>" +
+      "</div>" +
+    "</div>";
+
+  document.body.appendChild(bg);
+  document.addEventListener("keydown", _pdlEsc);
+  var t = bg.querySelector(".pdl-tutup");
+  if(t) t.focus();
+}
+
+function tutupPanduanDarurat(){
+  var bg = document.getElementById("modalDaruratBg");
+  if(bg) bg.remove();
+  document.removeEventListener("keydown", _pdlEsc);
+}
+
+function _pdlCetak(){
+  var h = '<!doctype html><html lang="id"><head><meta charset="utf-8" />' +
+    "<title>Panduan Darurat Lapangan \u00B7 Kliping RCS.CBS</title><style>" +
+    "body{font-family:Georgia,serif;max-width:720px;margin:32px auto;padding:0 24px;color:#2C2C2B;line-height:1.55}" +
+    "h1{font-size:26px;margin:0 0 4px}h2{font-size:18px;margin:26px 0 8px;border-bottom:1px solid #E6E5E3;padding-bottom:6px}" +
+    "h3{font-size:14px;margin:16px 0 6px}p.lead{color:#7D7A75;margin:0 0 8px}ul,ol{margin:6px 0 6px 20px;padding:0}li{margin:4px 0}" +
+    ".w{border-left:3px solid #E56458;padding:8px 12px;margin:10px 0;background:#FCE9E7}" +
+    ".o{border-left:3px solid #46A171;padding:8px 12px;margin:10px 0;background:#E8F1EC}" +
+    ".m{color:#7D7A75;font-size:12px}" +
+    "</style></head><body>" +
+    "<h1>Panduan Darurat Lapangan</h1>" +
+    '<p class="m">Kliping RCS.CBS \u00B7 dicetak ' + new Date().toLocaleString("id-ID") + "</p>";
+
+  for(var i=0;i<PDL_SEKSI.length;i++){
+    var k = PDL_SEKSI[i].k;
+    var s = PDL_ISI[k];
+    h += "<h2>" + esc(s.judul) + "</h2>";
+    h += '<p class="lead">' + esc(s.lead) + "</p>";
+    for(var j=0;j<s.blok.length;j++){
+      var b = s.blok[j];
+      h += "<h3>" + esc(b.t) + "</h3>";
+      if(b.kontak){
+        h += "<ul>";
+        for(var m=0;m<b.kontak.length;m++){ h += "<li><b>" + esc(b.kontak[m].n) + "</b> \u2014 " + esc(b.kontak[m].d) + "</li>"; }
+        h += "</ul>";
+      }
+      h += _pdlDaftar(b.b, false) + _pdlDaftar(b.n, true);
+    }
+    if(s.bahaya && s.bahaya.length) h += '<div class="w"><b>Jangan dilakukan</b>' + _pdlDaftar(s.bahaya, false) + "</div>";
+    if(s.aman && s.aman.length) h += '<div class="o"><b>Ingat ini</b>' + _pdlDaftar(s.aman, false) + "</div>";
+  }
+
+  h += '<p class="m">Darurat: 112 (nasional) \u00B7 115 (Basarnas) \u00B7 110 (Polisi) \u00B7 119 (Kesehatan). ' +
+    "Panduan ringkas, bukan pengganti pelatihan pertolongan pertama dan navigasi.</p></body></html>";
+
+  var w = window.open("", "_blank");
+  if(!w){ toast("Popup diblokir. Izinkan popup untuk mencetak panduan."); return; }
+  w.document.write(h);
+  w.document.close();
+  setTimeout(function(){ try{ w.print(); }catch(e){} }, 350);
+}
+
 /* ============ PORTAL KIRIM SURAT PEMBACA & BUAH PIKIR ============ */
 function bukaPortalSurat(jenisDef, subjekDef){
   var old=document.getElementById("modalSuratBg");
@@ -4015,7 +4487,7 @@ function bukaPortalSurat(jenisDef, subjekDef){
     '<div class="modal" style="max-width:540px;padding:24px;position:relative;animation:modalPop 0.25s cubic-bezier(0.16,1,0.3,1) both">'+
     '<button type="button" onclick="tutupPortalSurat()" style="position:absolute;top:16px;right:16px;background:none;border:0;font-size:22px;cursor:pointer;color:var(--ink2);line-height:1">&times;</button>'+
     '<h3 style="display:flex;align-items:center;gap:8px">\u2709\ufe0f Portal Kirim Surat Pembaca &amp; Buah Pikir</h3>'+
-    '<p class="msub" style="margin-bottom:14px">Meja Redaksi REICHAS CHELEBES terbuka menerima tanggapan, sanggahan, usulan berita, maupun naskah Buah Pikir karya kamu.</p>'+
+    '<p class="msub" style="margin-bottom:14px">Meja Redaksi RCS.CBS terbuka menerima tanggapan, sanggahan, usulan berita, maupun naskah Buah Pikir karya kamu.</p>'+
     '<form onsubmit="kirimSuratPembaca(event)">'+
     '<div class="f" style="margin-bottom:12px"><label class="req" style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Nama / Inisial Pengirim</label><input type="text" id="suratNama" required placeholder="Contoh: Rahmat / Pendaki Jalur Timur" class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
     '<div class="f" style="margin-bottom:12px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Email / No. WhatsApp <span class="hint" style="font-weight:400;color:var(--ink2)">(opsional, untuk balasan redaksi)</span></label><input type="text" id="suratKontak" placeholder="email@contoh.com atau 0812..." class="inp" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
@@ -4436,7 +4908,7 @@ var RCS_EMAIL2_BAWAAN="kliping.rcscbs@gmail.com";
 function hkmKontak(){
   var s=(typeof db!=="undefined"&&db&&db.settings)||{};
   var k=s.kontak||{};
-  return {email:k.email||RCS_EMAIL_BAWAAN,email2:(k.email2===""?"":(k.email2||RCS_EMAIL2_BAWAAN)),wa:k.wa||"",alamat:k.alamat||"Makassar, Sulawesi Selatan",org:k.org||"REICHAS CHELEBES"};
+  return {email:k.email||RCS_EMAIL_BAWAAN,email2:(k.email2===""?"":(k.email2||RCS_EMAIL2_BAWAAN)),wa:k.wa||"",alamat:k.alamat||"Makassar, Sulawesi Selatan",org:k.org||"RCS.CBS"};
 }
 function hkmBaca(){if(!db.settings.kontak)db.settings.kontak=hkmKontak();return db.settings.kontak}
 function hkmSurel(subjek,ke){var c=hkmKontak();var a=(ke==="redaksi"&&c.email2)?c.email2:c.email;return "mailto:"+a+"?subject="+encodeURIComponent(subjek)}
@@ -4528,7 +5000,7 @@ function viewKontak(){
     ["Keberatan atau ralat","Kamu mewakili media, atau menemukan kekeliruan fakta di salah satu kliping.","Keberatan atas materi kliping","redaksi"],
     ["Usul bahan kliping","Menemukan berita yang layak dibedah? Kirim tautannya, sebutkan kenapa menurutmu penting.","Usulan bahan kliping","redaksi"],
     ["Kerja sama sponsor","Toko perlengkapan, penyelenggara pelatihan, atau lembaga yang ingin memasang slot sponsor.","Penawaran kerja sama sponsor",""],
-    ["Gabung jadi kurator","Anggota REICHAS yang ingin ikut menggunting dan menulis konteks.","Ingin bergabung sebagai kurator","redaksi"]
+    ["Gabung jadi kurator","Anggota RCS.CBS yang ingin ikut menggunting dan menulis konteks.","Ingin bergabung sebagai kurator","redaksi"]
   ];
   return hkmHead("Kontak","Satu pintu untuk semua urusan: keberatan media, usul bahan, kerja sama, atau sekadar bertanya.")+
    hkmNav("kontak")+
@@ -4590,7 +5062,7 @@ function kartuKontak(){
 function kontakSimpan(){
   var k=hkmBaca();
   function v(i){var e=document.getElementById(i);return e?e.value.trim():""}
-  k.email=v("kEmail")||RCS_EMAIL_BAWAAN;k.email2=v("kEmail2");k.wa=v("kWa");k.alamat=v("kAlamat")||"Makassar, Sulawesi Selatan";k.org=v("kOrg")||"REICHAS CHELEBES";
+  k.email=v("kEmail")||RCS_EMAIL_BAWAAN;k.email2=v("kEmail2");k.wa=v("kWa");k.alamat=v("kAlamat")||"Makassar, Sulawesi Selatan";k.org=v("kOrg")||"RCS.CBS";
   save();
   try{supa.from("app_settings").upsert({id:"situs",data:db.settings}).then(function(r){if(!pErr(r&&r.error,"kontak"))toast("Kontak disimpan")})}catch(e){toast("Kontak disimpan")}
   render();
