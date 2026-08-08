@@ -5443,7 +5443,7 @@ function cetakDokumen(judul,subjudul,daftar){
      '<div class="met">'+cetakEsc(subjudul)+' \u00b7 dicetak '+cetakEsc(tglCetak)+'</div></header>';
   h+='<div class="isi"><h3>Daftar isi</h3><ol>'+daftar.map(function(k){return "<li>"+cetakEsc(k.judul)+" \u2014 "+cetakEsc(k.rubrik)+"</li>"}).join("")+'</ol></div>';
   h+=daftar.map(function(k,i){return cetakKlipHTML(k,i+1)}).join("");
-  h+='<div class="ft">Kliping RCS.CBS \u00b7 Dikelola Divisi Komunikasi &amp; Publikasi bersama Divisi Pendidikan &amp; Edukasi \u00b7 REICHAS CHELEBES, Makassar<br />'+
+  h+='<div class="ft">Kliping RCS.CBS \u00b7 Dikelola Divisi Komunikasi &amp; Publikasi bersama Divisi Pendidikan &amp; Edukasi \u00b7 RCS.CBS, Makassar<br />'+
      'Arsip daring: kliping-reichas.my.id \u00b7 Surel redaksi: kliping.rcscbs@gmail.com</div>';
   h+='</body></html>';
   return h;
@@ -5764,7 +5764,7 @@ function viewOpini(k){
    '<div class="sec">'+(isi||"<p>\u2014</p>")+"</div>"+
    (pel.length?'<div class="sec"><h4>Poin penutup</h4><ol>'+pel.map(function(p){return "<li>"+esc(p)+"</li>"}).join("")+"</ol></div>":"")+
    (rj?'<div class="sec"><h4>Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+rj+"</ul></div>":"")+
-   '<div class="opi-note"><b>Ini Buah Pikir, bukan laporan.</b> Isinya pandangan pribadi penulis dan tidak mewakili sikap resmi REICHAS CHELEBES. Sanggahan boleh dikirim ke kliping.rcscbs@gmail.com dan akan kami muat bila layak.</div>'+
+   '<div class="opi-note"><b>Ini Buah Pikir, bukan laporan.</b> Isinya pandangan pribadi penulis dan tidak mewakili sikap resmi RCS.CBS. Sanggahan boleh dikirim ke kliping.rcscbs@gmail.com dan akan kami muat bila layak.</div>'+
    '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Ditulis '+tglID(k.tglKliping)+" oleh "+esc(nm(k.kurator))+(k.peninjau?" \u00b7 disetujui "+esc(nm(k.peninjau)):"")+"</p>"+
    '<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+"</div></div>"+foot();
 }
