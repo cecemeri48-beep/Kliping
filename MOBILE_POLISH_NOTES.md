@@ -25,3 +25,5 @@ Catatan deploy:
 
 14. Password Gmail frontend dibersihkan: browser hanya menyimpan label email, kredensial tetap di Vercel env.
 15. Selector TTS dibuat lebih aman terhadap duplicate ID lint/static.
+
+16. Restore mobile floating Anoa: tampil di kiri bawah, otomatis sembunyi saat panel kutipan aktif.
