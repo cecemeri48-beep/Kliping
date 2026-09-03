@@ -1610,6 +1610,14 @@ body.admin-mode .mascot-mini { display: none !important; }
   .mascot-mini{right:12px!important;bottom:calc(86px + var(--safe-bottom))!important;z-index:621!important;pointer-events:auto!important}
   .mp-quote.on~.mascot-wrap,.mp-quote.on~.mascot-mini{display:none!important}
 }
+
+/* === Hard fix: Anoa touch target mobile === */
+@media(max-width:640px){
+  .mascot-wrap{width:92px!important;height:140px!important;overflow:visible!important}
+  .mascot-inner{width:92px!important;height:140px!important}
+  .mascot-sparkle{pointer-events:none!important}
+  .mascot-img{touch-action:none!important;user-select:none!important;-webkit-user-drag:none!important}
+}
 </style>
 </head>
 <body>
@@ -6535,6 +6543,48 @@ bootstrap();
 
 /* === Mobile Perfect Polish by Notion AI === */
 (function(){if(window.__mobilePolish)return;window.__mobilePolish=true;var LS='rcs_mobile_polish_seen_v1',step=0,deferredPrompt=null;var slides=[['Baca cepat, tetap kritis','Kliping diringkas agar nyaman dibaca di layar kecil: judul jelas, konteks singkat, dan pelajaran praktis.'],['Simpan dan lanjutkan','Pakai rak baca untuk menyimpan kliping penting. Cocok untuk dibaca lagi saat di perjalanan.'],['Dengar, salin, bagikan','Mode baca, narator, kutipan siap salin, dan tombol share dibuat lebih dekat dengan jempol.']];function el(id){return document.getElementById(id)}function ensure(){if(!el('mpReader')){var b=document.createElement('div');b.id='mpReader';b.className='mp-readerbar';b.innerHTML='<i></i>';document.body.appendChild(b)}if(!el('mpFab')){var f=document.createElement('div');f.id='mpFab';f.className='mobile-polish-fab';f.innerHTML='<button class="mp-btn" title="Mode baca" onclick="mpToggleRead()">Aa</button><button class="mp-btn" title="Kutip/share" onclick="mpQuote()">↗</button>';document.body.appendChild(f)}if(!el('mpInstall')){var ins=document.createElement('div');ins.id='mpInstall';ins.className='mp-install';ins.innerHTML='<div style="flex:1"><b>Pasang Kliping di layar utama</b><span>Buka lebih cepat dan terasa seperti aplikasi.</span></div><button class="btn btn-p" onclick="mpDoInstall()">Pasang</button><button class="btn" onclick="mpHideInstall()">Nanti</button>';document.body.appendChild(ins)}if(!el('mpOnboard')){var o=document.createElement('div');o.id='mpOnboard';o.className='mp-onboard';o.innerHTML='<div class="mp-onboard-card"><span class="mp-onboard-k">KLIPING MOBILE</span><h2 id="mpObTitle"></h2><p id="mpObText"></p><div class="mp-onboard-dots" id="mpObDots"></div><div class="mp-onboard-actions"><button class="ghost" onclick="mpSkipOnboard()">Lewati</button><button class="main" onclick="mpNextOnboard()" id="mpObBtn">Lanjut</button></div></div>';document.body.appendChild(o)}if(!el('mpQuote')){var q=document.createElement('div');q.id='mpQuote';q.className='mp-quote';q.innerHTML='<button class="mp-quote-close" onclick="mpCloseQuote()" aria-label="Tutup kutipan">×</button><b>Kutipan siap bagikan</b><textarea id="mpQuoteText"></textarea><div class="row"><button class="btn" onclick="mpCloseQuote()">Tutup</button><button class="btn btn-p" onclick="mpCopyQuote()">Salin</button><button class="btn btn-g" onclick="mpShareQuote()">Share</button></div>';document.body.appendChild(q)}}function updateProgress(){var d=document.documentElement,y=scrollY||d.scrollTop,h=d.scrollHeight-innerHeight,pct=h>0?Math.max(0,Math.min(100,y/h*100)):0;var i=el('mpReader')&&el('mpReader').querySelector('i');if(i)i.style.width=pct+'%'}function renderOnboard(){ensure();el('mpObTitle').textContent=slides[step][0];el('mpObText').textContent=slides[step][1];el('mpObBtn').textContent=step===slides.length-1?'Mulai membaca':'Lanjut';el('mpObDots').innerHTML=slides.map(function(_,i){return '<i class="'+(i===step?'on':'')+'"></i>'}).join('');el('mpOnboard').style.display='flex'}window.mpNextOnboard=function(){if(step<slides.length-1){step++;renderOnboard()}else window.mpSkipOnboard()};window.mpSkipOnboard=function(){try{localStorage.setItem(LS,'1')}catch(e){}if(el('mpOnboard'))el('mpOnboard').style.display='none'};window.mpToggleRead=function(){document.body.classList.toggle('mp-reading-mode');try{localStorage.setItem('rcs_read_mode',document.body.classList.contains('mp-reading-mode')?'1':'0')}catch(e){}if(navigator.vibrate)navigator.vibrate(15)};window.mpQuote=function(){ensure();var title=(document.querySelector('.art h2')||document.querySelector('.clip h3')||{}).textContent||'Kliping RCS.CBS';var lead=(document.querySelector('.art .lead')||document.querySelector('.sec p')||{}).textContent||'Membaca hari ini, melek fakta selamanya.';el('mpQuoteText').value='“'+lead.trim().slice(0,220)+'”\n\n— '+title.trim()+'\nKliping RCS.CBS';el('mpQuote').classList.add('on')};window.mpCloseQuote=function(){if(el('mpQuote'))el('mpQuote').classList.remove('on')};window.mpCopyQuote=function(){var t=el('mpQuoteText').value;if(navigator.clipboard)navigator.clipboard.writeText(t);if(window.toast)toast('Kutipan disalin');if(navigator.vibrate)navigator.vibrate(20)};window.mpShareQuote=function(){var t=el('mpQuoteText').value;if(navigator.share)navigator.share({title:'Kliping RCS.CBS',text:t,url:location.href}).catch(function(){});else window.mpCopyQuote()};window.mpHideInstall=function(){if(el('mpInstall'))el('mpInstall').style.display='none';try{localStorage.setItem('rcs_install_hide','1')}catch(e){}};window.mpDoInstall=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;window.mpHideInstall()}else{if(window.toast)toast('Gunakan menu browser: Tambahkan ke layar utama')}};window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;try{if(!localStorage.getItem('rcs_install_hide'))setTimeout(function(){ensure();el('mpInstall').style.display='flex'},1800)}catch(x){}});window.addEventListener('scroll',updateProgress,{passive:true});window.addEventListener('resize',updateProgress);document.addEventListener('DOMContentLoaded',function(){ensure();updateProgress();try{if(localStorage.getItem('rcs_read_mode')==='1')document.body.classList.add('mp-reading-mode');if(!localStorage.getItem(LS)&&matchMedia('(max-width:700px)').matches)setTimeout(renderOnboard,700)}catch(e){}});setTimeout(function(){ensure();updateProgress()},1200);})();
+
+/* === Hard fix: Anoa interaktif saat disentuh di mobile === */
+(function(){
+  if(window.__anoaTouchHardFix)return; window.__anoaTouchHardFix=true;
+  function ready(fn){ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fn); else fn(); }
+  ready(function(){
+    var wrap=document.getElementById('mascotWrap');
+    var inner=document.getElementById('mascotInner');
+    var speech=document.getElementById('mascotSpeech');
+    var sparkle=document.getElementById('mascotSparkle');
+    var toggle=document.getElementById('mascotToggle');
+    if(!wrap||!inner)return;
+    var sx=0,sy=0,sl=0,st=0,moved=false,down=false;
+    function msg(){
+      var list=[];
+      try{ list=(window.kataMaskotEfektif&&window.kataMaskotEfektif())||[]; }catch(e){}
+      if(!list.length) list=['Siap naik gunung? Baca dulu! 🦬','Satu kliping, seribu pelajaran. 💡','Kapan kita ke Bivak lagi? ⛺'];
+      return list[Math.floor(Math.random()*list.length)];
+    }
+    function pop(){
+      if(speech){
+        speech.textContent=msg();
+        speech.classList.add('tampil');
+        clearTimeout(speech._anoaHide);
+        speech._anoaHide=setTimeout(function(){speech.classList.remove('tampil')},3600);
+      }
+      inner.classList.remove('lompat'); void inner.offsetWidth; inner.classList.add('lompat');
+      if(sparkle){sparkle.classList.remove('aktif'); void sparkle.offsetWidth; sparkle.classList.add('aktif')}
+      setTimeout(function(){inner.classList.remove('lompat'); if(sparkle)sparkle.classList.remove('aktif')},760);
+      if(navigator.vibrate)try{navigator.vibrate(18)}catch(e){}
+    }
+    function pt(e){var t=e.touches&&e.touches[0]||e.changedTouches&&e.changedTouches[0]||e; return {x:t.clientX||0,y:t.clientY||0}}
+    function start(e){ if(e.target===toggle)return; down=true;moved=false;var a=pt(e),r=wrap.getBoundingClientRect();sx=a.x;sy=a.y;sl=r.left;st=r.top;inner.classList.add('dragging'); }
+    function move(e){ if(!down)return;var a=pt(e),dx=a.x-sx,dy=a.y-sy;if(Math.abs(dx)>6||Math.abs(dy)>6)moved=true;if(moved){if(e.cancelable)e.preventDefault();wrap.style.left=Math.max(4,Math.min(innerWidth-96,sl+dx))+'px';wrap.style.top=Math.max(4,Math.min(innerHeight-150,st+dy))+'px';wrap.style.right='auto';wrap.style.bottom='auto';}}
+    function end(e){ if(!down)return;down=false;inner.classList.remove('dragging'); if(!moved){ if(e&&e.cancelable)e.preventDefault(); pop(); } else {try{var r=wrap.getBoundingClientRect();localStorage.setItem('mascot-pos',JSON.stringify({left:Math.round(r.left),top:Math.round(r.top)}))}catch(x){}} }
+    wrap.addEventListener('pointerdown',start,{passive:false});
+    window.addEventListener('pointermove',move,{passive:false});
+    window.addEventListener('pointerup',end,{passive:false});
+    wrap.addEventListener('click',function(e){ if(e.target!==toggle && !moved){ e.preventDefault(); pop(); } },true);
+    wrap.style.pointerEvents='auto'; inner.style.pointerEvents='auto';
+  });
+})();
 </script>
 </body>
 </html>
