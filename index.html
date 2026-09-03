@@ -1618,6 +1618,17 @@ body.admin-mode .mascot-mini { display: none !important; }
   .mascot-sparkle{pointer-events:none!important}
   .mascot-img{touch-action:none!important;user-select:none!important;-webkit-user-drag:none!important}
 }
+
+/* === FINAL: Anoa benar-benar floating draggable mobile === */
+@media(max-width:640px){
+  .mascot-wrap{display:block!important;position:fixed!important;left:14px!important;top:auto!important;right:auto!important;bottom:calc(92px + env(safe-area-inset-bottom,0px))!important;width:96px!important;height:136px!important;z-index:9999!important;overflow:visible!important;transform:none!important;pointer-events:auto!important;touch-action:none!important}
+  .mascot-inner{position:absolute!important;left:0!important;bottom:0!important;width:96px!important;height:136px!important;transform:none!important;transform-origin:left bottom!important;pointer-events:auto!important;touch-action:none!important;cursor:grab!important}
+  .mascot-inner.dragging{cursor:grabbing!important}
+  .mascot-img{position:absolute!important;left:0!important;bottom:0!important;width:82px!important;max-width:82px!important;height:auto!important;pointer-events:auto!important;touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important}
+  .mascot-speech{display:block!important;position:absolute!important;left:8px!important;bottom:108px!important;max-width:220px!important;min-width:150px!important;font-size:12px!important;line-height:1.35!important;padding:9px 11px!important;pointer-events:none!important;z-index:10000!important}
+  .mascot-toggle{display:grid!important;opacity:.95!important;pointer-events:auto!important;z-index:10001!important}
+  .mascot-mini{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -6584,6 +6595,27 @@ bootstrap();
     wrap.addEventListener('click',function(e){ if(e.target!==toggle && !moved){ e.preventDefault(); pop(); } },true);
     wrap.style.pointerEvents='auto'; inner.style.pointerEvents='auto';
   });
+})();
+
+/* === FINAL: Anoa floating + drag fix mobile === */
+(function(){
+  function boot(){
+    var wrap=document.getElementById('mascotWrap'), inner=document.getElementById('mascotInner'), speech=document.getElementById('mascotSpeech'), sparkle=document.getElementById('mascotSparkle'), toggle=document.getElementById('mascotToggle');
+    if(!wrap||!inner||window.__anoaFinalDragFix)return; window.__anoaFinalDragFix=true;
+    var mobile=function(){return window.matchMedia&&window.matchMedia('(max-width:640px)').matches};
+    function place(){ if(!mobile())return; wrap.style.position='fixed'; wrap.style.left=localStorage.getItem('anoa-mobile-left')||'14px'; wrap.style.top=localStorage.getItem('anoa-mobile-top')||''; wrap.style.right='auto'; if(!wrap.style.top)wrap.style.bottom='calc(92px + env(safe-area-inset-bottom,0px))'; else wrap.style.bottom='auto'; wrap.style.display='block'; }
+    function say(){var list=[];try{list=(window.kataMaskotEfektif&&window.kataMaskotEfektif())||[]}catch(e){} if(!list.length)list=['Siap naik gunung? Baca dulu! 🦬','Satu kliping, seribu pelajaran. 💡','Kapan kita ke Bivak lagi? ⛺']; if(speech){speech.textContent=list[Math.floor(Math.random()*list.length)]; speech.classList.add('tampil'); clearTimeout(speech._h); speech._h=setTimeout(function(){speech.classList.remove('tampil')},3500)} if(sparkle){sparkle.classList.remove('aktif'); void sparkle.offsetWidth; sparkle.classList.add('aktif')} inner.classList.remove('lompat'); void inner.offsetWidth; inner.classList.add('lompat'); setTimeout(function(){inner.classList.remove('lompat')},700);}
+    var down=false,moved=false,sx=0,sy=0,sl=0,st=0;
+    function P(e){var t=(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0])||e; return {x:t.clientX||0,y:t.clientY||0}}
+    function start(e){if(e.target===toggle)return; if(!mobile())return; down=true;moved=false;var p=P(e),r=wrap.getBoundingClientRect();sx=p.x;sy=p.y;sl=r.left;st=r.top;inner.classList.add('dragging'); if(e.cancelable)e.preventDefault()}
+    function move(e){if(!down||!mobile())return;var p=P(e),dx=p.x-sx,dy=p.y-sy;if(Math.abs(dx)>4||Math.abs(dy)>4)moved=true;if(moved){if(e.cancelable)e.preventDefault();var nl=Math.max(4,Math.min(window.innerWidth-90,sl+dx));var nt=Math.max(4,Math.min(window.innerHeight-150,st+dy));wrap.style.left=nl+'px';wrap.style.top=nt+'px';wrap.style.right='auto';wrap.style.bottom='auto';}}
+    function end(e){if(!down)return;down=false;inner.classList.remove('dragging');if(!moved){say()}else{try{var r=wrap.getBoundingClientRect();localStorage.setItem('anoa-mobile-left',Math.round(r.left)+'px');localStorage.setItem('anoa-mobile-top',Math.round(r.top)+'px')}catch(x){}}}
+    place(); setTimeout(place,500); setTimeout(place,1800);
+    inner.addEventListener('touchstart',start,{passive:false}); window.addEventListener('touchmove',move,{passive:false}); window.addEventListener('touchend',end,{passive:false});
+    inner.addEventListener('pointerdown',start,{passive:false}); window.addEventListener('pointermove',move,{passive:false}); window.addEventListener('pointerup',end,{passive:false});
+    inner.addEventListener('click',function(e){if(mobile()&&!moved){e.preventDefault();say()}},true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
 </script>
 </body>
