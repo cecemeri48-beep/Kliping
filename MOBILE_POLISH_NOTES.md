@@ -27,3 +27,7 @@ Catatan deploy:
 15. Selector TTS dibuat lebih aman terhadap duplicate ID lint/static.
 
 16. Restore mobile floating Anoa: tampil di kiri bawah, otomatis sembunyi saat panel kutipan aktif.
+
+17. Fungsi interaksi Anoa mobile dipulihkan: tap lompat/sparkle/ucapan, drag tetap aktif, speech bubble tampil lagi.
+
+18. Cache service worker dinaikkan ke reichas-v56-anoa-final-mobile agar HP/PWA mengambil fix Anoa terbaru.
