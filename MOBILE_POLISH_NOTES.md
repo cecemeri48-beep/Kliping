@@ -20,3 +20,8 @@ Catatan deploy:
 - Bila CDN Supabase tersedia di produksi, aplikasi tetap memakai client Supabase asli.
 
 12. Tombol eksternal Bivak Rental ditambahkan di menu dan footer: https://bivak-rental.vercel.app/#
+
+13. Floating Anoa tidak lagi tertutup panel kutipan; tombol menu dibuat compact tanpa tulisan MENU.
+
+14. Password Gmail frontend dibersihkan: browser hanya menyimpan label email, kredensial tetap di Vercel env.
+15. Selector TTS dibuat lebih aman terhadap duplicate ID lint/static.
