@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<!-- build: anoa-drag-transform-v57 -->
 <!-- build: anoa-final-mobile-v56 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -1625,6 +1626,21 @@ body.admin-mode .mascot-mini { display: none !important; }
   .mascot-wrap{display:block!important;position:fixed!important;left:14px!important;top:auto!important;right:auto!important;bottom:calc(92px + env(safe-area-inset-bottom,0px))!important;width:96px!important;height:136px!important;z-index:9999!important;overflow:visible!important;transform:none!important;pointer-events:auto!important;touch-action:none!important}
   .mascot-inner{position:absolute!important;left:0!important;bottom:0!important;width:96px!important;height:136px!important;transform:none!important;transform-origin:left bottom!important;pointer-events:auto!important;touch-action:none!important;cursor:grab!important}
   .mascot-inner.dragging{cursor:grabbing!important}
+  .mascot-img{position:absolute!important;left:0!important;bottom:0!important;width:82px!important;max-width:82px!important;height:auto!important;pointer-events:auto!important;touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important}
+  .mascot-speech{display:block!important;position:absolute!important;left:8px!important;bottom:108px!important;max-width:220px!important;min-width:150px!important;font-size:12px!important;line-height:1.35!important;padding:9px 11px!important;pointer-events:none!important;z-index:10000!important}
+  .mascot-toggle{display:grid!important;opacity:.95!important;pointer-events:auto!important;z-index:10001!important}
+  .mascot-mini{display:none!important}
+}
+
+/* === FINAL FIX v57: Anoa mobile drag via transform, not top/left === */
+@media(max-width:640px){
+  .mascot-wrap{
+    display:block!important;position:fixed!important;left:14px!important;top:auto!important;right:auto!important;bottom:calc(92px + env(safe-area-inset-bottom,0px))!important;
+    width:96px!important;height:136px!important;z-index:9999!important;overflow:visible!important;
+    transform:translate3d(var(--anoa-x,0px),var(--anoa-y,0px),0)!important;
+    pointer-events:auto!important;touch-action:none!important;will-change:transform!important;
+  }
+  .mascot-inner{position:absolute!important;left:0!important;bottom:0!important;width:96px!important;height:136px!important;transform:none!important;pointer-events:auto!important;touch-action:none!important;cursor:grab!important}
   .mascot-img{position:absolute!important;left:0!important;bottom:0!important;width:82px!important;max-width:82px!important;height:auto!important;pointer-events:auto!important;touch-action:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important}
   .mascot-speech{display:block!important;position:absolute!important;left:8px!important;bottom:108px!important;max-width:220px!important;min-width:150px!important;font-size:12px!important;line-height:1.35!important;padding:9px 11px!important;pointer-events:none!important;z-index:10000!important}
   .mascot-toggle{display:grid!important;opacity:.95!important;pointer-events:auto!important;z-index:10001!important}
@@ -6617,6 +6633,31 @@ bootstrap();
     inner.addEventListener('click',function(e){if(mobile()&&!moved){e.preventDefault();say()}},true);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot); else boot();
+})();
+
+/* === FINAL FIX v57: Anoa benar-benar bisa digeser di mobile === */
+(function(){
+  function boot(){
+    var wrap=document.getElementById('mascotWrap'), inner=document.getElementById('mascotInner'), img=document.getElementById('mascotImg'), speech=document.getElementById('mascotSpeech'), sparkle=document.getElementById('mascotSparkle'), toggle=document.getElementById('mascotToggle');
+    if(!wrap||!inner||window.__anoaDragV57)return; window.__anoaDragV57=true;
+    function mobile(){return window.matchMedia&&window.matchMedia('(max-width:640px)').matches}
+    function n(v){v=parseFloat(v);return isNaN(v)?0:v}
+    function apply(x,y){wrap.style.setProperty('--anoa-x',x+'px');wrap.style.setProperty('--anoa-y',y+'px')}
+    function load(){var x=n(localStorage.getItem('anoa-v57-x')), y=n(localStorage.getItem('anoa-v57-y')); apply(x,y)}
+    function save(x,y){try{localStorage.setItem('anoa-v57-x',String(Math.round(x)));localStorage.setItem('anoa-v57-y',String(Math.round(y)))}catch(e){}}
+    function say(){var list=[];try{list=(window.kataMaskotEfektif&&window.kataMaskotEfektif())||[]}catch(e){} if(!list.length)list=['Siap naik gunung? Baca dulu! 🦬','Satu kliping, seribu pelajaran. 💡','Kapan kita ke Bivak lagi? ⛺']; if(speech){speech.textContent=list[Math.floor(Math.random()*list.length)];speech.classList.add('tampil');clearTimeout(speech._h);speech._h=setTimeout(function(){speech.classList.remove('tampil')},3500)} if(sparkle){sparkle.classList.remove('aktif');void sparkle.offsetWidth;sparkle.classList.add('aktif')} inner.classList.remove('lompat');void inner.offsetWidth;inner.classList.add('lompat');setTimeout(function(){inner.classList.remove('lompat');if(sparkle)sparkle.classList.remove('aktif')},760)}
+    var down=false,moved=false,sx=0,sy=0,startX=0,startY=0,curX=0,curY=0;
+    function P(e){var t=(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0])||e;return{x:t.clientX||0,y:t.clientY||0}}
+    function bounds(x,y){var baseLeft=14, baseBottom=92, w=90, h=136; var minX=4-baseLeft, maxX=window.innerWidth-baseLeft-w-4; var baseTop=window.innerHeight-baseBottom-h; var minY=4-baseTop, maxY=window.innerHeight-baseTop-h-72; return {x:Math.max(minX,Math.min(maxX,x)),y:Math.max(minY,Math.min(maxY,y))}}
+    function start(e){if(!mobile()||e.target===toggle)return; var p=P(e); down=true;moved=false;sx=p.x;sy=p.y;curX=n(getComputedStyle(wrap).getPropertyValue('--anoa-x'));curY=n(getComputedStyle(wrap).getPropertyValue('--anoa-y'));startX=curX;startY=curY;inner.classList.add('dragging'); if(e.cancelable)e.preventDefault();}
+    function move(e){if(!down||!mobile())return;var p=P(e),dx=p.x-sx,dy=p.y-sy;if(Math.abs(dx)>3||Math.abs(dy)>3)moved=true;if(moved){if(e.cancelable)e.preventDefault();var b=bounds(startX+dx,startY+dy);curX=b.x;curY=b.y;apply(curX,curY)}}
+    function end(e){if(!down)return;down=false;inner.classList.remove('dragging'); if(moved){save(curX,curY)}else{if(e&&e.cancelable)e.preventDefault();say()}}
+    load(); setTimeout(load,300); setTimeout(load,1200);
+    [wrap,inner,img].forEach(function(el){if(!el)return;el.addEventListener('touchstart',start,{passive:false});el.addEventListener('pointerdown',start,{passive:false});});
+    window.addEventListener('touchmove',move,{passive:false});window.addEventListener('touchend',end,{passive:false});window.addEventListener('touchcancel',end,{passive:false});
+    window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',end,{passive:false});window.addEventListener('pointercancel',end,{passive:false});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
 </body>
