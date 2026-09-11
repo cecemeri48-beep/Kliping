@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<!-- build: v59-google-saja -->
+<!-- build: v60-grid-ringkas -->
 <!-- build: anoa-final-mobile-v56 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -1646,6 +1646,45 @@ body.admin-mode .mascot-mini { display: none !important; }
   .mascot-toggle{display:grid!important;opacity:.95!important;pointer-events:auto!important;z-index:10001!important}
   .mascot-mini{display:none!important}
 }
+
+/* ---------- PAPAN RINGKAS (grid kartu kecil) v60 ----------
+   Aktif hanya bila kelas .ringkas ditambahkan pada .board.
+   Semua pemilih memakai .board.ringkas (spesifisitas 0,2,0) sehingga menang
+   atas aturan .board/.clip bawaan tanpa perlu mengubahnya. Tanpa kelas itu,
+   tampilan lama tidak tersentuh sama sekali. */
+.board.ringkas{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:14px;align-items:stretch}
+.board.ringkas .clip{padding:12px!important;border-radius:14px;margin-bottom:0!important}
+.board.ringkas .clip:hover{transform:translateY(-3px)}
+.board.ringkas .clip:before{height:5px}
+.board.ringkas .clip-img,.board.ringkas .clip img{aspect-ratio:16/9;height:auto!important;width:100%;object-fit:cover;border-radius:9px!important;margin:2px 0 8px!important}
+.board.ringkas .clip-tags{gap:4px;margin-bottom:2px}
+.board.ringkas .clip-tags .tag{font-size:10px;padding:2px 8px}
+.board.ringkas .clip h3{font-size:15px!important;line-height:1.3;margin:6px 0 4px!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.board.ringkas .clip .lead{display:none!important}
+.board.ringkas .clip .src{margin-top:auto;padding-top:8px;font-size:10.5px;gap:6px;flex-wrap:wrap}
+.board.ringkas .clip-meta{margin-top:7px;font-size:10.5px;gap:5px}
+.board.ringkas .mark{padding:4px 9px;font-size:10.5px;min-height:0}
+.board.ringkas .clip button.open{margin-top:9px!important;min-height:36px!important;font-size:12px!important;padding:7px 9px;border-radius:10px}
+@media (max-width:640px){
+  .board.ringkas{grid-template-columns:repeat(2,1fr);gap:10px;padding-bottom:22px}
+  .board.ringkas .clip{padding:9px!important;border-radius:13px;box-shadow:0 5px 15px rgba(16,42,67,.10)}
+  .board.ringkas .clip-img,.board.ringkas .clip img{aspect-ratio:4/3;border-radius:8px!important;margin:1px 0 7px!important}
+  .board.ringkas .clip h3{font-size:13.5px!important;line-height:1.27;margin:5px 0 3px!important}
+  .board.ringkas .clip-tags .tag{font-size:9px;padding:2px 6px}
+  .board.ringkas .clip .src{font-size:9.5px;padding-top:6px;gap:4px}
+  .board.ringkas .clip-meta{margin-top:6px;font-size:9.5px;gap:4px}
+  .board.ringkas .mark{padding:3px 7px;font-size:9.5px}
+  .board.ringkas .clip button.open{margin-top:7px!important;min-height:34px!important;font-size:11.5px!important;padding:6px 7px;border-radius:9px}
+}
+@media (max-width:360px){
+  .board.ringkas{gap:8px}
+  .board.ringkas .clip{padding:8px!important}
+  .board.ringkas .clip h3{font-size:12.5px!important}
+}
+.pv-btn{white-space:nowrap}
+.pv-btn.on{background:#f2efff;color:#4f3bb4;border-color:#d9d0ff;font-weight:700}
+[data-tema="gelap"] .pv-btn.on{background:#241f3a;color:#c3b7ff;border-color:#3a2f5c}
+
 </style>
 </head>
 <body>
@@ -6571,6 +6610,60 @@ bootstrap();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+
+/* ================= PAPAN RINGKAS (grid kecil untuk ponsel) v60 =================
+   Menambahkan kelas .ringkas pada <div class="board"> supaya kartu kliping
+   tampil sebagai grid dua kolom di ponsel, sehingga pembaca tidak perlu
+   menggulir panjang ketika kliping sudah banyak. Pilihan disimpan di
+   localStorage. Bawaan: ringkas di layar <=640px, lengkap di layar besar.
+   Lapisan ini hanya menyisipkan satu kelas dan satu tombol; isi kartu,
+   reaksi, dan penanda Rak Baca tidak diubah. */
+function papanView(){
+  try{
+    var v=localStorage.getItem("rcs_papan_view");
+    if(v==="ringkas"||v==="lengkap")return v;
+  }catch(e){}
+  try{ return (window.innerWidth && window.innerWidth<=640) ? "ringkas" : "lengkap" }catch(e){}
+  return "ringkas";
+}
+function setPapanView(v){
+  v=(v==="lengkap")?"lengkap":"ringkas";
+  try{ localStorage.setItem("rcs_papan_view",v) }catch(e){}
+  try{ render() }catch(e){}
+  try{ toast(v==="ringkas"?"▦ Tampilan ringkas · kartu kecil":"▤ Tampilan lengkap · kartu besar") }catch(e){}
+}
+function togglePapanView(){ setPapanView(papanView()==="ringkas"?"lengkap":"ringkas") }
+function tombolPapanView(){
+  var r=(papanView()==="ringkas");
+  return '<button class="btn btn-sm pv-btn'+(r?" on":"")+'" onclick="togglePapanView()" aria-pressed="'+(r?"true":"false")+'" title="Ganti kerapatan kartu kliping">'+(r?"▦ Ringkas":"▤ Lengkap")+'</button>';
+}
+(function(){
+  var MARK='<div class="board">';
+  var RAK="go({pv:{n:'rak'}})";
+  function pasang(h,pakaiTombol){
+    if(typeof h!=="string")return h;
+    try{
+      if(papanView()==="ringkas")h=h.split(MARK).join('<div class="board ringkas">');
+      if(pakaiTombol){
+        var idx=h.indexOf(RAK);
+        if(idx>=0){
+          var b=h.lastIndexOf("<button",idx);
+          if(b>=0)h=h.slice(0,b)+tombolPapanView()+h.slice(b);
+        }
+      }
+    }catch(e){}
+    return h;
+  }
+  if(typeof viewBoard==="function"){
+    var _vbR=viewBoard;
+    viewBoard=function(){ return pasang(_vbR.apply(this,arguments),true) };
+  }
+  if(typeof viewRak==="function"){
+    var _vrR=viewRak;
+    viewRak=function(){ return pasang(_vrR.apply(this,arguments),false) };
+  }
+})();
+
 </script>
 </body>
 </html>
