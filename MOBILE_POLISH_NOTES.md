@@ -31,3 +31,7 @@ Catatan deploy:
 17. Fungsi interaksi Anoa mobile dipulihkan: tap lompat/sparkle/ucapan, drag tetap aktif, speech bubble tampil lagi.
 
 18. Cache service worker dinaikkan ke reichas-v56-anoa-final-mobile agar HP/PWA mengambil fix Anoa terbaru.
+
+19. Visual refresh editorial (minim AI slop): satu aksen hijau rimba, semua gradien ungu-lime & glow dihilangkan; tombol share seragam netral; banner literasi jadi kartu tinta; strip pelangi kartu diganti garis gunting putus-putus; ikon bottom nav diganti SVG garis (emoji dihilangkan); statistik tanpa emoji; onboarding tinta solid + aksen hijau; maskot lebih kecil, gelembung tidak terpotong, dan tidak menumpuk layar onboarding; mode gelap ikut aksen hijau.
+
+20. Cache service worker dinaikkan ke reichas-v62-visual-editorial agar HP/PWA mengambil visual refresh terbaru.

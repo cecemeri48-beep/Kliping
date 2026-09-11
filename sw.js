@@ -1,4 +1,4 @@
-const CACHE='reichas-v61-aset-ringan';
+const CACHE='reichas-v62-visual-editorial';
 /* Hanya aset yang benar-benar dipakai pada tampilan pertama. og-image.jpg
    (156 KB) dan ikon 512 px dibuang dari precache: keduanya tidak pernah
    ditampilkan ke pembaca (hanya untuk pratinjau WhatsApp dan ikon PWA),

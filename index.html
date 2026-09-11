@@ -1707,6 +1707,146 @@ body.admin-mode .mascot-mini { display: none !important; }
   .gbr-art{min-height:120px}
 }
 
+/* ================= VISUAL REFRESH: EDITORIAL, MINIM AI-SLOP ================= */
+:root{
+  --brand:#1F6A44;          /* hijau rimba: satu aksen, sesuai pencinta alam */
+  --brand-d:#164F31;
+  --brand-s:#E3EEE7;
+  --brand-l:#8CC6A4;        /* aksen di atas latar gelap */
+  --paper:#F6F4EE;          /* kanvas kertas hangat */
+  --ink-d:#201D18;          /* tinta */
+}
+body{background:var(--paper)}
+
+/* Header: bersih, tanpa glow & gradien */
+.top{background:rgba(255,255,255,.94)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}
+.brand img,.pasang-bar img{border:1px solid var(--line)!important;box-shadow:none!important;filter:none!important}
+.brand img:hover,.pasang-bar img:hover{transform:none!important;box-shadow:none!important;filter:none!important}
+.menuwrap .menu-btn{background:var(--ink-d)!important;background-image:none!important;box-shadow:none!important;letter-spacing:.1em}
+.menuwrap .menu-btn:hover{transform:none!important;box-shadow:none!important;background:#38342C!important}
+.menuwrap .menu-btn:focus-visible{outline:2px solid var(--brand)!important;outline-offset:2px}
+.who .btn-p{box-shadow:none!important}
+
+/* Tombol utama: hijau solid */
+.btn-p{background:var(--brand)!important;background-image:none!important;border-color:var(--brand)!important;box-shadow:none!important}
+.btn-p:hover{background:var(--brand-d)!important;background-image:none!important;transform:none!important;box-shadow:none!important}
+.btn{border-radius:10px!important}
+
+/* Hero: foto asli tetap, caption lebih rapi tanpa sheen */
+.paper-hero,.paper-copy{animation:none!important}
+.paper-copy>div{background:rgba(18,22,19,.78)!important;border-left:3px solid var(--brand-l)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:0 10px 26px rgba(0,0,0,.22)!important}
+.paper-copy>div:after{display:none!important}
+.paper-copy h2,.paper-copy p{text-shadow:none!important}
+
+/* Banner literasi: kartu tinta editorial, bukan gradien */
+.lit-inner{background:var(--ink-d)!important;background-image:none!important;box-shadow:0 14px 30px rgba(24,21,16,.20)!important}
+.lit-inner:before{display:none!important}
+.lit-badge{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.22)!important;font-weight:600}
+.lit-qitem{background:rgba(255,255,255,.07)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:1px solid rgba(255,255,255,.14)!important;box-shadow:none!important}
+.lit-qitem-ic{background:rgba(255,255,255,.12)!important}
+
+/* Tombol share: netral seragam, bukan warna-warni brand */
+.sh{background:#fff!important;background-image:none!important;color:var(--ink)!important;border:1px solid var(--line)!important;box-shadow:none!important}
+.sh:hover{filter:none!important;background:var(--soft2)!important;transform:none!important}
+.lit-share .sh{background:transparent!important;color:#fff!important;border-color:rgba(255,255,255,.35)!important}
+.lit-share .sh:hover{background:rgba(255,255,255,.12)!important}
+
+/* Banner siaga: merah solid semantik */
+.siaga-banner{background:#B3402E!important;background-image:none!important;box-shadow:none!important}
+
+/* Chip & nav: tinta solid saat aktif, tanpa bayangan keras */
+.chip,.paper-hero+.wrap .chip{box-shadow:none!important;border:1px solid var(--line)!important}
+.chip:hover{transform:none!important;box-shadow:none!important}
+.chip.on,.paper-hero+.wrap .chip.on{background:var(--ink-d)!important;border-color:var(--ink-d)!important;color:#fff!important;box-shadow:none!important}
+.nav button.on{background:var(--ink-d)!important;background-image:none!important;color:#fff!important}
+
+/* Pencarian: fokus hijau halus */
+.cari-inp{box-shadow:0 1px 3px rgba(24,21,16,.06)!important;backdrop-filter:none!important}
+.cari-inp:focus{border-color:var(--brand)!important;box-shadow:0 0 0 3px rgba(31,106,68,.15)!important}
+
+/* Statistik: angka duluan, emoji minggir */
+.stat-i .si-ic{display:none!important}
+.stat-i{box-shadow:none!important;border-left:3px solid var(--brand)!important}
+
+/* Kartu kliping: radius & bayangan kalem */
+.clip{border-radius:14px!important;box-shadow:0 1px 2px rgba(24,21,16,.05),0 8px 20px rgba(24,21,16,.05)!important}
+.clip:hover{transform:translateY(-2px)!important;box-shadow:0 3px 6px rgba(24,21,16,.06),0 12px 28px rgba(24,21,16,.08)!important}
+.clip:hover .clip-img{transform:none!important}
+
+/* Peta gunung: aksen hijau */
+.peta-pin:hover{border-color:var(--brand)!important;box-shadow:0 4px 12px rgba(31,106,68,.12)!important}
+.peta-pin.on{background:var(--brand-s)!important;background-image:none!important;border-color:var(--brand)!important}
+
+/* Footer: tombol solid */
+.foot .btn-p,.btn-bivak,.foot .btn-bivak{background:var(--brand)!important;background-image:none!important;border-color:var(--brand)!important;color:#fff!important;box-shadow:none!important}
+.btn-bivak:hover,.foot .btn-bivak:hover{filter:none!important;transform:none!important;background:var(--brand-d)!important}
+.foot-marks i{background:rgba(255,255,255,.4)!important}
+
+/* FAB & readerbar: tinta & hijau solid */
+.mp-btn{background:var(--ink-d)!important;background-image:none!important;border-radius:50%!important;box-shadow:0 6px 16px rgba(24,21,16,.26)!important}
+.mp-readerbar i{background:var(--brand)!important;background-image:none!important}
+.mp-install{background:#211F1B!important;border:1px solid rgba(255,255,255,.14)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-radius:14px!important;box-shadow:0 14px 34px rgba(0,0,0,.28)!important}
+.mp-quote{border-radius:14px!important;box-shadow:0 12px 30px rgba(24,21,16,.18)!important}
+
+/* Onboarding: tinta solid + aksen hijau, bukan ungu-lime */
+.mp-onboard{background:#181B17!important;background-image:none!important}
+.mp-onboard-card{background:none!important}
+.mp-onboard-k{background:var(--brand)!important;color:#fff!important;font-weight:700!important}
+.mp-onboard-dots i.on{background:var(--brand-l)!important}
+.mp-onboard-actions .main{background:#fff!important;color:#181B17!important}
+.mp-onboard-actions .ghost{background:transparent!important;border:1px solid rgba(255,255,255,.32)!important;color:#fff!important}
+
+/* Bottom nav: aktif hijau + ikon garis */
+.btabs button{color:#8A8578}
+.btabs button.on{color:var(--brand)!important}
+.btabs button .bi svg{width:21px;height:21px;display:block}
+
+/* Maskot: gelembung tak terpotong layar, ring ungu hilang */
+.mascot-mini{box-shadow:0 6px 18px rgba(24,21,16,.22)!important;border:2px solid #fff!important}
+.mascot-mini:hover{transform:none!important;box-shadow:0 6px 18px rgba(24,21,16,.22)!important}
+@media(max-width:640px){
+  .mascot-wrap{max-width:64px!important}
+  .mascot-img{max-width:64px!important}
+  .mascot-speech{left:0!important;right:auto!important;transform:none!important;max-width:168px!important;min-width:0!important;font-size:11.5px!important}
+}
+
+/* Podcast bar: tinta solid */
+.podcast-bar{background:#211F1B!important;background-image:none!important;box-shadow:0 14px 32px rgba(0,0,0,.28)!important}
+
+/* Mode gelap: aksen hijau, tanpa blob radial */
+[data-tema="gelap"] body{background:#0E1210!important;background-image:none!important}
+[data-tema="gelap"] .btn-p{background:#2E8B5E!important;border-color:#2E8B5E!important}
+[data-tema="gelap"] .chip.on,[data-tema="gelap"] .paper-hero+.wrap .chip.on{background:#E8E5DE!important;border-color:#E8E5DE!important;color:#171A17!important}
+[data-tema="gelap"] .nav button.on{background:#E8E5DE!important;color:#171A17!important}
+[data-tema="gelap"] .side button.on{background:rgba(140,198,164,.14)!important;background-image:none!important;color:var(--brand-l)!important}
+[data-tema="gelap"] .open{background:var(--brand)!important;color:#fff!important}
+[data-tema="gelap"] .open:hover{background:var(--brand-d)!important}
+[data-tema="gelap"] .cari-inp:focus{border-color:#63B78C!important;box-shadow:0 0 0 3px rgba(99,183,140,.18)!important}
+[data-tema="gelap"] .btabs button.on{color:var(--brand-l)!important}
+[data-tema="gelap"] .mascot-mini{border-color:#161b24!important}
+[data-tema="gelap"] .stat-i{border-left-color:#63B78C!important}
+[data-tema="gelap"] .sh{background:#1B212B!important;color:#E8EAED!important;border-color:#2B313B!important}
+[data-tema="gelap"] .sh:hover{background:#232A35!important}
+
+/* --- PATCH 2: sisa slop --- */
+/* Strip pelangi kartu -> garis gunting putus-putus (motif kliping) */
+.clip:before,.clip:nth-child(3n+2):before,.clip:nth-child(3n):before{background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 11px)!important;height:3px!important;left:16px!important;right:16px!important}
+.clip:hover{transform:translateY(-2px)!important}
+/* Tombol buka kliping: hijau solid */
+.open{background:var(--brand)!important;color:#fff!important;border-color:var(--brand)!important;font-weight:700!important}
+.open:hover{background:var(--brand-d)!important;color:#fff!important}
+/* Tombol Ringkas/Lengkap: tint hijau, bukan ungu */
+.pv-btn.on{background:var(--brand-s)!important;color:var(--brand-d)!important;border-color:#BFD6C8!important;font-weight:700}
+[data-tema="gelap"] .pv-btn.on{background:rgba(140,198,164,.14)!important;color:var(--brand-l)!important;border-color:rgba(140,198,164,.35)!important}
+/* Toggle maskot: tinta solid */
+.mascot-toggle{background:var(--ink-d)!important;background-image:none!important;box-shadow:0 2px 6px rgba(0,0,0,.25)!important}
+.mascot-toggle:hover{box-shadow:0 2px 6px rgba(0,0,0,.25)!important}
+/* Maskot & FAB tidak menumpuk layar onboarding */
+.mp-onboard{z-index:2000!important}
+body:has(.mp-onboard[style*="flex"]) .mascot-wrap,
+body:has(.mp-onboard[style*="flex"]) .mascot-mini,
+body:has(.mp-onboard[style*="flex"]) .mobile-polish-fab{display:none!important}
+
 </style>
 </head>
 <body>
@@ -3532,7 +3672,7 @@ function viewRak(){
 function goTab(i){var n=["board","materi","rak","arsip","pedoman"][i];if(n)go({pv:{n:n}})}
 function bottomNav(){
   if(S.mode!=="public")return "";
-  var t=[["board","\ud83d\udcf0","Papan"],["materi","\ud83d\udcda","Materi"],["rak","\ud83d\udd16","Rak"],["arsip","\ud83d\udcc1","Arsip"],["pedoman","\ud83d\udcd6","Pedoman"]];
+  var t=[["board",'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h12.5v13H6.5a2.5 2.5 0 0 1-2.5-2.5z"/><path d="M16.5 8.5H19a1.5 1.5 0 0 1 1.5 1.5v6.5a2.5 2.5 0 0 1-2.5 2.5"/><path d="M7.5 9h6M7.5 12.5h6M7.5 16h4"/></svg>',"Papan"],["materi",'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8h6M9 11.5h6M9 15h4"/></svg>',"Materi"],["rak",'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h10a1 1 0 0 1 1 1V21l-6-4.2L6 21V4.5a1 1 0 0 1 1-1z"/></svg>',"Rak"],["arsip",'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="4.5" rx="1"/><path d="M5 8.5v9.5A1.5 1.5 0 0 0 6.5 19.5h11a1.5 1.5 0 0 0 1.5-1.5V8.5"/><path d="M10 12.5h4"/></svg>',"Arsip"],["pedoman",'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.4 5 8.2 4.5 4.5 4.5v14c3.7 0 5.9.5 7.5 2 1.6-1.5 3.8-2 7.5-2v-14c-3.7 0-5.9.5-7.5 2z"/><path d="M12 6.5v14"/></svg>',"Pedoman"]];
   return '<nav class="btabs">'+t.map(function(p,i){
     var on=(S.pv.n===p[0]||(p[0]==="board"&&S.pv.n==="clip")||(p[0]==="materi"&&S.pv.n==="materiDetail"))?"on":"";
     return '<button class="'+on+'" onclick="goTab('+i+')"><span class="bi">'+p[1]+'</span><span class="bl">'+p[2]+'</span></button>';
