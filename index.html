@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<!-- build: anoa-drag-transform-v57 -->
+<!-- build: v59-google-saja -->
 <!-- build: anoa-final-mobile-v56 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -1779,24 +1779,16 @@ async function fetchAll(){
 function setMeFromSession(session){
   const email=session&&session.user&&session.user.email;
   if(!email){
-    try {
-      var savedMe = localStorage.getItem("rcs_active_user");
-      if (savedMe && db && db.pengguna) {
-        var uSaved = db.pengguna.find(function(p){ return p.id === savedMe || p.email === savedMe; });
-        if (uSaved && uSaved.aktif !== false) {
-          S.me = uSaved.id;
-          return null;
-        }
-      }
-    } catch(e){}
+    /* Tanpa sesi Supabase yang sah, tidak ada identitas pengelola.
+       Jangan pernah memulihkan dari localStorage: itu bisa dipalsukan siapa pun. */
     S.me=null;
+    try{localStorage.removeItem("rcs_active_user")}catch(e){}
     return null;
   }
   const u=db.pengguna.find(p=>p.email&&p.email.toLowerCase()===email.toLowerCase());
   if(!u){S.me=null;return {email:email,sebab:"asing"}}
   if(u.aktif===false||u.aktif===0||u.aktif==="false"){S.me=null;return {email:email,sebab:"nonaktif"}}
   S.me=u.id;
-  try { localStorage.setItem("rcs_active_user", u.id); } catch(e){}
   return null;
 }
 async function bootstrap(){
@@ -1848,46 +1840,38 @@ const STAG={"Calon":"tag","Ditulis":"tag tag-o","Ditinjau":"tag tag-b","Terbit":
 function me(){
   if(!db || !db.pengguna) return null;
   var u = db.pengguna.find(function(p){ return p.id===S.me; });
-  if(u) return u;
-  /* S.me mungkin tidak cocok — coba pulihkan dari localStorage */
-  try {
-    var saved = localStorage.getItem("rcs_active_user");
-    if(saved){
-      var uSaved = db.pengguna.find(function(p){ return p.id === saved; });
-      if(uSaved && uSaved.aktif !== false){
-        S.me = uSaved.id;
-        return uSaved;
-      }
-    }
-  } catch(e){}
+  if(u && u.aktif !== false) return u;
   return null;
 }
-function can(k){const m=me();return m?PERM[m.peran].includes(k):false}
+function can(k){const m=me();const izin=m&&PERM[m.peran];return Array.isArray(izin)?izin.includes(k):false}
 function user(id){return db.pengguna.find(u=>u.id===id)}
 function nm(id){const u=user(id);return u?u.nama:"—"}
 function mat(id){return db.materi.find(m=>m.id===id)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function terbit(){return db.kliping.filter(k=>k.status==="Terbit")}
-function tglID(s){if(!s)return "���";const b=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];const p=s.split("-");return p[2]*1+" "+b[p[1]*1-1]+" "+p[0]}
+function tglID(s){if(!s)return "—";var b=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];var p=String(s).slice(0,10).split("-");if(p.length!==3)return String(s);var hh=parseInt(p[2],10),bb=parseInt(p[1],10);if(isNaN(hh)||isNaN(bb)||!b[bb-1])return String(s);return hh+" "+b[bb-1]+" "+p[0]}
+function siagaBanner(){
+  try{
+    var st=(db&&db.settings)||{};
+    if(st.siagaAktif!==true)return "";
+    var teks=String(st.siagaTeks||"").trim();
+    if(!teks)return "";
+    if(window.__siagaTutup)return "";
+    return '<div class="siaga-banner" id="siagaBanner"><div class="siaga-inner"><span class="siaga-ic">SIAGA</span><span class="siaga-tx">'+esc(teks)+'</span><button class="siaga-close" type="button" aria-label="Tutup peringatan" onclick="tutupSiaga()">\u00d7</button></div></div>';
+  }catch(e){return ""}
+}
+function tutupSiaga(){window.__siagaTutup=1;var b=document.getElementById("siagaBanner");if(b&&b.parentNode)b.parentNode.removeChild(b)}
+/* Peta gunung belum pernah dibuat; kembalikan kosong supaya pemanggilnya aman. */
+function petaGunungHTML(){return ""}
 function jilid(s){return s?s.slice(0,7):""}
 function log(aksi,obj){const rec={ts:new Date().toISOString().slice(0,16).replace("T"," "),user:S.me||null,aksi:aksi,obj:obj};if(db&&db.audit)db.audit.unshift(rec);supa.from("audit").insert({ts:rec.ts,aktor:rec.user,aksi:aksi,obj:obj}).then(({error})=>{if(error)console.warn("audit",error.message)})}
 let tt;
 function toast(m){const el=document.getElementById("toast");el.innerHTML='<div class="toast">'+esc(m)+"</div>";clearTimeout(tt);tt=setTimeout(()=>{el.innerHTML=""},2600)}
 function go(o){
-  console.log("[go] called with:",JSON.stringify(o),"S.me before:",S.me);
   if(o&&Object.prototype.hasOwnProperty.call(o,"draft")&&o.draft===null)hapusDrafLokal();
   Object.assign(S,o);
-  /* Jika pindah ke mode admin tapi S.me kosong, coba pulihkan dari localStorage */
-  if(S.mode==="admin" && !S.me){
-    try {
-      var _saved = localStorage.getItem("rcs_active_user");
-      if(_saved && db && db.pengguna){
-        var _u = db.pengguna.find(function(p){ return p.id === _saved; });
-        if(_u && _u.aktif !== false){ S.me = _u.id; console.log("[go] recovered S.me from localStorage:", S.me); }
-      }
-    } catch(e){}
-  }
-  console.log("[go] S after assign:", JSON.stringify({mode:S.mode,av:S.av,me:S.me}));
+  /* Mode admin hanya boleh untuk sesi yang sudah sah. */
+  if(S.mode==="admin" && !me()){ S.mode="login"; }
   try{if("speechSynthesis" in window)window.speechSynthesis.cancel();}catch(e){}
   TTS={id:null,on:false,paused:false};
   try{if(S.mode==="public"&&S.pv&&S.pv.n==="clip"){history.replaceState(null,"",location.pathname+"#klip="+S.pv.id)}else if(location.hash){history.replaceState(null,"",location.pathname)}}catch(e){}
@@ -2339,7 +2323,7 @@ function viewClip(){
    '<div class="sec"><h4>1 \u00b7 Potongan</h4><div class="cut">'+esc(k.potongan)+'</div><div class="src" style="border-top:1px dashed var(--line)"><span>'+esc(k.media)+" \u00b7 "+tglID(k.tglBerita)+'</span><a href="'+esc(k.tautan)+'" target="_blank" rel="noopener">Baca sumber asli \u2197</a></div></div>'+
    '<div class="sec"><h4>2 \u00b7 Konteks</h4><p>'+esc(k.konteks)+"</p></div>"+
    '<div class="sec"><h4>3 \u00b7 Pelajaran</h4><ol>'+k.pelajaran.map(p=>"<li>"+esc(p)+"</li>").join("")+"</ol></div>"+
-   '<div class="sec"><h4>4 \u00b7 Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+(rj||"<li>���</li>")+"</ul></div>"+
+   '<div class="sec"><h4>4 \u00b7 Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+(rj||"<li>—</li>")+"</ul></div>"+
    '<div class="note o">'+esc(db.settings.penyangkalan)+"</div>"+
    (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+'</div>':"")+
    '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Digunting '+tglID(k.tglKliping)+" oleh "+esc(nm(k.kurator))+(k.peninjau?" \u00b7 ditinjau "+esc(nm(k.peninjau)):"")+" \u00b7 gambar: "+(isImg(k.gambar)?"foto":esc(k.gambar))+"</p>"+'<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'</div></div>'+foot();
@@ -2378,80 +2362,18 @@ function foot(){
 }
 function tipis(){db.settings.sinyalTipis=!db.settings.sinyalTipis;save();render();toast(db.settings.sinyalTipis?"Mode sinyal tipis aktif":"Mode sinyal tipis nonaktif")}
 
-/* ================= login ================= */
-/* ================= login (Password & OAuth Google) ================= */
+/* ================= login (hanya OAuth Google) ================= */
+/* Login email+kata sandi dihapus total pada v59. Identitas pengelola
+   sepenuhnya berasal dari Supabase Auth lewat Google, lalu dicocokkan
+   dengan daftar di tabel profiles. Tidak ada input password di browser. */
 function viewLogin(){
   return '<div class="login" style="max-width:440px;margin:32px auto;padding:28px 24px;border-radius:18px;box-shadow:0 18px 45px rgba(16,42,67,0.12);border:1px solid var(--line)">'+
     '<h2 style="margin:0 0 6px;font-size:22px">Masuk Pengelola</h2>'+
-    '<p style="color:var(--ink2);margin:0 0 20px;font-size:13.5px;line-height:1.45">Masuk dengan email &amp; kata sandi atau akun Google terdaftar untuk mengelola kliping, materi, &amp; tinjauan.</p>'+
-    '<form onsubmit="masukPassword(event)">'+
-    '<div class="f" style="margin-bottom:14px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Email Pengelola</label><input type="email" id="lEmail" required placeholder="nama@reichas.my.id" class="inp" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
-    '<div class="f" style="margin-bottom:18px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px">Kata Sandi / Password</label><input type="password" id="lPass" required placeholder="Masukkan kata sandi" class="inp" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;box-sizing:border-box" /></div>'+
-    '<button type="submit" id="btnPassLogin" class="btn btn-p" style="width:100%;padding:11px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);border:0;color:#fff;border-radius:10px;cursor:pointer;margin-bottom:14px">\ud83d\udd11 Masuk dengan Password</button>'+
-    '</form>'+
-    '<div style="display:flex;align-items:center;margin:16px 0;gap:12px"><hr style="flex:1;border:0;border-top:1px solid var(--line)" /><span style="font-size:12px;color:var(--ink2);font-weight:600">atau</span><hr style="flex:1;border:0;border-top:1px solid var(--line)" /></div>'+
+    '<p style="color:var(--ink2);margin:0 0 20px;font-size:13.5px;line-height:1.45">Masuk memakai akun Google terdaftar untuk mengelola kliping, materi, &amp; tinjauan.</p>'+
     '<button class="role" onclick="masukGoogle()" style="width:100%;box-sizing:border-box;margin-bottom:12px"><i class="ic">G</i><span><b>Masuk dengan Google</b><span>Login OAuth satu klik dengan Google.</span></span></button>'+
-    '<div style="text-align:center;margin-top:12px"><button class="btn btn-sm" onclick=\'go({mode:"public",pv:{n:"board"}})\'>\u2190 Kembali ke situs</button></div>'+
+    '<p style="color:var(--ink2);margin:14px 0 0;font-size:12.5px;line-height:1.5">Hanya email yang terdaftar sebagai pengelola yang bisa masuk. Login dengan kata sandi sudah dinonaktifkan demi keamanan \u2014 silakan pakai tombol Google di atas.</p>'+
+    '<div style="text-align:center;margin-top:16px"><button class="btn btn-sm" onclick=\'go({mode:"public",pv:{n:"board"}})\'>\u2190 Kembali ke situs</button></div>'+
     '</div>';
-}
-
-async function masukPassword(e){
-  if(e)e.preventDefault();
-  var email=(document.getElementById("lEmail").value||"").trim();
-  var password=(document.getElementById("lPass").value||"").trim();
-  var btn=document.getElementById("btnPassLogin");
-
-  if(!email||!password){
-    toast("Mohon isi email dan kata sandi.");
-    return;
-  }
-
-  if(btn){btn.disabled=true;btn.textContent="Memeriksa...";}
-
-  try{
-    /* 1. Coba lewat Supabase Auth Password */
-    var res=await supa.auth.signInWithPassword({email:email,password:password});
-    if(!res.error && res.data && res.data.session){
-      await bootstrap();
-      toast("\u2728 Berhasil masuk sebagai pengelola!");
-      return;
-    }
-
-    /* 2. Coba cocokkan dengan profil pengelola terdaftar di sistem */
-    var u=(db.pengguna||[]).find(function(p){return p.email && p.email.toLowerCase()===email.toLowerCase();});
-    if(u){
-      if(u.aktif===false||u.aktif===0||u.aktif==="false"){
-        toast("Akun "+email+" dinonaktifkan. Hubungi Super-Admin.");
-        if(btn){btn.disabled=false;btn.textContent="\ud83d\udd11 Masuk dengan Password";}
-        return;
-      }
-      S.me=u.id;
-      S.mode="admin";
-      S.av="dasbor";
-      try { localStorage.setItem("rcs_active_user", u.id); } catch(e){}
-      toast("✨ Berhasil masuk sebagai "+u.nama+" ("+u.peran+")");
-      render();
-      return;
-    }
-
-    /* 3. Akses Super-Admin Darurat (bila email cocok dengan nama super-admin) */
-    var adminNama=(db.pengguna||[]).find(function(p){return p.peran==="Super-Admin"&&p.aktif;});
-    if(adminNama && (email.toLowerCase().indexOf("admin")>=0 || email.toLowerCase().indexOf("nietche")>=0)){
-      S.me=adminNama.id;
-      S.mode="admin";
-      S.av="dasbor";
-      try { localStorage.setItem("rcs_active_user", adminNama.id); } catch(e){}
-      toast("✨ Berhasil masuk sebagai "+adminNama.nama+" ("+adminNama.peran+")");
-      render();
-      return;
-    }
-
-    toast("Gagal masuk: "+((res.error&&res.error.message)||"Email atau kata sandi tidak cocok."));
-  }catch(err){
-    toast("Gagal masuk: "+(err.message||err));
-  }finally{
-    if(btn){btn.disabled=false;btn.textContent="\ud83d\udd11 Masuk dengan Password";}
-  }
 }
 
 async function masukGoogle(){
@@ -2475,21 +2397,6 @@ function emailRedaksiBadgeHtml(){
 function viewAdmin(){
   var m=me();
   /* Jika me() null, coba pulihkan sesi dari localStorage */
-  if(!m){
-    console.warn("[viewAdmin] me() returned null. S.me=",S.me,"Trying recovery...");
-    try {
-      var _saved = localStorage.getItem("rcs_active_user");
-      console.log("[viewAdmin] rcs_active_user from localStorage:",_saved);
-      if(_saved && db && db.pengguna){
-        var _u = db.pengguna.find(function(p){ return p.id === _saved; });
-        if(_u && _u.aktif !== false){
-          S.me = _u.id;
-          m = _u;
-          console.log("[viewAdmin] Recovered user:",m.nama,m.peran);
-        }
-      }
-    } catch(e){ console.error("[viewAdmin] recovery error:",e); }
-  }
   if(!m) return viewLogin();
   const keys=PERM[m.peran]||[];
   if(!S.av || !keys.includes(S.av)){
@@ -3492,7 +3399,7 @@ function viewBoard(){
   '</div>';
   var hasil='<p class="hasil">Menampilkan <b>'+list.length+'</b> dari '+terbit().length+' kliping'+(S.topik?' \u00b7 topik <b>#'+esc(S.topik)+'</b>':'')+(S.q?' \u00b7 kata kunci \u201c'+esc(S.q)+'\u201d':'')+'</p>';
   var polos=!S.q&&!S.topik&&(!S.filter||S.filter==="Semua");
-  return '<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p></div></div></section>'+
+  return siagaBanner()+'<section class="hero paper-hero" style="background-image:url(\''+HERO+'\')" aria-label="Kliping RCS.CBS"><div class="wrap paper-copy"><div><h2>Meja Kliping Bersama Pencinta Alam Sulawesi</h2><p>Berita dari mana saja kami gunting, tempel, lalu beri catatan pinggir. Setiap potongan selalu ditutup dengan pelajaran yang bisa dipakai di lapangan.</p></div></div></section>'+
     litBanner()+
     '<div class="wrap">'+statStrip()+(polos?sorotanBox():"")+alat+
     '<div class="filters rubrik-row">'+chips+'</div>'+trow+hasil+
@@ -6424,6 +6331,8 @@ bootstrap();
 
   function handleStart(e) {
     if (e.target === toggle) return;
+    /* Di layar kecil, urusan geser & ketuk dipegang FINAL FIX v57 agar tidak dobel. */
+    try{ if(window.matchMedia && window.matchMedia('(max-width:640px)').matches) return; }catch(err){}
     isDragging = true;
     hasMoved = false;
     var pt = getClientXY(e);
@@ -6574,7 +6483,8 @@ bootstrap();
 
 /* === Hard fix: Anoa interaktif saat disentuh di mobile === */
 (function(){
-  if(window.__anoaTouchHardFix)return; window.__anoaTouchHardFix=true;
+  /* Dinonaktifkan: digantikan FINAL FIX v57 di bawah supaya geser/ketuk maskot tidak dobel. */
+  return;
   function ready(fn){ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fn); else fn(); }
   ready(function(){
     var wrap=document.getElementById('mascotWrap');
@@ -6618,6 +6528,8 @@ bootstrap();
 (function(){
   function boot(){
     var wrap=document.getElementById('mascotWrap'), inner=document.getElementById('mascotInner'), speech=document.getElementById('mascotSpeech'), sparkle=document.getElementById('mascotSparkle'), toggle=document.getElementById('mascotToggle');
+    /* Dinonaktifkan: digantikan FINAL FIX v57 di bawah. */
+    if(true)return;
     if(!wrap||!inner||window.__anoaFinalDragFix)return; window.__anoaFinalDragFix=true;
     var mobile=function(){return window.matchMedia&&window.matchMedia('(max-width:640px)').matches};
     function place(){ if(!mobile())return; wrap.style.position='fixed'; wrap.style.left=localStorage.getItem('anoa-mobile-left')||'14px'; wrap.style.top=localStorage.getItem('anoa-mobile-top')||''; wrap.style.right='auto'; if(!wrap.style.top)wrap.style.bottom='calc(92px + env(safe-area-inset-bottom,0px))'; else wrap.style.bottom='auto'; wrap.style.display='block'; }
