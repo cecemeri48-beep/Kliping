@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<!-- build: v60-grid-ringkas -->
+<!-- build: v61-aset-ringan -->
 <!-- build: anoa-final-mobile-v56 -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -12,7 +12,9 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link rel="preload" as="image" href="hero-m.webp" type="image/webp" media="(max-width:820px)" />
+<link rel="preload" as="image" href="hero.webp" type="image/webp" media="(min-width:821px)" />
 <link rel="dns-prefetch" href="https://nfeexstvdjgywonbtxtb.supabase.co" />
 <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
 <meta name="google-site-verification" content="qNMqPYjzdndI4etjWI23Ee0iSSSOpDBrJYeOiaABXyk" />
@@ -1685,6 +1687,26 @@ body.admin-mode .mascot-mini { display: none !important; }
 .pv-btn.on{background:#f2efff;color:#4f3bb4;border-color:#d9d0ff;font-weight:700}
 [data-tema="gelap"] .pv-btn.on{background:#241f3a;color:#c3b7ff;border-color:#3a2f5c}
 
+
+/* ---------- v61: skeleton gambar + hero ponsel dipadatkan ---------- */
+/* Selama gambar dari media luar belum turun, kotaknya terisi kilau abu
+   sehingga tidak ada lompatan tata letak dan tidak ada kedip putih.
+   Begitu gambar selesai dimuat, ia menutupi latar ini sepenuhnya. */
+.clip-img,.gbr-art{background-image:linear-gradient(100deg,#e9e6e0 25%,#f6f4f0 37%,#e9e6e0 52%);background-size:280% 100%;background-repeat:no-repeat;animation:gbrKilau 1.5s linear infinite}
+[data-tema="gelap"] .clip-img,[data-tema="gelap"] .gbr-art{background-image:linear-gradient(100deg,#1b212b 25%,#232a35 37%,#1b212b 52%)}
+.gbr-art{min-height:140px;object-fit:cover}
+@keyframes gbrKilau{0%{background-position:130% 0}100%{background-position:-45% 0}}
+@media (prefers-reduced-motion:reduce){.clip-img,.gbr-art{animation:none}}
+@media (max-width:640px){
+  /* hero 230px -> 196px: hemat satu kepalan gulir tanpa mengorbankan judul */
+  .hero,.paper-hero{height:196px!important}
+  .paper-copy{padding:14px 16px!important}
+  .paper-copy>div{padding:11px 13px!important}
+  .paper-copy h2{font-size:20px!important;line-height:1.14!important}
+  .paper-copy p{font-size:12px!important;line-height:1.38!important}
+  .gbr-art{min-height:120px}
+}
+
 </style>
 </head>
 <body>
@@ -1740,8 +1762,13 @@ const supa=(window.supabase&&window.supabase.createClient)?window.supabase.creat
 };
 
 const LOGO="logo.png";
-const HERO="hero.jpg";
-const PAPER="paper.jpg";
+/* Aset latar dipilih sesuai dukungan WebP dan lebar layar. Ponsel cukup
+   mengunduh hero-m.webp (±58 KB) bukan hero.jpg (±595 KB). Peramban
+   tanpa WebP tetap mendapat JPG lama, jadi tidak ada yang kehilangan gambar. */
+var _webpBisa=(function(){try{var c=document.createElement("canvas");if(!c.getContext||!c.toDataURL)return false;return c.toDataURL("image/webp").indexOf("data:image/webp")===0}catch(e){return false}})();
+var _layarKecil=(function(){try{return (window.innerWidth||1200)<=820}catch(e){return false}})();
+const HERO=_webpBisa?(_layarKecil?"hero-m.webp":"hero.webp"):"hero.jpg";
+const PAPER=_webpBisa?"paper.webp":"paper.jpg";
 const KEY = "kliping-reichas-v2";
 
 /* ================= seed ================= */
@@ -2364,7 +2391,7 @@ function viewClip(){
    '<div class="sec"><h4>3 \u00b7 Pelajaran</h4><ol>'+k.pelajaran.map(p=>"<li>"+esc(p)+"</li>").join("")+"</ol></div>"+
    '<div class="sec"><h4>4 \u00b7 Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+(rj||"<li>—</li>")+"</ul></div>"+
    '<div class="note o">'+esc(db.settings.penyangkalan)+"</div>"+
-   (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+'</div>':"")+
+   (isImg(k.gambar)?'<div class="sec"><img class="gbr-art" src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" loading="lazy" decoding="async" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+'</div>':"")+
    '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Digunting '+tglID(k.tglKliping)+" oleh "+esc(nm(k.kurator))+(k.peninjau?" \u00b7 ditinjau "+esc(nm(k.peninjau)):"")+" \u00b7 gambar: "+(isImg(k.gambar)?"foto":esc(k.gambar))+"</p>"+'<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'</div></div>'+foot();
 }
 function viewMateri(){
@@ -3363,7 +3390,7 @@ function _terapkanBaca(){var el=document.querySelector(".art");if(el)el.style.se
 function kartuKlip(k){
   var simpan=rakAda(k.id);
   return '<article class="clip">'+
-    (isImg(k.gambar)?'<img class="clip-img" src="'+esc(k.gambar)+'" alt="" loading="lazy" />':'')+
+    (isImg(k.gambar)?'<img class="clip-img" src="'+esc(k.gambar)+'" alt="" loading="lazy" decoding="async" />':'')+
     '<div class="clip-tags"><span class="tag tag-b">'+esc(k.rubrik)+'</span>'+vonisTag(k)+'</div>'+
     '<h3>'+sorot(k.judul)+'</h3><p class="lead">'+sorot(k.lead)+'</p>'+
     '<div class="src"><span>'+esc(k.media)+'</span><span>'+tglID(k.tglBerita)+'</span></div>'+
@@ -3475,7 +3502,7 @@ function viewClip(){
     '<div class="sec"><h4>4 \u00b7 Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+(rj||"<li>\u2014</li>")+'</ul></div>'+
     (tg?'<div class="sec"><h4>Topik</h4><div class="topik-row" style="padding:0">'+tg+'</div></div>':'')+
     '<div class="note o">'+esc(db.settings.penyangkalan)+'</div>'+
-    (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+'</p>':'')+'</div>':'')+
+    (isImg(k.gambar)?'<div class="sec"><img class="gbr-art" src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" loading="lazy" decoding="async" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+'</p>':'')+'</div>':'')+
     (rel.length?'<div class="sec"><h4>Kliping serupa</h4><div class="rel">'+rel.map(function(x){return '<a href="#" onclick=\'go({pv:{n:"clip",id:"'+x.id+'"}});return false\'><b>'+esc(x.judul)+'</b><small>'+esc(x.rubrik)+' \u00b7 \u23f1 '+menitBaca(x)+' menit</small></a>'}).join("")+'</div></div>':'')+
     '<p style="font-size:13px;color:var(--ink2);margin-top:16px">Digunting '+tglID(k.tglKliping)+' oleh '+esc(nm(k.kurator))+lencanaHTML(rksTotalKurator(k.kurator).total)+(k.peninjau?' \u00b7 ditinjau '+esc(nm(k.peninjau)):'')+'</p>'+
     '<div class="clip-share"><span>Bagikan:</span>'+shBtns(k.id)+'<button class="sh sh-lain" onclick=\'bagikanAsli("'+k.id+'")\'>Lainnya\u2026</button></div>'+
@@ -6220,7 +6247,7 @@ function viewOpini(k){
   return '<div class="art"><button class="btn btn-sm" onclick=\'go({pv:{n:"board"}})\'>\u2190 Kembali ke papan</button>'+
    '<div class="opi-head"><span class="tag tag-opi">\u270d Buah Pikir</span><span class="tag tag-b">'+esc(k.rubrik)+'</span><span class="tag">'+esc(k.wilayah)+'</span></div>'+
    "<h2>"+esc(k.judul)+'</h2><p class="lead">'+esc(k.lead)+"</p>"+tts+bar+
-   (isImg(k.gambar)?'<div class="sec"><img src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+"</div>":"")+
+   (isImg(k.gambar)?'<div class="sec"><img class="gbr-art" src="'+esc(k.gambar)+'" alt="'+esc(k.judul)+'" loading="lazy" decoding="async" style="width:100%;border-radius:12px;border:1px solid var(--line)" />'+(k.gbrKet?'<p style="font-size:13px;color:var(--ink2);margin:8px 2px 0;font-style:italic">'+esc(k.gbrKet)+"</p>":"")+"</div>":"")+
    '<div class="sec">'+(isi||"<p>\u2014</p>")+"</div>"+
    (pel.length?'<div class="sec"><h4>Poin penutup</h4><ol>'+pel.map(function(p){return "<li>"+esc(p)+"</li>"}).join("")+"</ol></div>":"")+
    (rj?'<div class="sec"><h4>Rujukan materi</h4><ul style="margin:0;padding-left:20px">'+rj+"</ul></div>":"")+
