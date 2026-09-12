@@ -77,3 +77,5 @@ Catatan deploy:
 40. Gim ketiga Rehat Sejenak: SUSUN LOGO (rehat/puzzle.html) — logo RCS.CBS HOPE (rehat/logo-puzzle.webp) dipotong 4x4; potongan tertukar DAN 5 di antaranya terputar 90–270°. Ketuk dua potongan untuk menukar, ketuk potongan terpilih untuk memutar. Skor murni kecepatan: 6000 − 30/detik − 8/tukar. Input nama sama seperti dua gim lain; masuk Papan Rekor Bersama sebagai game 'puzzle'. Hub menampilkan kartu ketiga + peringkat SUSUN.
 
 41. Cache service worker dinaikkan ke reichas-v73-game-susun. Bila tabel rehat_skor sudah dibuat dari paket v71, jalankan ulang rehat-leaderboard.sql (kini memperluas batasan game ke 'puzzle' lewat alter table di bagian bawah).
+
+42. Pintasan 🎮 Rehat Sejenak kini juga ada di menu dropdown header (fungsi _menuRehat, pola sama seperti Rak Baca/Panduan Darurat) — duduk di antara Bivak Rental dan Panduan Darurat, diberi aksen gradien violet (mi-rehat, ada varian mode gelap). Cache SW: reichas-v74-menu-rehat.

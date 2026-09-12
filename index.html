@@ -1599,7 +1599,7 @@ body.admin-mode .mascot-mini { display: none !important; }
 .pdl-foot .pdl-mini{flex:1 1 240px}
 .pdl-foot-aksi{display:flex;gap:8px;margin-left:auto}
 @media (max-width:560px){.pdl-modal{max-height:92vh;padding:18px 16px 14px}.pdl-tajuk{font-size:18px;margin-right:44px}.pdl-tabs{gap:6px;padding-bottom:8px;margin-bottom:12px}.pdl-chip{min-height:36px;padding:6px 11px;font-size:12.5px}.pdl-foot-aksi{margin-left:0;width:100%}.pdl-foot-aksi .btn{flex:1}}
-.btn-bivak,.foot .btn-bivak{background:linear-gradient(135deg,#16a34a,#31c5c2)!important;color:#fff!important;border:0!important;font-weight:800;box-shadow:0 8px 18px rgba(22,163,74,.28)}.btn-bivak:hover,.foot .btn-bivak:hover{filter:brightness(1.06);transform:translateY(-1px);text-decoration:none!important}.menu-pop .mi.mi-bivak{background:linear-gradient(135deg,rgba(22,163,74,.12),rgba(49,197,194,.12));color:var(--navy);font-weight:800}[data-tema="gelap"] .menu-pop .mi.mi-bivak{background:linear-gradient(135deg,rgba(22,163,74,.20),rgba(49,197,194,.16));color:#dfffea}
+.btn-bivak,.foot .btn-bivak{background:linear-gradient(135deg,#16a34a,#31c5c2)!important;color:#fff!important;border:0!important;font-weight:800;box-shadow:0 8px 18px rgba(22,163,74,.28)}.btn-bivak:hover,.foot .btn-bivak:hover{filter:brightness(1.06);transform:translateY(-1px);text-decoration:none!important}.menu-pop .mi.mi-bivak{background:linear-gradient(135deg,rgba(22,163,74,.12),rgba(49,197,194,.12));color:var(--navy);font-weight:800}[data-tema="gelap"] .menu-pop .mi.mi-bivak{background:linear-gradient(135deg,rgba(22,163,74,.20),rgba(49,197,194,.16));color:#dfffea}.menu-pop .mi.mi-rehat{background:linear-gradient(135deg,rgba(115,87,255,.12),rgba(66,103,231,.12));color:var(--navy);font-weight:800}[data-tema="gelap"] .menu-pop .mi.mi-rehat{background:linear-gradient(135deg,rgba(115,87,255,.22),rgba(66,103,231,.18));color:#e8e4ff}
 
 
 /* === Restore mobile floating Anoa === */
@@ -3872,6 +3872,16 @@ function _menuDarurat(){
   b.onclick=function(){tutupMenu();bukaPanduanDarurat()};
   pop.appendChild(b);
 }
+function _menuRehat(){
+  if(S.mode!=="public")return;
+  var pop=document.querySelector(".menu-pop");if(!pop||pop.querySelector("[data-rehat]"))return;
+  var b=document.createElement("button");
+  b.className="mi mi-rehat";b.setAttribute("role","menuitem");b.setAttribute("data-rehat","1");
+  b.innerHTML='<span class="mi-ic">\ud83c\udfae</span><span class="mi-tx">Rehat Sejenak</span>';
+  b.onclick=function(){tutupMenu();location.href="rehat/"};
+  var dr=pop.querySelector("[data-darurat]");
+  pop.insertBefore(b,dr||null);
+}
 function _progresBaca(){
   var el=document.getElementById("bacaProg");
   if(!el){el=document.createElement("div");el.id="bacaProg";el.innerHTML="<i></i>";document.body.appendChild(el);
@@ -3893,6 +3903,7 @@ function _luring(){
 function pasangEkstra(){
   try{_menuRak()}catch(e){}
   try{_menuDarurat()}catch(e){}
+  try{_menuRehat()}catch(e){}
   try{_progresBaca()}catch(e){}
   try{_terapkanBaca()}catch(e){}
   try{_luring()}catch(e){}
