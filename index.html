@@ -1801,7 +1801,7 @@ body{background:var(--paper)}
 .btabs button.on{color:var(--brand)!important}
 .btabs button .bi svg{width:21px;height:21px;display:block}
 
-/* Maskot: gelembung tak terpotong layar, ring ungu hilang */
+/* Maskot: gelembung tak terpotong, ring ungu hilang */
 .mascot-mini{box-shadow:0 6px 18px rgba(24,21,16,.22)!important;border:2px solid #fff!important}
 .mascot-mini:hover{transform:none!important;box-shadow:0 6px 18px rgba(24,21,16,.22)!important}
 @media(max-width:640px){
@@ -1846,6 +1846,19 @@ body{background:var(--paper)}
 body:has(.mp-onboard[style*="flex"]) .mascot-wrap,
 body:has(.mp-onboard[style*="flex"]) .mascot-mini,
 body:has(.mp-onboard[style*="flex"]) .mobile-polish-fab{display:none!important}
+
+/* --- PATCH 3: perbaikan login Google --- */
+#oauthOverlay{position:fixed;inset:0;z-index:10050;background:rgba(246,244,238,.96);display:none;align-items:center;justify-content:center;padding:24px}
+body:has(#oauthOverlay[style*="flex"]) .mascot-wrap,
+body:has(#oauthOverlay[style*="flex"]) .mascot-mini{display:none!important}
+[data-tema="gelap"] #oauthOverlay{background:rgba(14,18,16,.96)}
+.oauth-card{max-width:360px;width:100%;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 18px 45px rgba(16,42,67,.12);color:var(--ink)}
+.oauth-card h2{margin:8px 0 6px;font-size:19px}
+.oauth-card p{color:var(--ink2);font-size:13.5px;line-height:1.5;margin:0 0 16px}
+[data-tema="gelap"] .oauth-card{background:#161B24;border-color:#2B313B;color:#E8EAED}
+.oauth-spin{width:34px;height:34px;margin:0 auto 12px;border-radius:50%;border:3px solid var(--brand-s);border-top-color:var(--brand);animation:oauthSpin .8s linear infinite}
+@keyframes oauthSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.oauth-spin{animation-duration:1.6s}}
 
 </style>
 </head>
@@ -1999,6 +2012,7 @@ function setMeFromSession(session){
 }
 async function bootstrap(){
   try{
+    const _oauth=await prosesBalikanOAuth();
     const {data:{session}}=await supa.auth.getSession();
     await fetchAll();
     const tolak=setMeFromSession(session);
@@ -2006,6 +2020,8 @@ async function bootstrap(){
     const _h=(location.hash.match(/klip=([A-Za-z0-9_-]+)/)||[])[1];
     if(_h&&db.kliping.some(k=>k.id===_h)){S.mode="public";S.pv={n:"clip",id:_h}}
     else if(location.hash.indexOf("admin") >= 0 && S.me){S.mode="admin";S.av=S.av||"dasbor"}
+    if(_oauth==="ok"){tutupOAuthOverlay();if(S.me){S.mode="admin";S.av=S.av||"dasbor";toast("Berhasil masuk — selamat bertugas")}}
+    else if(S.mode==="login"&&S.me){S.mode="admin";S.av=S.av||"dasbor"}
     if(S.me&&!S.draft&&!_h&&S.mode!=="admin"){const _dr=pulihkanDraf();if(_dr){S.draft=_dr;S.av="kliping";S.mode="admin";toast("Draf kliping dipulihkan — lanjutkan mengisi");}}
   }catch(e){console.error(e);toast("Gagal memuat data: "+(e.message||e));if(!db)db=seed()}
   try{initGA()}catch(e){}
@@ -2568,6 +2584,55 @@ function foot(){
 }
 function tipis(){db.settings.sinyalTipis=!db.settings.sinyalTipis;save();render();toast(db.settings.sinyalTipis?"Mode sinyal tipis aktif":"Mode sinyal tipis nonaktif")}
 
+/* ================= balikan OAuth Google =================
+   Setelah redirect Google, URL membawa ?code= (PKCE) atau #access_token=
+   (implicit), atau ?error=... bila ditolak. Sebelumnya tidak ditangani:
+   kegagalan tampil diam-diam dan pengguna terdampar di beranda. */
+var __oauthReturn=false; /* dipertahankan untuk kompatibilitas, logika memakai nilai kembalian */
+function _oauthParams(){
+  var q=new URLSearchParams(location.search);
+  var h=new URLSearchParams((location.hash||"").replace(/^#/,""));
+  function g(k){return q.get(k)||h.get(k)}
+  return {code:g("code"),at:g("access_token"),err:g("error"),desc:g("error_description")};
+}
+function oauthOverlay(html){
+  var o=document.getElementById("oauthOverlay");
+  if(!o){o=document.createElement("div");o.id="oauthOverlay";document.body.appendChild(o)}
+  o.innerHTML=html;o.style.display="flex";
+}
+function tutupOAuthOverlay(){var o=document.getElementById("oauthOverlay");if(o)o.style.display="none"}
+function _kartuMasukGagal(pesan){
+  return '<div class="oauth-card"><div style="font-size:30px">&#9888;&#65039;</div>'+
+    '<h2>Masuk tidak berhasil</h2>'+
+    '<p>'+esc(pesan||"Google tidak mengizinkan masuk. Coba lagi, atau buka situs ini di peramban utama (Chrome/Safari).")+'</p>'+
+    '<button class="btn btn-p" style="width:100%;min-height:44px" onclick="tutupOAuthOverlay();masukGoogle()">Coba lagi dengan Google</button>'+
+    '<button class="btn" style="width:100%;margin-top:8px;min-height:44px" onclick="tutupOAuthOverlay()">Kembali ke situs</button></div>';
+}
+async function prosesBalikanOAuth(){
+  if(document.getElementById("oauthOverlay"))return null;
+  var p=_oauthParams();
+  if(!(p.code||p.at||p.err))return null;
+  if(p.err){
+    var pesan=p.desc||p.err;
+    try{pesan=decodeURIComponent(String(pesan).replace(/\+/g," "))}catch(e){}
+    try{history.replaceState(null,"",location.pathname)}catch(e){}
+    oauthOverlay(_kartuMasukGagal(pesan));
+    return "gagal";
+  }
+  oauthOverlay('<div class="oauth-card" style="text-align:center"><div class="oauth-spin"></div>'+
+    '<div style="font-weight:700;font-size:15px">Menyelesaikan masuk dengan Google\u2026</div>'+
+    '<div style="color:var(--ink2);font-size:12.5px;margin-top:6px">Mohon tunggu sebentar, jangan tutup halaman.</div></div>');
+  var sesi=null;
+  for(var i=0;i<16;i++){
+    try{var r=await supa.auth.getSession();if(r&&r.data&&r.data.session){sesi=r.data.session;break}}catch(e){}
+    await new Promise(function(res){setTimeout(res,500)});
+  }
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+  if(sesi){tutupOAuthOverlay();return "ok"}
+  oauthOverlay(_kartuMasukGagal("Sesi tidak terbentuk. Tautan masuk mungkin kedaluwarsa atau peramban berganti di tengah jalan."));
+  return "gagal";
+}
+
 /* ================= login (hanya OAuth Google) ================= */
 /* Login email+kata sandi dihapus total pada v59. Identitas pengelola
    sepenuhnya berasal dari Supabase Auth lewat Google, lalu dicocokkan
@@ -2577,14 +2642,23 @@ function viewLogin(){
     '<h2 style="margin:0 0 6px;font-size:22px">Masuk Pengelola</h2>'+
     '<p style="color:var(--ink2);margin:0 0 20px;font-size:13.5px;line-height:1.45">Masuk memakai akun Google terdaftar untuk mengelola kliping, materi, &amp; tinjauan.</p>'+
     '<button class="role" onclick="masukGoogle()" style="width:100%;box-sizing:border-box;margin-bottom:12px"><i class="ic">G</i><span><b>Masuk dengan Google</b><span>Login OAuth satu klik dengan Google.</span></span></button>'+
+    (_inApp()?'<div class="note o" style="margin:0 0 14px;text-align:left;font-size:12.5px;line-height:1.5">Anda membuka situs dari peramban mini aplikasi. Google sering menolak masuk dari sini. Bila gagal, salin tautan lalu buka di Chrome/Safari.<div style="margin-top:8px"><button class="btn btn-sm" onclick="salinTautanSitus()">Salin tautan situs</button></div></div>':'')+
     '<p style="color:var(--ink2);margin:14px 0 0;font-size:12.5px;line-height:1.5">Hanya email yang terdaftar sebagai pengelola yang bisa masuk. Login dengan kata sandi sudah dinonaktifkan demi keamanan \u2014 silakan pakai tombol Google di atas.</p>'+
     '<div style="text-align:center;margin-top:16px"><button class="btn btn-sm" onclick=\'go({mode:"public",pv:{n:"board"}})\'>\u2190 Kembali ke situs</button></div>'+
     '</div>';
 }
 
+function _inApp(){var ua=navigator.userAgent||"";return /Instagram|FBAN|FBAV|FBIOS|WhatsApp|Line\/|TikTok|musical_ly|Telegram/i.test(ua)}
+function salinTautanSitus(){var u=location.origin+location.pathname;try{if(navigator.clipboard)navigator.clipboard.writeText(u)}catch(e){}toast("Tautan disalin — tempel di Chrome/Safari untuk masuk")}
 async function masukGoogle(){
-  const {error}=await supa.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin+window.location.pathname}});
-  if(error)toast("Gagal masuk: "+error.message);
+  try{tutupOAuthOverlay()}catch(e){}
+  var b=document.querySelector(".login .role");
+  if(b){b.style.pointerEvents="none";var bb=b.querySelector("b");if(bb)bb.textContent="Mengalihkan ke Google\u2026"}
+  const {error}=await supa.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin+window.location.pathname,queryParams:{prompt:"select_account"}}});
+  if(error){
+    toast("Gagal masuk: "+error.message);
+    if(b){b.style.pointerEvents="";var bb2=b.querySelector("b");if(bb2)bb2.textContent="Masuk dengan Google"}
+  }
 }
 
 /* ================= admin shell ================= */

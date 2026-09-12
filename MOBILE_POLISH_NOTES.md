@@ -32,6 +32,8 @@ Catatan deploy:
 
 18. Cache service worker dinaikkan ke reichas-v56-anoa-final-mobile agar HP/PWA mengambil fix Anoa terbaru.
 
-19. Visual refresh editorial (minim AI slop): satu aksen hijau rimba, semua gradien ungu-lime & glow dihilangkan; tombol share seragam netral; banner literasi jadi kartu tinta; strip pelangi kartu diganti garis gunting putus-putus; ikon bottom nav diganti SVG garis (emoji dihilangkan); statistik tanpa emoji; onboarding tinta solid + aksen hijau; maskot lebih kecil, gelembung tidak terpotong, dan tidak menumpuk layar onboarding; mode gelap ikut aksen hijau.
+19. Visual refresh editorial (minim AI slop): satu aksen hijau rimba; gradien ungu-lime, glow, dan glassmorphism dihilangkan; tombol share seragam netral; banner literasi jadi kartu tinta; strip pelangi kartu diganti garis gunting putus-putus; ikon bottom nav diganti SVG garis; statistik tanpa emoji; onboarding tinta solid + aksen hijau; maskot lebih kecil dan tidak menumpuk onboarding; mode gelap ikut aksen hijau.
 
-20. Cache service worker dinaikkan ke reichas-v62-visual-editorial agar HP/PWA mengambil visual refresh terbaru.
+20. Perbaikan login Google (berlaku mobile & desktop): URL balikan OAuth (?code / #access_token / ?error) kini ditangani — muncul layar "Menyelesaikan masuk...", lalu otomatis masuk panel admin bila berhasil, atau kartu error yang jelas dengan tombol Coba lagi bila gagal (sebelumnya gagal diam-diam di beranda). Tombol Google memakai prompt pemilih akun agar tidak loop setelah logout, dan ada peringatan khusus bila situs dibuka dari peramban mini (Instagram/WhatsApp/dsb). Titik masuk tetap tersembunyi via ketuk logo, sesuai keputusan pengelola.
+
+21. Cache service worker dinaikkan ke reichas-v63-login-oauth-fix agar semua perangkat mengambil perbaikan terbaru.
