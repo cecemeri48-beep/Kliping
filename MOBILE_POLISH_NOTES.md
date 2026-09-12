@@ -37,3 +37,9 @@ Catatan deploy:
 20. Perbaikan login Google (berlaku mobile & desktop): URL balikan OAuth (?code / #access_token / ?error) kini ditangani — muncul layar "Menyelesaikan masuk...", lalu otomatis masuk panel admin bila berhasil, atau kartu error yang jelas dengan tombol Coba lagi bila gagal (sebelumnya gagal diam-diam di beranda). Tombol Google memakai prompt pemilih akun agar tidak loop setelah logout, dan ada peringatan khusus bila situs dibuka dari peramban mini (Instagram/WhatsApp/dsb). Titik masuk tetap tersembunyi via ketuk logo, sesuai keputusan pengelola.
 
 21. Cache service worker dinaikkan ke reichas-v63-login-oauth-fix agar semua perangkat mengambil perbaikan terbaru.
+
+22. Polesan visual kekinian (v64, lapisan CSS paling akhir di index.html): tipografi dipertegas (text-wrap:balance pada judul, letter-spacing, ukuran judul artikel memakai clamp), mikro-interaksi pegas pada chip filter/bottom nav/kartu/tombol (cubic-bezier pegas + efek tekan saat disentuh), bayangan kartu kliping diperhalus tiga lapis, color-scheme light/dark agar scrollbar dan kontrol form ikut tema, kontras --ink2 dinaikkan dari #7D7A75 ke #6B6863, dan semua animasi baru otomatis mati bila prefers-reduced-motion aktif.
+
+23. Materi outdoor baru di seed: m8 Packing Seimbang (aturan 20 persen), m9 Komunikasi Darurat Tanpa Sinyal, m10 Memilih Tempat Kemah yang Aman, m11 Tiga Simpul Wajib di Lapangan. Seed hanya tampil saat Supabase tidak terjangkau — untuk produksi jalankan materi-outdoor-v64.sql di SQL Editor Supabase, atau tambahkan lewat panel admin (Materi → tambah).
+
+24. Cache service worker dinaikkan ke reichas-v64-visual-kekinian-mobile agar HP/PWA mengambil polesan terbaru.

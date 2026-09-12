@@ -3,6 +3,7 @@
 <head>
 <!-- build: v61-aset-ringan -->
 <!-- build: anoa-final-mobile-v56 -->
+<!-- build: v64-visual-kekinian-mobile -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Kliping RCS.CBS — Propaganda Literasi &amp; Cek Fakta</title>
@@ -1860,6 +1861,42 @@ body:has(#oauthOverlay[style*="flex"]) .mascot-mini{display:none!important}
 @keyframes oauthSpin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.oauth-spin{animation-duration:1.6s}}
 
+/* ================= v64 — polesan visual kekinian (mobile-first) =================
+   Lapisan paling akhir agar menang kaskade tanpa mengubah aturan lama.
+   Semua animasi ringan GPU dan dimatikan oleh prefers-reduced-motion. */
+:root{color-scheme:light;--ink2:#6B6863}
+[data-tema="gelap"]{color-scheme:dark;--ink2:#a3a8b0}
+
+/* 1. Tipografi lebih tegas & seimbang */
+body{font-feature-settings:"ss01","cv11";-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.clip h3,.art h2,.paper-copy h2,.modal h3{text-wrap:balance}
+.clip h3{letter-spacing:-.015em}
+.art h2{font-size:clamp(25px,4.6vw,30px);letter-spacing:-.025em}
+@media(max-width:640px){.art h2{font-size:clamp(24px,6.6vw,28px)}}
+
+/* 2. Mikro-interaksi pegas — terasa hidup di layar sentuh */
+.chip,.paper-hero+.wrap .chip{transition:transform .28s cubic-bezier(.34,1.56,.64,1),background-color .18s ease,color .18s ease,border-color .18s ease,box-shadow .28s cubic-bezier(.34,1.56,.64,1)!important}
+.chip.on,.paper-hero+.wrap .chip.on{transform:scale(1.06)}
+.chip:active{transform:scale(.94)}
+.btabs button{transition:transform .28s cubic-bezier(.34,1.56,.64,1),color .18s ease}
+.btabs button.on{transform:translateY(-2px) scale(1.07)}
+.btabs button:active{transform:scale(.9)}
+.clip{transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s ease!important}
+.clip:active{transform:scale(.985)}
+.btn,.mp-btn{transition:transform .18s cubic-bezier(.34,1.56,.64,1),background-color .18s ease,border-color .18s ease,box-shadow .18s ease}
+.btn:active,.mp-btn:active{transform:scale(.94)}
+.btn,.mp-btn,.chip,.btabs button{-webkit-tap-highlight-color:transparent}
+.toast{animation:barMasuk .35s cubic-bezier(.16,1,.3,1) both}
+
+/* 3. Kedalaman halus pada kartu kliping */
+.clip{box-shadow:0 1px 2px rgba(24,21,16,.05),0 8px 20px rgba(24,21,16,.05),0 18px 42px -20px rgba(24,21,16,.14)!important}
+[data-tema="gelap"] .clip{box-shadow:0 1px 2px rgba(0,0,0,.45),0 10px 26px rgba(0,0,0,.35)!important}
+
+@media(prefers-reduced-motion:reduce){
+  .chip,.clip,.btabs button,.btn,.mp-btn{transition:none!important;transform:none!important}
+  .toast{animation:none}
+}
+
 </style>
 </head>
 <body>
@@ -1944,7 +1981,11 @@ function seed(){return{
   {id:"m4",judul:"Prosedur Lapor SAR",rumpun:"Keselamatan",tingkat:"Dasar",acuan:"Basarnas",isi:"Laporan yang baik memuat lima hal: siapa, berapa orang, di mana titik terakhir diketahui, kondisi terkini, dan perlengkapan yang dibawa. Semakin cepat lima hal ini tersampaikan, semakin sempit area pencarian."},
   {id:"m5",judul:"Membaca Badai Gunung",rumpun:"Cuaca",tingkat:"Menengah",acuan:"BMKG dan literatur meteorologi gunung",isi:"Awan cumulonimbus yang tumbuh cepat sebelum tengah hari adalah tanda paling jelas untuk membatalkan pendakian menuju puncak terbuka."},
   {id:"m6",judul:"Etika Leave No Trace",rumpun:"Etika",tingkat:"Dasar",acuan:"Leave No Trace Center for Outdoor Ethics",isi:"Tujuh prinsip yang bisa diringkas menjadi satu kebiasaan: bawa turun lebih banyak daripada yang kamu bawa naik."},
-  {id:"m7",judul:"Simaksi dan Zonasi Kawasan",rumpun:"Aturan",tingkat:"Dasar",acuan:"Peraturan pengelola kawasan konservasi",isi:"Simaksi bukan sekadar karcis. Ia adalah catatan resmi keberadaan kita di kawasan, yang menjadi titik awal pencarian bila terjadi sesuatu."}
+  {id:"m7",judul:"Simaksi dan Zonasi Kawasan",rumpun:"Aturan",tingkat:"Dasar",acuan:"Peraturan pengelola kawasan konservasi",isi:"Simaksi bukan sekadar karcis. Ia adalah catatan resmi keberadaan kita di kawasan, yang menjadi titik awal pencarian bila terjadi sesuatu."},
+  {id:"m8",judul:"Packing Seimbang: Aturan 20 Persen",rumpun:"Logistik",tingkat:"Dasar",acuan:"Kompilasi catatan lapangan anggota",isi:"Berat carrier idealnya tidak lebih dari 20 persen berat badan untuk pendakian satu-dua hari. Barang paling berat diletakkan menempel punggung dan setinggi bahu, bukan di dasar tas. Jas hujan, P3K, headlamp, dan sarung tangan selalu di kantong luar \u2014 barang darurat tidak boleh dikubur."},
+  {id:"m9",judul:"Komunikasi Darurat Tanpa Sinyal",rumpun:"Keselamatan",tingkat:"Dasar",acuan:"Standar komunikasi lapangan RCS.CBS",isi:"Sepakati kode sebelum berangkat: satu tiupan peluit panjang berarti berhenti dan berkumpul, tiga tiupan pendek beruntun berarti minta tolong. Tentukan titik kumpul ulang setiap kali melewati persimpangan jalur, dan titipkan rencana rute tertulis kepada anggota yang berjalan paling belakang."},
+  {id:"m10",judul:"Memilih Tempat Kemah yang Aman",rumpun:"Keterampilan",tingkat:"Dasar",acuan:"Leave No Trace Center for Outdoor Ethics",isi:"Hindari tiga tempat: di bawah pohon besar yang lapuk, di cekungan bekas aliran air meski tampak kering, dan di punggungan terbuka saat musim badai. Pilih tanah datar dengan drainase alami, dan usahakan tiba saat langit masih terang agar sempat membaca sekeliling."},
+  {id:"m11",judul:"Tiga Simpul Wajib di Lapangan",rumpun:"Keterampilan",tingkat:"Menengah",acuan:"Modul Pendidikan Dasar RCS.CBS",isi:"Figure eight untuk ujung tambat, bowline untuk simpul tetap yang mudah dilepas, dan taut-line untuk menegangkan tali flysheet. Latih ketiganya sampai bisa dipasang dengan mata tertutup \u2014 di lapangan kamu akan memakainya dalam gelap dengan tangan dingin."}
  ],
  kliping:[
   {id:"k1",judul:"Dua pendaki turun dengan gejala hipotermia di jalur punggungan",lead:"Cuaca berubah dalam 40 menit, dan pakaian basah menjadi pemicu utamanya.",rubrik:"Bedah Insiden",media:"Tribun Timur",tautan:"https://contoh.media/berita-1",tglBerita:"2026-07-24",tglKliping:"2026-07-25",wilayah:"Sulawesi Selatan",lokasi:["Bawakaraeng"],topik:["Keselamatan","Cuaca"],potongan:"Dua pendaki dievakuasi tim gabungan pada Kamis sore setelah menunjukkan gejala hipotermia di jalur punggungan. Keduanya dilaporkan dalam keadaan sadar saat mencapai pos bawah.",konteks:"Ini kejadian keempat dengan pola yang hampir sama dalam dua tahun terakhir di kawasan yang sama: hujan sore, jaket bukan tahan angin, dan keputusan untuk terus naik meski pakaian sudah basah. Pola berulang seperti ini menandakan persoalan pengetahuan, bukan nasib.",pelajaran:["Basah lebih berbahaya daripada dingin. Ganti lapisan basah sebelum berhenti bergerak, bukan sesudahnya.","Tetapkan batas waktu balik sebelum berangkat, dan patuhi meski puncak terlihat dekat.","Bawa satu lapisan kering yang disimpan kedap air dan tidak pernah dipakai kecuali darurat."],materi:["m1","m5"],status:"Terbit",kurator:"u4",peninjau:"u3",kepekaan:"Sensitif",gambar:"Diagram sendiri"},
