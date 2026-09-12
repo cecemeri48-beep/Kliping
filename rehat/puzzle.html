@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SUSUN LOGO — Rehat Sejenak · Kliping RCS.CBS</title>
+<style>
+  :root{ --green:#2E7D4F; --gold:#ffce4a; --ink:#2C2C2B; }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    background:#141a17; color:var(--ink);
+    display:flex; align-items:center; justify-content:center; min-height:100vh; overflow:hidden; }
+  #wrap{ position:relative; width:100%; max-width:440px; height:100vh; max-height:760px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5); overflow:hidden;
+    background:linear-gradient(170deg,#232a25,#141a17 60%); }
+  @media(min-width:460px){ #wrap{ border-radius:18px; height:96vh; } }
+  .back{ position:absolute; top:10px; left:10px; z-index:6; display:inline-flex; align-items:center;
+    background:rgba(0,0,0,.38); color:#fff; text-decoration:none; font-size:12px; font-weight:700;
+    padding:9px 13px; border-radius:999px; border:1px solid rgba(255,255,255,.25); backdrop-filter:blur(6px); min-height:36px; }
+  #hud{ position:absolute; top:14px; left:0; right:0; z-index:4; pointer-events:none;
+    color:#fff; font-weight:800; font-size:15px; letter-spacing:.04em; display:flex; justify-content:center; gap:14px; }
+  #hud span{ background:rgba(0,0,0,.35); padding:6px 12px; border-radius:999px; font-variant-numeric:tabular-nums; }
+  #stage{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:64px 22px 26px; }
+  #board{ position:relative; width:min(88vw,380px); aspect-ratio:1/1; border-radius:16px; overflow:hidden;
+    background:#000; box-shadow:0 14px 34px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.08); }
+  .tile{ position:absolute; width:25%; height:25%; padding:2px; transition:transform .18s cubic-bezier(.34,1.4,.64,1); cursor:pointer; }
+  .tile .in{ width:100%; height:100%; background-image:url('logo-puzzle.webp'); background-size:400% 400%;
+    border-radius:7px; box-shadow:0 2px 8px rgba(0,0,0,.4); transition:transform .18s ease, box-shadow .18s ease; }
+  .tile.sel .in{ box-shadow:0 0 0 3px var(--gold),0 4px 16px rgba(0,0,0,.55); }
+  .tile.done .in{ box-shadow:0 0 0 2px rgba(140,198,164,.75); }
+  #board.solved .tile{ padding:0; }
+  #board.solved .tile .in{ border-radius:0; box-shadow:none; }
+  .hint{ color:rgba(255,255,255,.75); font-size:13px; text-align:center; max-width:320px; line-height:1.5; }
+  .overlay{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:28px; gap:14px; z-index:8;
+    background:radial-gradient(120% 90% at 50% 12%, rgba(255,255,255,.10), rgba(10,14,11,.87)); backdrop-filter:blur(2px); }
+  .hidden{ display:none !important; }
+  .title{ color:#fff; font-weight:800; letter-spacing:1px; font-size:30px; line-height:1.05; text-shadow:0 3px 12px rgba(0,0,0,.5); }
+  .title span{ color:var(--gold); }
+  .sub{ color:rgba(255,255,255,.92); font-size:15px; font-weight:600; max-width:320px; line-height:1.55; }
+  .btn{ margin-top:6px; background:var(--gold); color:#3a2a00; border:none; cursor:pointer;
+    font-weight:800; font-size:17px; padding:14px 34px; border-radius:14px;
+    box-shadow:0 8px 22px rgba(0,0,0,.4); transition:transform .08s ease, filter .15s ease; min-height:48px; }
+  .btn:active{ transform:translateY(2px) scale(.98); }
+  .scoreline{ color:#fff; font-size:15px; font-weight:700; }
+  .big{ font-size:46px; font-weight:800; color:#fff; }
+  .record{ color:var(--gold); font-weight:800; font-size:15px; letter-spacing:.5px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <a href="./" class="back">&#8592; Rehat</a>
+  <div id="hud"><span id="time">0:00</span><span id="moves">0 tukar</span></div>
+  <div id="stage">
+    <div id="board"></div>
+    <div class="hint">Ketuk dua potongan untuk menukar posisinya.<br />Ketuk potongan yang sedang terpilih sekali lagi untuk <b>memutarnya</b> 90&deg;.</div>
+  </div>
+
+  <div class="overlay" id="startScreen">
+    <div class="title">SUSUN<span> LOGO</span></div>
+    <div class="sub">Logo RCS.CBS HOPE terpotong jadi 16 bagian — dan beberapa potongan terputar. Tukar posisi &amp; putar sampai utuh. <b>Poin ditentukan seberapa cepat kamu menyusunnya.</b></div>
+    <div style="width:100%;max-width:260px"><input id="playerName" type="text" maxlength="24" placeholder="Nama pemain untuk Papan Rekor" autocomplete="off"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.35);color:#fff;font-size:15px;text-align:center" /></div>
+    <button class="btn" id="startBtn">MULAI MENYUSUN</button>
+    <div class="scoreline">Poin terbaikmu: <b id="bestStart">0</b></div>
+  </div>
+
+  <div class="overlay hidden" id="winScreen">
+    <div class="title">LOGO UTUH<span> &#127881;</span></div>
+    <div class="big" id="winPts">0</div>
+    <div class="scoreline" id="winStat"></div>
+    <div class="record" id="winRecord"></div>
+    <button class="btn" id="againBtn">MAIN LAGI</button>
+  </div>
+</div>
+<script>
+(function(){
+  var N=4, SIZE=N*N;
+  var cell=[], rot=[], divs=[], sel=-1, moves=0, secs=0, timer=null, playing=false;
+  var board=document.getElementById('board');
+  var SUPA='https://nfeexstvdjgywonbtxtb.supabase.co';
+  var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E';
+  var BEST='reichas_puzzle_best', HIST='reichas_hist_puzzle', NAMA='reichas_player_name';
+
+  function el(id){return document.getElementById(id)}
+  function fmt(s){return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2)}
+
+  function build(){
+    board.innerHTML=''; divs=[];
+    for(var i=0;i<SIZE;i++){
+      var d=document.createElement('div'); d.className='tile';
+      var inn=document.createElement('div'); inn.className='in';
+      inn.style.backgroundPosition=((i%N)/(N-1)*100)+'% '+(Math.floor(i/N)/(N-1)*100)+'%';
+      d.appendChild(inn); board.appendChild(d); divs[i]=d;
+      (function(idx){ d.addEventListener('click',function(){ tap(idx); }); })(i);
+    }
+  }
+
+  function place(){
+    for(var c=0;c<SIZE;c++){
+      var piece=cell[c], d=divs[piece];
+      d.style.transform='translate('+((c%N)*100)+'%,'+(Math.floor(c/N)*100)+'%)';
+      d.firstChild.style.transform='rotate('+(rot[piece]*90)+'deg)';
+      d.classList.toggle('done', piece===c && rot[piece]%4===0);
+    }
+  }
+  function posOf(piece){ return cell.indexOf(piece); }
+  function solved(){
+    for(var c=0;c<SIZE;c++){ if(cell[c]!==c || rot[c]%4!==0) return false; }
+    return true;
+  }
+
+  function tap(piece){
+    if(!playing) return;
+    if(sel===piece){ /* ketuk ulang = putar 90° */
+      rot[piece]=(rot[piece]+1)%4; place(); return;
+    }
+    if(sel===-1){ sel=piece; divs[piece].classList.add('sel'); return; }
+    var a=posOf(sel), b=posOf(piece);
+    cell[a]=piece; cell[b]=sel;
+    divs[sel].classList.remove('sel'); sel=-1;
+    moves++; el('moves').textContent=moves+' tukar';
+    place();
+    if(solved()) win();
+  }
+
+  function shuffle(){
+    cell=[]; rot=[];
+    for(var i=0;i<SIZE;i++){ cell[i]=i; rot[i]=0; }
+    for(var k=SIZE-1;k>0;k--){ var j=(Math.random()*(k+1))|0; var t=cell[k]; cell[k]=cell[j]; cell[j]=t; }
+    var idx=[]; for(var m=0;m<SIZE;m++) idx.push(m);
+    for(var r=0;r<5;r++){ var pick=idx.splice((Math.random()*idx.length)|0,1)[0]; rot[pick]=1+((Math.random()*3)|0); }
+    if(solved()) return shuffle();
+    moves=0; secs=0; sel=-1;
+    el('moves').textContent='0 tukar'; el('time').textContent='0:00';
+    board.classList.remove('solved');
+    place();
+  }
+
+  function startTimer(){ stopTimer(); timer=setInterval(function(){ secs++; el('time').textContent=fmt(secs); },1000); }
+  function stopTimer(){ if(timer){clearInterval(timer);timer=null} }
+  /* poin murni kecepatan: 6000 − 30/detik − 8/tukar */
+  function points(){ return Math.max(10, 6000 - secs*30 - moves*8); }
+
+  function win(){
+    playing=false; stopTimer();
+    board.classList.add('solved'); place();
+    var pts=points();
+    el('winPts').textContent=pts+' poin';
+    el('winStat').textContent=fmt(secs)+' \u00b7 '+moves+' tukar';
+    var best=0; try{best=parseInt(localStorage.getItem(BEST)||'0',10)||0}catch(e){}
+    if(pts>best){ try{localStorage.setItem(BEST,String(pts))}catch(e){} el('winRecord').textContent='Rekor baru!'; }
+    else el('winRecord').textContent='Terbaik: '+best;
+    try{var h=JSON.parse(localStorage.getItem(HIST)||'[]');h.unshift({s:pts,t:Date.now()});localStorage.setItem(HIST,JSON.stringify(h.slice(0,10)))}catch(e){}
+    try{var n=(localStorage.getItem(NAMA)||'').trim();
+      if(n){fetch(SUPA+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:'puzzle',nama:n.slice(0,24),skor:pts})}).catch(function(){})}}catch(e){}
+    setTimeout(function(){ el('winScreen').classList.remove('hidden'); },900);
+  }
+
+  function mulai(){ sv(); el('startScreen').classList.add('hidden'); el('winScreen').classList.add('hidden'); shuffle(); playing=true; startTimer(); }
+  el('startBtn').addEventListener('click',mulai);
+  el('againBtn').addEventListener('click',mulai);
+
+  var inp=el('playerName');
+  function sv(){try{localStorage.setItem(NAMA,(inp.value||'').trim().slice(0,24))}catch(e){}}
+  if(inp){try{inp.value=localStorage.getItem(NAMA)||''}catch(e){}inp.addEventListener('input',sv);}
+
+  var best=0; try{best=parseInt(localStorage.getItem(BEST)||'0',10)||0}catch(e){}
+  el('bestStart').textContent=best;
+  build();
+})();
+</script>
+</body>
+</html>

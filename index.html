@@ -9,6 +9,7 @@
 <!-- build: v67-splash-kompas-ringan -->
 <!-- build: v68-materi-hewan-liar -->
 <!-- build: v69-materi-lengkap-40 -->
+<!-- build: v70-rehat-sejenak -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Kliping RCS.CBS — Propaganda Literasi &amp; Cek Fakta</title>
@@ -2679,7 +2680,7 @@ function viewPedomanPublik(){
    '<div class="note r">Menemukan kekeliruan atau ingin materinya dicabut? Sampaikan kepada Divisi Komunikasi dan Publikasi RCS.CBS. Kami menanggapi dalam tiga hari kalender.</div></div>'+foot();
 }
 function foot(){
-  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · RCS.CBS, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="bukaPortalSurat()" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);color:#fff;border:0">\u2709\ufe0f Kirim Surat Pembaca</button><a class="btn btn-sm btn-bivak" href="https://bivak-rental.vercel.app/#" target="_blank" rel="noopener">🏕️ Bivak Rental</a><button class="btn btn-sm" onclick="bukaPanduanDarurat()">🎒 Panduan Darurat Lapangan</button><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
+  return '<footer class="foot" style="--paper:url(\''+PAPER+'\')"><div class="wrap"><b>Kliping RCS.CBS</b><div class="foot-marks"><i></i><i></i><i></i></div><div>'+esc(db.settings.tagline)+'<br />Dikelola Divisi Komunikasi & Publikasi bersama Divisi Pendidikan & Edukasi · RCS.CBS, Makassar</div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-p" onclick="bukaPortalSurat()" style="background:linear-gradient(135deg,var(--violet,#7357ff),#4267e7);color:#fff;border:0">\u2709\ufe0f Kirim Surat Pembaca</button><a class="btn btn-sm btn-bivak" href="https://bivak-rental.vercel.app/#" target="_blank" rel="noopener">🏕️ Bivak Rental</a><a class="btn btn-sm" href="rehat/">🎮 Rehat Sejenak</a><button class="btn btn-sm" onclick="bukaPanduanDarurat()">🎒 Panduan Darurat Lapangan</button><button class="btn btn-sm" onclick="tipis()">Mode sinyal tipis: '+(db.settings.sinyalTipis?"aktif":"nonaktif")+'</button>'+_btnInstal()+_btnLepas()+'<button class="btn btn-sm" onclick=\'go({pv:{n:"pedoman"}})\'>Pedoman kurasi</button></div></div></footer>';
 }
 function tipis(){db.settings.sinyalTipis=!db.settings.sinyalTipis;save();render();toast(db.settings.sinyalTipis?"Mode sinyal tipis aktif":"Mode sinyal tipis nonaktif")}
 

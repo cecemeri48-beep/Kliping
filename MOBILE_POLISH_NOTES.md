@@ -61,3 +61,19 @@ Catatan deploy:
 32. Materi gelombang tiga (m25–m40, 16 materi): P3K lapangan (Stop the Bleed, Red Cross CPR, tandu darurat), tersesat & sinyal (STOP ala US Forest Service, sinyal 3x universal, PLB Cospas-Sarsat/NOAA), hewan lanjutan (tawon, rabies WHO, pacet ala NSW National Parks), cuaca & bencana tropis (heat stroke NWS, tsunami Ready.gov, kebakaran hutan Ready.gov), air & sanitasi kemah (CDC), plus dua materi pemula (Ten Essentials REI, Tiga T AdventureSmart). Untuk produksi jalankan materi-outdoor-v69.sql (memuat m8–m40, menggantikan v68; upsert aman diulang).
 
 33. Cache service worker dinaikkan ke reichas-v69-materi-lengkap-40.
+
+34. Rehat Sejenak (v70): dua gim dari proyek Pintu Angin dikloning ke folder rehat/ — FLYER (terbangkan logo melewati celah pegunungan) dan NGOPI (tangkap kopi dengan cangkir) — lengkap dengan halaman hub rehat/index.html bergaya editorial Kliping. Papan Rekor membaca localStorage: rekor terbaik (reichas_best, reichas_ngopi_best) plus riwayat 10 skor terakhir per gim (reichas_hist_flyer/ngopi, dicatat oleh suntikan kecil di kode game-over). Gim mandiri penuh (logo base64, audio WebAudio) sehingga nol berkas tambahan dan bisa dimainkan offline setelah dibuka sekali. Tautan masuk di footer situs. Setiap gim diberi tombol kembali ke Rehat Sejenak.
+
+35. Perbaikan SW terkait halaman kedua: navigasi kini dicache per-URL (c.put(req)) bukan selalu ke "/" — sebelumnya membuka /rehat/ akan menimpa cache beranda. Cache dinaikkan ke reichas-v70-rehat-sejenak.
+
+36. Papan Rekor Bersama (v71): Rehat Sejenak kini berjenjang dua — rekor perangkat (localStorage, offline) dan papan rekor bersama seluruh pembaca (tabel Supabase rehat_skor, publik tanpa akun). Pemain mengisi nama sekali sebelum main (input di layar mulai kedua gim, tersimpan di perangkat; bisa juga diatur dari halaman hub). Skor terkirim via REST Supabase langsung dari gim (tanpa library baru), gagal jaringan = diam-diam dilewati. RLS: select+insert publik, tanpa update/delete; CHECK membatasi game ('flyer'/'ngopi'), nama 1-24 karakter, skor 0-100000. Wajib: jalankan rehat-leaderboard.sql di SQL Editor Supabase.
+
+37. Cache service worker dinaikkan ke reichas-v71-papan-rekor-bersama.
+
+38. Percantik visual gim (v72), semuanya vektor canvas tanpa berkas baru: FLYER kini punya langit yang berubah siang ke senja seiring skor (matahari turun & memerah, bintang muncul), awan parallax, burung siluet jauh, pinus & garis rumput bergulir di garis tanah, dan vignette lembut. NGOPI kini berlatar kafe: lampu string berpendar, bokeh hangat, meja kayu tempat cangkir berdiri, dan uap mengepul dari kopi.
+
+39. Cache service worker dinaikkan ke reichas-v72-visual-game-kafe.
+
+40. Gim ketiga Rehat Sejenak: SUSUN LOGO (rehat/puzzle.html) — logo RCS.CBS HOPE (rehat/logo-puzzle.webp) dipotong 4x4; potongan tertukar DAN 5 di antaranya terputar 90–270°. Ketuk dua potongan untuk menukar, ketuk potongan terpilih untuk memutar. Skor murni kecepatan: 6000 − 30/detik − 8/tukar. Input nama sama seperti dua gim lain; masuk Papan Rekor Bersama sebagai game 'puzzle'. Hub menampilkan kartu ketiga + peringkat SUSUN.
+
+41. Cache service worker dinaikkan ke reichas-v73-game-susun. Bila tabel rehat_skor sudah dibuat dari paket v71, jalankan ulang rehat-leaderboard.sql (kini memperluas batasan game ke 'puzzle' lewat alter table di bagian bawah).

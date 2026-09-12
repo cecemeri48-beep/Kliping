@@ -1,4 +1,4 @@
-const CACHE='reichas-v69-materi-lengkap-40';
+const CACHE='reichas-v73-game-susun';
 /* Hanya aset yang benar-benar dipakai pada tampilan pertama. og-image.jpg
    (156 KB) dan ikon 512 px dibuang dari precache: keduanya tidak pernah
    ditampilkan ke pembaca (hanya untuk pratinjau WhatsApp dan ikon PWA),
@@ -12,7 +12,7 @@ self.addEventListener('fetch',function(e){
   var url=new URL(req.url);
   if(url.origin!==location.origin||url.pathname.indexOf('/api/')===0)return;
   if(req.mode==='navigate'){
-    e.respondWith(fetch(req).then(function(r){var cp=r.clone();caches.open(CACHE).then(function(c){c.put('/',cp)}).catch(function(){});return r}).catch(function(){return caches.match('/').then(function(r){return r||caches.match('/index.html')})}));
+    e.respondWith(fetch(req).then(function(r){var cp=r.clone();caches.open(CACHE).then(function(c){c.put(req,cp)}).catch(function(){});return r}).catch(function(){return caches.match(req).then(function(r){return r||caches.match('/')}).then(function(r){return r||caches.match('/index.html')})}));
     return;
   }
   e.respondWith(caches.match(req).then(function(r){return r||fetch(req).then(function(res){var cp=res.clone();caches.open(CACHE).then(function(c){c.put(req,cp)}).catch(function(){});return res}).catch(function(){return r})}));
