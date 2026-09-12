@@ -43,3 +43,11 @@ Catatan deploy:
 23. Materi outdoor baru di seed: m8 Packing Seimbang (aturan 20 persen), m9 Komunikasi Darurat Tanpa Sinyal, m10 Memilih Tempat Kemah yang Aman, m11 Tiga Simpul Wajib di Lapangan. Seed hanya tampil saat Supabase tidak terjangkau — untuk produksi jalankan materi-outdoor-v64.sql di SQL Editor Supabase, atau tambahkan lewat panel admin (Materi → tambah).
 
 24. Cache service worker dinaikkan ke reichas-v64-visual-kekinian-mobile agar HP/PWA mengambil polesan terbaru.
+
+25. Materi outdoor gelombang dua (m12–m19) — semuanya memakai kolom tautan sehingga tombol "Buka referensi" tampil di halaman detail materi. Sumber internasional: UIAA (panjat tebing), National Speleological Society (susur goa), American Canyoneering Association (susur sungai), American Whitewater Safety Code (jeram), NZ Mountain Safety Council (menyeberangi sungai), NOAA/National Weather Service (petir 30/30), Divers Alert Network (snorkeling & menyelam), RNLI (rip current di pantai). Untuk produksi jalankan materi-outdoor-v65.sql (sudah memuat m8–m19, menggantikan v64; aman diulang karena upsert).
+
+26. Cache service worker dinaikkan ke reichas-v65-materi-outdoor-berlink.
+
+27. Hiasan grafis onboarding mobile (v66): mata angin kompas SVG inline di area atas yang sebelumnya kosong — cincin skala hijau berputar pelan, jarum hijau berayun 45° setiap langkah slide, huruf arah U-T-S-B, dan koordinat Makassar (5°08′S 119°25′E) sebagai aksen editorial. Tanpa berkas gambar baru sehingga mode sinyal tipis tidak terbebani; animasi mati saat prefers-reduced-motion, dan hiasan disembunyikan di layar sangat pendek (max-height 540px).
+
+28. Cache service worker dinaikkan ke reichas-v66-onboarding-mata-angin.
