@@ -1,4 +1,4 @@
-const CACHE='reichas-v67-splash-kompas-ringan';
+const CACHE='reichas-v69-materi-lengkap-40';
 /* Hanya aset yang benar-benar dipakai pada tampilan pertama. og-image.jpg
    (156 KB) dan ikon 512 px dibuang dari precache: keduanya tidak pernah
    ditampilkan ke pembaca (hanya untuk pratinjau WhatsApp dan ikon PWA),
