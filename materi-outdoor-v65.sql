@@ -1,7 +1,6 @@
 -- v65: dua belas materi kegiatan outdoor (m8-m19) untuk halaman Materi.
--- MENGGANTIKAN materi-outdoor-v64.sql — file ini sudah memuat semuanya.
 -- Jalankan di Supabase -> SQL Editor. Aman diulang (upsert per id).
--- Catatan: kolom "tautan" menampilkan tombol "Buka referensi" di halaman materi.
+-- Kolom "tautan" menampilkan tombol "Buka referensi" di halaman detail materi.
 
 insert into materi (id, judul, rumpun, tingkat, acuan, tautan, isi) values
   ('m8', 'Packing Seimbang: Aturan 20 Persen', 'Logistik', 'Dasar', 'Kompilasi catatan lapangan anggota', null,

@@ -38,16 +38,14 @@ Catatan deploy:
 
 21. Cache service worker dinaikkan ke reichas-v63-login-oauth-fix agar semua perangkat mengambil perbaikan terbaru.
 
-22. Polesan visual kekinian (v64, lapisan CSS paling akhir di index.html): tipografi dipertegas (text-wrap:balance pada judul, letter-spacing, ukuran judul artikel memakai clamp), mikro-interaksi pegas pada chip filter/bottom nav/kartu/tombol (cubic-bezier pegas + efek tekan saat disentuh), bayangan kartu kliping diperhalus tiga lapis, color-scheme light/dark agar scrollbar dan kontrol form ikut tema, kontras --ink2 dinaikkan dari #7D7A75 ke #6B6863, dan semua animasi baru otomatis mati bila prefers-reduced-motion aktif.
+22. Polesan visual kekinian (v64, lapisan CSS paling akhir): tipografi dipertegas (text-wrap:balance, letter-spacing, judul artikel pakai clamp), mikro-interaksi pegas pada chip/bottom nav/kartu/tombol, bayangan kartu tiga lapis, color-scheme light/dark, kontras --ink2 dinaikkan ke #6B6863, semua animasi mati saat prefers-reduced-motion.
 
-23. Materi outdoor baru di seed: m8 Packing Seimbang (aturan 20 persen), m9 Komunikasi Darurat Tanpa Sinyal, m10 Memilih Tempat Kemah yang Aman, m11 Tiga Simpul Wajib di Lapangan. Seed hanya tampil saat Supabase tidak terjangkau — untuk produksi jalankan materi-outdoor-v64.sql di SQL Editor Supabase, atau tambahkan lewat panel admin (Materi → tambah).
+23. Materi outdoor gelombang satu: m8 Packing Seimbang (aturan 20 persen), m9 Komunikasi Darurat Tanpa Sinyal, m10 Memilih Tempat Kemah, m11 Tiga Simpul Wajib.
 
-24. Cache service worker dinaikkan ke reichas-v64-visual-kekinian-mobile agar HP/PWA mengambil polesan terbaru.
+24. Materi outdoor gelombang dua berlink (m12–m19), memakai kolom tautan sehingga tombol "Buka referensi" tampil di halaman detail: UIAA (panjat), National Speleological Society (goa), American Canyoneering Association (susur sungai), American Whitewater (jeram), NZ Mountain Safety Council (menyeberangi sungai), NOAA/NWS (petir 30/30), Divers Alert Network (selam), RNLI (rip current). Untuk produksi jalankan materi-outdoor-v65.sql (memuat m8–m19, aman diulang karena upsert).
 
-25. Materi outdoor gelombang dua (m12–m19) — semuanya memakai kolom tautan sehingga tombol "Buka referensi" tampil di halaman detail materi. Sumber internasional: UIAA (panjat tebing), National Speleological Society (susur goa), American Canyoneering Association (susur sungai), American Whitewater Safety Code (jeram), NZ Mountain Safety Council (menyeberangi sungai), NOAA/National Weather Service (petir 30/30), Divers Alert Network (snorkeling & menyelam), RNLI (rip current di pantai). Untuk produksi jalankan materi-outdoor-v65.sql (sudah memuat m8–m19, menggantikan v64; aman diulang karena upsert).
+25. Hiasan onboarding mobile (v66): mata angin kompas SVG inline di area atas yang kosong — cincin skala berputar pelan, jarum berayun 45° per langkah slide, huruf U-T-S-B, koordinat Makassar. Tanpa berkas gambar baru; disembunyikan di layar ≤540px tinggi.
 
-26. Cache service worker dinaikkan ke reichas-v65-materi-outdoor-berlink.
+26. Splash mata angin (v67): tampil setiap buka/reload ±1,3 detik lalu memudar (ketuk untuk lewati), wordmark KLIPING RCS.CBS. Ringan: SVG inline (variabel MPCOMPASS dipakai bersama splash & onboarding), nol permintaan jaringan baru, elemen dihapus dari DOM setelah memudar. Diskip saat balikan OAuth (?code/#access_token/?error). Onboarding 3 langkah tetap hanya untuk pengguna baru.
 
-27. Hiasan grafis onboarding mobile (v66): mata angin kompas SVG inline di area atas yang sebelumnya kosong — cincin skala hijau berputar pelan, jarum hijau berayun 45° setiap langkah slide, huruf arah U-T-S-B, dan koordinat Makassar (5°08′S 119°25′E) sebagai aksen editorial. Tanpa berkas gambar baru sehingga mode sinyal tipis tidak terbebani; animasi mati saat prefers-reduced-motion, dan hiasan disembunyikan di layar sangat pendek (max-height 540px).
-
-28. Cache service worker dinaikkan ke reichas-v66-onboarding-mata-angin.
+27. Cache service worker dinaikkan ke reichas-v67-splash-kompas-ringan.
