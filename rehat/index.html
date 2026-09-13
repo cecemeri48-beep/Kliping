@@ -108,9 +108,12 @@
   isi(document.getElementById('histPuzzle'),h('reichas_hist_puzzle'));
   /* papan rekor bersama */
   function loadRank(game,elm){
-    fetch(SUPA+'/rest/v1/rehat_skor?game=eq.'+game+'&select=nama,skor,created_at&order=skor.desc,created_at.asc&limit=10',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+    fetch(SUPA+'/rest/v1/rehat_skor?game=eq.'+game+'&select=nama,skor,created_at&order=skor.desc,created_at.asc&limit=50',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
     .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
     .then(function(rows){
+      var seen={},uniq=[]; /* satu nama = satu baris saja: skor tertinggi (urutan sudah desc) */
+      (rows||[]).forEach(function(x){var k=(x.nama||'').trim().toLowerCase(); if(k&&!seen[k]){seen[k]=1;uniq.push(x)}});
+      rows=uniq.slice(0,10);
       if(!rows.length){elm.innerHTML='<li class="kosong">Belum ada yang tercatat — jadilah yang pertama.</li>';return}
       elm.innerHTML=rows.map(function(x,i){
         return '<li><span class="no">'+(i+1)+'</span><span class="nm">'+esc(x.nama)+'</span><span class="tgl">'+tgl(x.created_at)+'</span><b>'+esc(x.skor)+'</b></li>'

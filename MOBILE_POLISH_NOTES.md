@@ -79,3 +79,9 @@ Catatan deploy:
 41. Cache service worker dinaikkan ke reichas-v73-game-susun. Bila tabel rehat_skor sudah dibuat dari paket v71, jalankan ulang rehat-leaderboard.sql (kini memperluas batasan game ke 'puzzle' lewat alter table di bagian bawah).
 
 42. Pintasan 🎮 Rehat Sejenak kini juga ada di menu dropdown header (fungsi _menuRehat, pola sama seperti Rak Baca/Panduan Darurat) — duduk di antara Bivak Rental dan Panduan Darurat, diberi aksen gradien violet (mi-rehat, ada varian mode gelap). Cache SW: reichas-v74-menu-rehat.
+
+43. Pengaman anti-dobel nama pemain, tiga lapis: (a) SERVER — rehat-leaderboard.sql kini punya kunci unik (game, lower(trim(nama))) + trigger rehat_skor_guard: insert nama yang sudah ada dibatalkan, baris lama hanya ditimpa bila skor baru lebih tinggi; sekaligus membersihkan duplikat lama (jalankan file SQL-nya sekali). (b) GIM — fungsi kirimSkor() memeriksa dulu skor tercatat dan batal mengirim bila tidak lebih tinggi (hemat kuota, anti dobel); dilewati saat luring, timeout 8 detik bila sinyal jelek. (c) HUB — Papan Rekor Bersama mengambil 50 baris, merangkum satu nama = satu baris (skor tertinggi), menampilkan 10 teratas.
+
+44. Puzzle kini jelas saat selesai & benar: HUD menampilkan penghitung "X/16 tepat" secara langsung; saat susunan utuh, papan memantul (animasi pzPop), diberi bingkai hijau, muncul lencana "✓ Susunan benar! Logo utuh kembali" ±1,6 detik sebelum layar hasil, plus lonceng dua nada (hormati tombol senyap).
+
+45. Mode ringan adaptif di FLYER & NGOPI (anti-lag HP panas): bila rata-rata bingkai >26 ms, hiasan berat dimatikan sementara — awan & burung siluet, bintang, vignette (FLYER); bokeh, uap, kedip lampu festoon (NGOPI) — lalu menyala otomatis saat lancar (<17 ms); menghormati prefers-reduced-motion; loop berhenti total saat tab tidak terlihat. Pengiriman skor FLYER & NGOPI dipindah ke fungsi kirimSkor() yang sama seperti puzzle (pra-cek anti-dobel + timeout 8 dtk). Cache SW: reichas-v75-ringan-antidobel.

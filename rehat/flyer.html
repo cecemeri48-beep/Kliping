@@ -150,7 +150,7 @@ function startGame(){
 function endGame(){try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'flyer',score:score},'*')}catch(e){}
   state='over';
   const newRecord = score > best;
-  if(newRecord){ best = score; localStorage.setItem('reichas_best', String(best));try{var _h=JSON.parse(localStorage.getItem('reichas_hist_flyer')||'[]');_h.unshift({s:score,t:Date.now()});localStorage.setItem('reichas_hist_flyer',JSON.stringify(_h.slice(0,10)))}catch(e){};try{var _n=(localStorage.getItem('reichas_player_name')||'').trim();if(_n&&(score|0)>0){fetch('https://nfeexstvdjgywonbtxtb.supabase.co/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:'flyer',nama:_n.slice(0,24),skor:Math.max(0,Math.floor(score)||0)})}).catch(function(){})}}catch(e){}; spawnConfetti(); }
+  if(newRecord){ best = score; localStorage.setItem('reichas_best', String(best));try{var _h=JSON.parse(localStorage.getItem('reichas_hist_flyer')||'[]');_h.unshift({s:score,t:Date.now()});localStorage.setItem('reichas_hist_flyer',JSON.stringify(_h.slice(0,10)))}catch(e){};try{var _n=(localStorage.getItem('reichas_player_name')||'').trim();if(_n&&(score|0)>0){kirimSkor('flyer',_n,Math.max(0,Math.floor(score)||0))}}catch(e){}; spawnConfetti(); }
   document.getElementById('finalScore').textContent = score;
   document.getElementById('bestScore').textContent = best;
   document.getElementById('recordMsg').textContent = newRecord ? '🏆 REKOR BARU!' : 'Terus semangat!';
@@ -204,7 +204,7 @@ function drawSky(){
   ctx.fillStyle='rgba(255,'+Math.round(241-80*t)+','+Math.round(190-120*t)+',.92)';
   ctx.beginPath(); ctx.arc(W*0.8, sy, sr, 0, Math.PI*2); ctx.fill();
   // bintang muncul saat senja
-  if(t>0.5){ ctx.fillStyle='rgba(255,255,255,'+((t-0.5)*1.5).toFixed(2)+')';
+  if(!lowFx&&t>0.5){ ctx.fillStyle='rgba(255,255,255,'+((t-0.5)*1.5).toFixed(2)+')';
     for(let i=0;i<24;i++){ ctx.fillRect((i*97)%W, (i*53)%(H*0.4), 2, 2); } }
 }
 function drawClouds(){
@@ -300,12 +300,38 @@ function drawGround(){
   }
 }
 
+/* kirimSkor: anti-dobel — kirim hanya bila skor baru lebih tinggi dari yang tercatat untuk nama ini */
+const SUPA_URL='https://nfeexstvdjgywonbtxtb.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E';
+function kirimSkor(game,nama,skor){
+  try{
+    if(navigator.onLine===false)return;
+    nama=nama.slice(0,24);
+    const H={apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY};
+    fetch(SUPA_URL+'/rest/v1/rehat_skor?game=eq.'+game+'&nama=ilike.'+encodeURIComponent(nama.trim())+'&select=skor&order=skor.desc&limit=1',{headers:H})
+    .then(function(r){return r.ok?r.json():[]})
+    .then(function(rows){
+      const ex=(rows&&rows[0])?(rows[0].skor|0):-1;
+      if(skor<=ex)return; /* sudah ada skor sama/lebih tinggi — jangan dobel */
+      const ctl=new AbortController(); const to=setTimeout(function(){try{ctl.abort()}catch(e){}},8000);
+      fetch(SUPA_URL+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:game,nama:nama,skor:skor}),signal:ctl.signal})
+      .then(function(){clearTimeout(to)}).catch(function(){clearTimeout(to)});
+    }).catch(function(){});
+  }catch(e){}
+}
 let last = performance.now();
+/* mode ringan adaptif: bila bingkai rata-rata berat (HP panas/berat), hiasan non-esensial dimatikan sementara */
+let _msAvg=16;
+let lowFx=false; try{lowFx=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+document.addEventListener('visibilitychange',function(){ if(!document.hidden){ last=performance.now(); requestAnimationFrame(loop);} });
 function loop(now){
+  if(document.hidden)return; /* hemat daya: tab tidak terlihat = berhenti */
+  const rawMs=now-last; _msAvg=_msAvg*0.94+Math.min(rawMs,120)*0.06;
+  if(!lowFx&&_msAvg>26)lowFx=true; else if(lowFx&&_msAvg<17)lowFx=false;
   const dt = Math.min(2, (now-last)/16.67); last = now;
   ctx.clearRect(0,0,W,H);
   drawSky();
-  drawClouds();
+  if(!lowFx)drawClouds();
 
   if(state==='play'){ bg1 += speed*0.25*dt; bg2 += speed*0.5*dt; }
   drawMountains((bg1)%(W+120), H*0.72, '#9cc9e6', 150);
@@ -336,7 +362,7 @@ function loop(now){
 
   for(const p of pipes) drawPipe(p);
   drawGround();
-  drawVignette();
+  if(!lowFx)drawVignette();
   if(state!=='start') drawBird();
 
   // confetti

@@ -31,6 +31,13 @@
   .tile.done .in{ box-shadow:0 0 0 2px rgba(140,198,164,.75); }
   #board.solved .tile{ padding:0; }
   #board.solved .tile .in{ border-radius:0; box-shadow:none; }
+  #board.solved{ animation:pzPop .6s ease; box-shadow:0 0 0 4px #8cc6a4, 0 18px 44px rgba(0,0,0,.5); }
+  @keyframes pzPop{ 0%{transform:scale(1)} 40%{transform:scale(1.045)} 100%{transform:scale(1)} }
+  #winBadge{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:5; pointer-events:none;
+    background:rgba(14,22,18,.92); color:#fff; border:2px solid #8cc6a4; font-weight:800; font-size:19px;
+    padding:14px 24px; border-radius:16px; opacity:0; transition:opacity .25s ease; text-align:center;
+    box-shadow:0 12px 34px rgba(0,0,0,.5); }
+  #winBadge.on{ opacity:1; }
   .hint{ color:rgba(255,255,255,.75); font-size:13px; text-align:center; max-width:320px; line-height:1.5; }
   .overlay{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:28px; gap:14px; z-index:8;
@@ -51,11 +58,12 @@
 <body>
 <div id="wrap">
   <a href="./" class="back">&#8592; Rehat</a>
-  <div id="hud"><span id="time">0:00</span><span id="moves">0 tukar</span></div>
+  <div id="hud"><span id="time">0:00</span><span id="tepat">0/16 tepat</span><span id="moves">0 tukar</span></div>
   <div id="stage">
     <div id="board"></div>
     <div class="hint">Ketuk dua potongan untuk menukar posisinya.<br />Ketuk potongan yang sedang terpilih sekali lagi untuk <b>memutarnya</b> 90&deg;.</div>
   </div>
+  <div id="winBadge">&#10003; Susunan benar!<br /><span style="font-size:13px;font-weight:600;opacity:.85">Logo utuh kembali</span></div>
 
   <div class="overlay" id="startScreen">
     <div class="title">SUSUN<span> LOGO</span></div>
@@ -98,12 +106,16 @@
   }
 
   function place(){
+    var tepat=0;
     for(var c=0;c<SIZE;c++){
       var piece=cell[c], d=divs[piece];
       d.style.transform='translate('+((c%N)*100)+'%,'+(Math.floor(c/N)*100)+'%)';
       d.firstChild.style.transform='rotate('+(rot[piece]*90)+'deg)';
-      d.classList.toggle('done', piece===c && rot[piece]%4===0);
+      var ok=(piece===c && rot[piece]%4===0);
+      if(ok)tepat++;
+      d.classList.toggle('done', ok);
     }
+    var tp=el('tepat'); if(tp)tp.textContent=tepat+'/'+SIZE+' tepat';
   }
   function posOf(piece){ return cell.indexOf(piece); }
   function solved(){
@@ -143,9 +155,48 @@
   /* poin murni kecepatan: 6000 − 30/detik − 8/tukar */
   function points(){ return Math.max(10, 6000 - secs*30 - moves*8); }
 
+  /* kirimSkor: anti-dobel — kirim hanya bila skor baru lebih tinggi dari yang tercatat untuk nama ini */
+  function kirimSkor(game,nama,skor){
+    try{
+      if(navigator.onLine===false)return;
+      nama=nama.slice(0,24);
+      var H={apikey:KEY,Authorization:'Bearer '+KEY};
+      fetch(SUPA+'/rest/v1/rehat_skor?game=eq.'+game+'&nama=ilike.'+encodeURIComponent(nama.trim())+'&select=skor&order=skor.desc&limit=1',{headers:H})
+      .then(function(r){return r.ok?r.json():[]})
+      .then(function(rows){
+        var ex=(rows&&rows[0])?(rows[0].skor|0):-1;
+        if(skor<=ex)return; /* sudah ada skor sama/lebih tinggi — jangan dobel */
+        var ctl=new AbortController();var to=setTimeout(function(){try{ctl.abort()}catch(e){}},8000);
+        fetch(SUPA+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:game,nama:nama,skor:skor}),signal:ctl.signal})
+        .then(function(){clearTimeout(to)}).catch(function(){clearTimeout(to)});
+      }).catch(function(){});
+    }catch(e){}
+  }
+
+  /* lonceng kecil saat logo utuh — hormati tombol senyap */
+  function ding(){
+    try{ if(localStorage.getItem('bwk_game_muted')==='1')return; }catch(e){}
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+      var ac=new AC();
+      [523.25,783.99].forEach(function(f,i){
+        var o=ac.createOscillator(), g=ac.createGain();
+        o.type='sine'; o.frequency.value=f;
+        var t0=ac.currentTime+i*0.13;
+        g.gain.setValueAtTime(0.0001,t0);
+        g.gain.exponentialRampToValueAtTime(0.18,t0+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001,t0+0.28);
+        o.connect(g); g.connect(ac.destination);
+        o.start(t0); o.stop(t0+0.32);
+      });
+      setTimeout(function(){try{ac.close()}catch(e){}},900);
+    }catch(e){}
+  }
   function win(){
     playing=false; stopTimer();
     board.classList.add('solved'); place();
+    var bd=el('winBadge'); if(bd)bd.classList.add('on');
+    ding();
     var pts=points();
     el('winPts').textContent=pts+' poin';
     el('winStat').textContent=fmt(secs)+' \u00b7 '+moves+' tukar';
@@ -154,11 +205,11 @@
     else el('winRecord').textContent='Terbaik: '+best;
     try{var h=JSON.parse(localStorage.getItem(HIST)||'[]');h.unshift({s:pts,t:Date.now()});localStorage.setItem(HIST,JSON.stringify(h.slice(0,10)))}catch(e){}
     try{var n=(localStorage.getItem(NAMA)||'').trim();
-      if(n){fetch(SUPA+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:'puzzle',nama:n.slice(0,24),skor:pts})}).catch(function(){})}}catch(e){}
-    setTimeout(function(){ el('winScreen').classList.remove('hidden'); },900);
+      if(n){kirimSkor('puzzle',n,pts)}}catch(e){}
+    setTimeout(function(){ if(bd)bd.classList.remove('on'); el('winScreen').classList.remove('hidden'); },1600);
   }
 
-  function mulai(){ sv(); el('startScreen').classList.add('hidden'); el('winScreen').classList.add('hidden'); shuffle(); playing=true; startTimer(); }
+  function mulai(){ sv(); var wb=el('winBadge'); if(wb)wb.classList.remove('on'); el('startScreen').classList.add('hidden'); el('winScreen').classList.add('hidden'); shuffle(); playing=true; startTimer(); }
   el('startBtn').addEventListener('click',mulai);
   el('againBtn').addEventListener('click',mulai);
 

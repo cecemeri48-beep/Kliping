@@ -133,7 +133,7 @@ function startGame(){ reset(); state='play';
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('overScreen').classList.add('hidden'); }
 function endGame(){try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'ngopi',score:score},'*')}catch(e){} state='over';
-  const nr=score>best; if(nr){ best=score; localStorage.setItem('reichas_ngopi_best',String(best));try{var _h=JSON.parse(localStorage.getItem('reichas_hist_ngopi')||'[]');_h.unshift({s:score,t:Date.now()});localStorage.setItem('reichas_hist_ngopi',JSON.stringify(_h.slice(0,10)))}catch(e){};try{var _n=(localStorage.getItem('reichas_player_name')||'').trim();if(_n&&(score|0)>0){fetch('https://nfeexstvdjgywonbtxtb.supabase.co/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:'ngopi',nama:_n.slice(0,24),skor:Math.max(0,Math.floor(score)||0)})}).catch(function(){})}}catch(e){}; }
+  const nr=score>best; if(nr){ best=score; localStorage.setItem('reichas_ngopi_best',String(best));try{var _h=JSON.parse(localStorage.getItem('reichas_hist_ngopi')||'[]');_h.unshift({s:score,t:Date.now()});localStorage.setItem('reichas_hist_ngopi',JSON.stringify(_h.slice(0,10)))}catch(e){};try{var _n=(localStorage.getItem('reichas_player_name')||'').trim();if(_n&&(score|0)>0){kirimSkor('ngopi',_n,Math.max(0,Math.floor(score)||0))}}catch(e){}; }
   document.getElementById('finalScore').textContent=score;
   document.getElementById('bestScore').textContent=best;
   document.getElementById('recordMsg').textContent= nr?'🏆 REKOR BARU!':'Mantap, lanjutkan!';
@@ -168,12 +168,13 @@ function drawBg(){
   ctx.stroke();
   for(let i=0;i<segs;i++){
     const bx=i*segW+segW/2, by=41;
-    const flick=0.72+0.28*Math.sin(tick*0.08+i*1.7);
+    const flick=lowFx?0.85:(0.72+0.28*Math.sin(tick*0.08+i*1.7));
     const glow=ctx.createRadialGradient(bx,by,2,bx,by,26);
     glow.addColorStop(0,'rgba(255,214,120,'+(0.8*flick).toFixed(2)+')'); glow.addColorStop(1,'rgba(255,214,120,0)');
     ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(bx,by,26,0,Math.PI*2); ctx.fill();
     ctx.fillStyle='#ffdf9a'; ctx.beginPath(); ctx.arc(bx,by,5,0,Math.PI*2); ctx.fill();
   }
+  if(!lowFx){
   // faint steam swirls
   ctx.fillStyle='rgba(255,255,255,.07)';
   for(let i=0;i<5;i++){ ctx.beginPath(); ctx.arc((i*110+ (tick*0.4)%W)%W, 120+ (i%2)*70, 60,0,Math.PI*2); ctx.fill(); }
@@ -182,6 +183,7 @@ function drawBg(){
     const bx=(i*137+ (tick*0.15)%(W+60))%(W+60)-30, by=180+((i*97)%240);
     ctx.fillStyle='rgba(255,225,170,.08)';
     ctx.beginPath(); ctx.arc(bx,by,26+(i%2)*14,0,Math.PI*2); ctx.fill();
+  }
   }
   // meja kayu di dasar — cangkir berdiri di atasnya
   const my=H-48;
@@ -262,8 +264,34 @@ function roundRect(x,y,w,h,r){ r=Math.min(r,w/2,Math.abs(h)/2);
 
 function addFloat(txt,x,y,c){ floats.push({txt,x,y,a:1,c}); }
 
+/* kirimSkor: anti-dobel — kirim hanya bila skor baru lebih tinggi dari yang tercatat untuk nama ini */
+const SUPA_URL='https://nfeexstvdjgywonbtxtb.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E';
+function kirimSkor(game,nama,skor){
+  try{
+    if(navigator.onLine===false)return;
+    nama=nama.slice(0,24);
+    const H={apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY};
+    fetch(SUPA_URL+'/rest/v1/rehat_skor?game=eq.'+game+'&nama=ilike.'+encodeURIComponent(nama.trim())+'&select=skor&order=skor.desc&limit=1',{headers:H})
+    .then(function(r){return r.ok?r.json():[]})
+    .then(function(rows){
+      const ex=(rows&&rows[0])?(rows[0].skor|0):-1;
+      if(skor<=ex)return; /* sudah ada skor sama/lebih tinggi — jangan dobel */
+      const ctl=new AbortController(); const to=setTimeout(function(){try{ctl.abort()}catch(e){}},8000);
+      fetch(SUPA_URL+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:game,nama:nama,skor:skor}),signal:ctl.signal})
+      .then(function(){clearTimeout(to)}).catch(function(){clearTimeout(to)});
+    }).catch(function(){});
+  }catch(e){}
+}
 let last=performance.now();
+/* mode ringan adaptif: bila bingkai rata-rata berat (HP panas/berat), hiasan non-esensial dimatikan sementara */
+let _msAvg=16;
+let lowFx=false; try{lowFx=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+document.addEventListener('visibilitychange',function(){ if(!document.hidden){ last=performance.now(); requestAnimationFrame(loop);} });
 function loop(now){
+  if(document.hidden)return; /* hemat daya: tab tidak terlihat = berhenti */
+  const rawMs=now-last; _msAvg=_msAvg*0.94+Math.min(rawMs,120)*0.06;
+  if(!lowFx&&_msAvg>26)lowFx=true; else if(lowFx&&_msAvg<17)lowFx=false;
   const dt=Math.min(2,(now-last)/16.67); last=now; tick+=dt;
   drawBg();
 
