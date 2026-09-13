@@ -50,6 +50,8 @@
   ol.ranks .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   ol.ranks b{font-variant-numeric:tabular-nums}
   ol.ranks .tgl{font-size:11px;color:var(--ink2)}
+  .badge-rek{display:inline-block;margin-left:6px;background:linear-gradient(135deg,#ffce4a,#ff9a3c);color:#3a2a00;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;letter-spacing:.4px;vertical-align:middle;animation:rekPulse 1.6s ease-in-out infinite}
+  @keyframes rekPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
   footer{max-width:640px;margin:0 auto;padding:0 18px 40px;font-size:12.5px;color:var(--ink2)}
   footer a{color:var(--ink2)}
 </style>
@@ -115,8 +117,18 @@
       (rows||[]).forEach(function(x){var k=(x.nama||'').trim().toLowerCase(); if(k&&!seen[k]){seen[k]=1;uniq.push(x)}});
       rows=uniq.slice(0,10);
       if(!rows.length){elm.innerHTML='<li class="kosong">Belum ada yang tercatat — jadilah yang pertama.</li>';return}
+      /* lencana REKOR BARU: teratas melampaui rekor yang terakhir dilihat perangkat ini, atau baru masuk <24 jam */
+      var topSkor=rows[0].skor|0, rekBaru=false;
+      try{
+        var kunci='reichas_top_'+game;
+        var sebelum=parseInt(localStorage.getItem(kunci)||'-1',10);
+        if(sebelum>=0 && topSkor>sebelum) rekBaru=true;
+        localStorage.setItem(kunci,String(topSkor));
+      }catch(e){}
+      var segar=false; try{ segar=(Date.now()-new Date(rows[0].created_at).getTime())<24*3600*1000; }catch(e){}
+      var tag=(rekBaru||segar)?'<span class="badge-rek">🔥 REKOR BARU</span>':'';
       elm.innerHTML=rows.map(function(x,i){
-        return '<li><span class="no">'+(i+1)+'</span><span class="nm">'+esc(x.nama)+'</span><span class="tgl">'+tgl(x.created_at)+'</span><b>'+esc(x.skor)+'</b></li>'
+        return '<li><span class="no">'+(i+1)+'</span><span class="nm">'+esc(x.nama)+(i===0?tag:'')+'</span><span class="tgl">'+tgl(x.created_at)+'</span><b>'+esc(x.skor)+'</b></li>'
       }).join('');
     })
     .catch(function(){elm.innerHTML='<li class="kosong">Papan rekor bersama butuh jaringan.</li>'});

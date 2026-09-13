@@ -19,9 +19,9 @@
     background:rgba(0,0,0,.38); color:#fff; text-decoration:none; font-size:12px; font-weight:700;
     padding:9px 13px; border-radius:999px; border:1px solid rgba(255,255,255,.25); backdrop-filter:blur(6px); min-height:36px; }
   #hud{ position:absolute; top:14px; left:0; right:0; z-index:4; pointer-events:none;
-    color:#fff; font-weight:800; font-size:15px; letter-spacing:.04em; display:flex; justify-content:center; gap:14px; }
-  #hud span{ background:rgba(0,0,0,.35); padding:6px 12px; border-radius:999px; font-variant-numeric:tabular-nums; }
-  #stage{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:64px 22px 26px; }
+    color:#fff; font-weight:800; font-size:14px; letter-spacing:.04em; display:flex; justify-content:center; gap:10px; }
+  #hud span{ background:rgba(0,0,0,.35); padding:6px 11px; border-radius:999px; font-variant-numeric:tabular-nums; }
+  #stage{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:64px 22px 26px; }
   #board{ position:relative; width:min(88vw,380px); aspect-ratio:1/1; border-radius:16px; overflow:hidden;
     background:#000; box-shadow:0 14px 34px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.08); }
   .tile{ position:absolute; width:25%; height:25%; padding:2px; transition:transform .18s cubic-bezier(.34,1.4,.64,1); cursor:pointer; }
@@ -33,15 +33,24 @@
   #board.solved .tile .in{ border-radius:0; box-shadow:none; }
   #board.solved{ animation:pzPop .6s ease; box-shadow:0 0 0 4px #8cc6a4, 0 18px 44px rgba(0,0,0,.5); }
   @keyframes pzPop{ 0%{transform:scale(1)} 40%{transform:scale(1.045)} 100%{transform:scale(1)} }
-  #winBadge{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:5; pointer-events:none;
+  #winBadge{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:8; pointer-events:none;
     background:rgba(14,22,18,.92); color:#fff; border:2px solid #8cc6a4; font-weight:800; font-size:19px;
     padding:14px 24px; border-radius:16px; opacity:0; transition:opacity .25s ease; text-align:center;
     box-shadow:0 12px 34px rgba(0,0,0,.5); }
   #winBadge.on{ opacity:1; }
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .chip{ background:rgba(255,255,255,.08); color:rgba(255,255,255,.85); border:1px solid rgba(255,255,255,.25);
+    border-radius:999px; padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer; min-height:40px; }
+  .chip.on{ background:var(--gold); color:#3a2a00; border-color:var(--gold); }
+  #peekBtn{ background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.3);
+    font-weight:700; font-size:13.5px; padding:11px 20px; border-radius:12px; cursor:pointer; min-height:44px; touch-action:none; }
+  #peekView{ position:absolute; inset:0; z-index:7; display:none;
+    background:rgba(10,14,11,.94) url('logo-puzzle.webp') center/88% no-repeat; }
+  #peekView.on{ display:block; }
   .hint{ color:rgba(255,255,255,.75); font-size:13px; text-align:center; max-width:320px; line-height:1.5; }
   .overlay{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding:28px; gap:14px; z-index:8;
-    background:radial-gradient(120% 90% at 50% 12%, rgba(255,255,255,.10), rgba(10,14,11,.87)); backdrop-filter:blur(2px); }
+    text-align:center; padding:28px; gap:14px; z-index:9;
+    background:radial-gradient(120% 90% at 50% 12%, rgba(255,255,255,.10), rgba(10,14,11,.88)); backdrop-filter:blur(2px); }
   .hidden{ display:none !important; }
   .title{ color:#fff; font-weight:800; letter-spacing:1px; font-size:30px; line-height:1.05; text-shadow:0 3px 12px rgba(0,0,0,.5); }
   .title span{ color:var(--gold); }
@@ -62,12 +71,15 @@
   <div id="stage">
     <div id="board"></div>
     <div class="hint">Ketuk dua potongan untuk menukar posisinya.<br />Ketuk potongan yang sedang terpilih sekali lagi untuk <b>memutarnya</b> 90&deg;.</div>
+    <button id="peekBtn" type="button">👁 Tahan untuk mengintip · +4 dtk</button>
   </div>
   <div id="winBadge">&#10003; Susunan benar!<br /><span style="font-size:13px;font-weight:600;opacity:.85">Logo utuh kembali</span></div>
+  <div id="peekView"></div>
 
   <div class="overlay" id="startScreen">
     <div class="title">SUSUN<span> LOGO</span></div>
-    <div class="sub">Logo RCS.CBS HOPE terpotong jadi 16 bagian — dan beberapa potongan terputar. Tukar posisi &amp; putar sampai utuh. <b>Poin ditentukan seberapa cepat kamu menyusunnya.</b></div>
+    <div class="sub">Logo RCS.CBS HOPE tercecer di tengah alam — potongannya tertukar dan terputar. Tukar &amp; putar sampai utuh. <b>Makin cepat, makin besar poinnya.</b></div>
+    <div class="chips" id="chips"><button class="chip" data-n="3" type="button">Mudah 3×3</button><button class="chip on" data-n="4" type="button">Normal 4×4</button><button class="chip" data-n="5" type="button">Sulit 5×5</button></div>
     <div style="width:100%;max-width:260px"><input id="playerName" type="text" maxlength="24" placeholder="Nama pemain untuk Papan Rekor" autocomplete="off"
       style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.35);color:#fff;font-size:15px;text-align:center" /></div>
     <button class="btn" id="startBtn">MULAI MENYUSUN</button>
@@ -79,6 +91,7 @@
     <div class="big" id="winPts">0</div>
     <div class="scoreline" id="winStat"></div>
     <div class="record" id="winRecord"></div>
+    <div class="sub" id="winPhrase" style="font-size:14px"></div>
     <button class="btn" id="againBtn">MAIN LAGI</button>
   </div>
 </div>
@@ -93,16 +106,31 @@
 
   function el(id){return document.getElementById(id)}
   function fmt(s){return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2)}
+  function getar(ms){try{if(navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
+
+  function setN(n){ N=n; SIZE=N*N; build(); }
 
   function build(){
     board.innerHTML=''; divs=[];
     for(var i=0;i<SIZE;i++){
       var d=document.createElement('div'); d.className='tile';
+      d.style.width=(100/N)+'%'; d.style.height=(100/N)+'%';
       var inn=document.createElement('div'); inn.className='in';
+      inn.style.backgroundSize=(N*100)+'% '+(N*100)+'%';
       inn.style.backgroundPosition=((i%N)/(N-1)*100)+'% '+(Math.floor(i/N)/(N-1)*100)+'%';
       d.appendChild(inn); board.appendChild(d); divs[i]=d;
       (function(idx){ d.addEventListener('click',function(){ tap(idx); }); })(i);
     }
+    reset();
+  }
+
+  function reset(){
+    cell=[]; rot=[];
+    for(var i=0;i<SIZE;i++){ cell[i]=i; rot[i]=0; }
+    moves=0; secs=0; sel=-1; playing=false;
+    stopTimer(); el('moves').textContent='0 tukar'; el('time').textContent='0:00';
+    board.classList.remove('solved');
+    place();
   }
 
   function place(){
@@ -126,13 +154,14 @@
   function tap(piece){
     if(!playing) return;
     if(sel===piece){ /* ketuk ulang = putar 90° */
-      rot[piece]=(rot[piece]+1)%4; place(); return;
+      rot[piece]=(rot[piece]+1)%4; tick2(); getar(10); place(); return;
     }
-    if(sel===-1){ sel=piece; divs[piece].classList.add('sel'); return; }
+    if(sel===-1){ sel=piece; divs[piece].classList.add('sel'); getar(8); return; }
     var a=posOf(sel), b=posOf(piece);
     cell[a]=piece; cell[b]=sel;
     divs[sel].classList.remove('sel'); sel=-1;
     moves++; el('moves').textContent=moves+' tukar';
+    tick2(); getar(12);
     place();
     if(solved()) win();
   }
@@ -142,7 +171,7 @@
     for(var i=0;i<SIZE;i++){ cell[i]=i; rot[i]=0; }
     for(var k=SIZE-1;k>0;k--){ var j=(Math.random()*(k+1))|0; var t=cell[k]; cell[k]=cell[j]; cell[j]=t; }
     var idx=[]; for(var m=0;m<SIZE;m++) idx.push(m);
-    for(var r=0;r<5;r++){ var pick=idx.splice((Math.random()*idx.length)|0,1)[0]; rot[pick]=1+((Math.random()*3)|0); }
+    for(var r=0;r<N+1;r++){ var pick=idx.splice((Math.random()*idx.length)|0,1)[0]; rot[pick]=1+((Math.random()*3)|0); }
     if(solved()) return shuffle();
     moves=0; secs=0; sel=-1;
     el('moves').textContent='0 tukar'; el('time').textContent='0:00';
@@ -152,8 +181,8 @@
 
   function startTimer(){ stopTimer(); timer=setInterval(function(){ secs++; el('time').textContent=fmt(secs); },1000); }
   function stopTimer(){ if(timer){clearInterval(timer);timer=null} }
-  /* poin murni kecepatan: 6000 − 30/detik − 8/tukar */
-  function points(){ return Math.max(10, 6000 - secs*30 - moves*8); }
+  /* poin murni kecepatan, dasar menyesuaikan tingkat kesulitan */
+  function points(){ var base=N===3?3000:(N===5?9500:6000); return Math.max(10, base - secs*30 - moves*8); }
 
   /* kirimSkor: anti-dobel — kirim hanya bila skor baru lebih tinggi dari yang tercatat untuk nama ini */
   function kirimSkor(game,nama,skor){
@@ -172,6 +201,9 @@
       }).catch(function(){});
     }catch(e){}
   }
+
+  function tick2(){try{ if(localStorage.getItem('bwk_game_muted')==='1')return; }catch(e){}
+    try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;var ac=new AC();var o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=1150;var t0=ac.currentTime;g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(0.08,t0+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t0+0.07);o.connect(g);g.connect(ac.destination);o.start(t0);o.stop(t0+0.09);setTimeout(function(){try{ac.close()}catch(e){}},250)}catch(e){}}
 
   /* lonceng kecil saat logo utuh — hormati tombol senyap */
   function ding(){
@@ -192,14 +224,17 @@
       setTimeout(function(){try{ac.close()}catch(e){}},900);
     }catch(e){}
   }
+
   function win(){
     playing=false; stopTimer();
     board.classList.add('solved'); place();
     var bd=el('winBadge'); if(bd)bd.classList.add('on');
-    ding();
+    ding(); getar([40,60,40]);
     var pts=points();
     el('winPts').textContent=pts+' poin';
     el('winStat').textContent=fmt(secs)+' \u00b7 '+moves+' tukar';
+    var PH=['Mantap jiwa!','Mata elang!','Logo utuh, hati pun utuh.','Sabar itu kunci!','Pecinta alam sejati!','Tajam juga ingatanmu!'];
+    var ph=el('winPhrase'); if(ph)ph.textContent=PH[(Math.random()*PH.length)|0];
     var best=0; try{best=parseInt(localStorage.getItem(BEST)||'0',10)||0}catch(e){}
     if(pts>best){ try{localStorage.setItem(BEST,String(pts))}catch(e){} el('winRecord').textContent='Rekor baru!'; }
     else el('winRecord').textContent='Terbaik: '+best;
@@ -219,6 +254,17 @@
 
   var best=0; try{best=parseInt(localStorage.getItem(BEST)||'0',10)||0}catch(e){}
   el('bestStart').textContent=best;
+
+  /* tingkat kesulitan */
+  var chips=el('chips');
+  if(chips){chips.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;[].slice.call(chips.children).forEach(function(c){c.classList.remove('on')});b.classList.add('on');setN(+b.dataset.n);getar(12)});}
+
+  /* intip: tahan untuk melihat logo utuh, +4 detik tiap intip */
+  var pk=el('peekBtn'), pv=el('peekView');
+  function peekOn(e){ if(e&&e.preventDefault)e.preventDefault(); if(!playing)return; pv.classList.add('on'); secs+=4; el('time').textContent=fmt(secs); getar(25); }
+  function peekOff(){ pv.classList.remove('on'); }
+  if(pk&&pv){ pk.addEventListener('pointerdown',peekOn); pk.addEventListener('pointerup',peekOff); pk.addEventListener('pointerleave',peekOff); }
+
   build();
 })();
 </script>

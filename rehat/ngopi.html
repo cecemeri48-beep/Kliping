@@ -15,6 +15,7 @@
     box-shadow:0 20px 60px rgba(0,0,0,.5); overflow:hidden; background:#000; }
   @media(min-width:460px){ #wrap{ border-radius:18px; height:96vh; } }
   canvas{ display:block; width:100%; height:100%; touch-action:none; }
+  #flash{ position:absolute; inset:0; background:rgba(214,48,49,.3); opacity:0; pointer-events:none; z-index:5; transition:opacity .35s ease; }
 
   .overlay{ position:absolute; inset:0; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center; padding:28px; gap:14px; z-index:5;
@@ -54,6 +55,7 @@
 </head>
 <body>
 <div id="wrap">
+  <div id="flash"></div>
   <a href="./" aria-label="Kembali ke Rehat Sejenak" style="position:absolute;top:10px;left:10px;z-index:6;display:inline-flex;align-items:center;background:rgba(0,0,0,.38);color:#fff;text-decoration:none;font-size:12px;font-weight:700;padding:9px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(6px);min-height:36px">&#8592; Rehat</a>
   <canvas id="game"></canvas>
   <div id="hud"><div class="score" id="hudScore">0</div><div class="lives" id="hudLives"></div></div>
@@ -91,6 +93,8 @@ const LOGO_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt
 document.getElementById('logoImg').src = LOGO_SRC;
 document.getElementById('logoImg2').src = LOGO_SRC;
 
+function getar(ms){try{if(navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
+function flashRed(){try{var f=document.getElementById('flash');if(!f)return;f.style.opacity='1';setTimeout(function(){f.style.opacity='0'},90)}catch(e){}}
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const W = 440, H = 760;
@@ -114,7 +118,8 @@ const TYPES=[
   {k:'rock', em:'🪨', pts:0, good:false, w:32},
 ];
 
-function reset(){ score=0; lives=3; items.length=0; floats.length=0; timer=0; spawnEvery=52; tick=0; cup.x=W/2; updateHud(); }
+let combo=0;
+function reset(){ score=0; lives=3; combo=0; items.length=0; floats.length=0; timer=0; spawnEvery=52; tick=0; cup.x=W/2; updateHud(); }
 function updateHud(){ document.getElementById('hudScore').textContent=score;
   document.getElementById('hudLives').textContent='❤️'.repeat(Math.max(0,lives)); }
 
@@ -136,7 +141,8 @@ function endGame(){try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAu
   const nr=score>best; if(nr){ best=score; localStorage.setItem('reichas_ngopi_best',String(best));try{var _h=JSON.parse(localStorage.getItem('reichas_hist_ngopi')||'[]');_h.unshift({s:score,t:Date.now()});localStorage.setItem('reichas_hist_ngopi',JSON.stringify(_h.slice(0,10)))}catch(e){};try{var _n=(localStorage.getItem('reichas_player_name')||'').trim();if(_n&&(score|0)>0){kirimSkor('ngopi',_n,Math.max(0,Math.floor(score)||0))}}catch(e){}; }
   document.getElementById('finalScore').textContent=score;
   document.getElementById('bestScore').textContent=best;
-  document.getElementById('recordMsg').textContent= nr?'🏆 REKOR BARU!':'Mantap, lanjutkan!';
+  var SENYUM=['Kopi tumpah dikit, wajar.','Tanganmu mulai panas!','Barista pun pernah jatuh.','Seduhan berikutnya pasti lebih pas.','Cafe tutup, coba lagi besok?'];
+  document.getElementById('recordMsg').textContent= nr?'🏆 REKOR BARU!':SENYUM[(Math.random()*SENYUM.length)|0];
   document.getElementById('overScreen').classList.remove('hidden'); }
 
 // input: pointer + keyboard
@@ -303,13 +309,14 @@ function loop(now){
 
     timer+=dt;
     if(timer>=spawnEvery){ timer=0; spawn(); if(spawnEvery>24) spawnEvery-=0.4; }
+    if(score>=25&&Math.random()<0.22)spawn(); /* gelombang ganda sesekali di skor tinggi */
 
     for(let i=items.length-1;i>=0;i--){
       const it=items[i]; it.y+=it.vy*dt; it.rot+=it.vr*dt;
       // catch check
       if(it.y > cup.y-cup.h/2 && it.y < cup.y+cup.h/2 && Math.abs(it.x-cup.x) < cup.w/2){
-        if(it.t.good){ score+=it.t.pts; addFloat('+'+it.t.pts, it.x, it.y, it.t.isLogo?'#b8860b':'#2f7346'); try{if(window.BWKAudio)window.BWKAudio.playPoint();}catch(e){} }
-        else { lives--; addFloat('-1', it.x, it.y, '#c0392b'); if(lives<=0) endGame(); }
+        if(it.t.good){ score+=it.t.pts; combo++; addFloat('+'+it.t.pts, it.x, it.y, it.t.isLogo?'#b8860b':'#2f7346'); if(combo>=3)addFloat('\ud83d\udd25x'+combo, it.x, it.y-26, '#e67e22'); if(combo>0&&combo%10===0&&lives<3){ lives++; addFloat('+1 \❤', cup.x, cup.y-44, '#ff6b5d'); } try{if(window.BWKAudio)window.BWKAudio.playPoint();}catch(e){} getar(12); }
+        else { lives--; combo=0; addFloat('-1', it.x, it.y, '#c0392b'); flashRed(); getar(70); if(lives<=0) endGame(); }
         items.splice(i,1); updateHud(); continue;
       }
       if(it.y>H+30){ // missed
