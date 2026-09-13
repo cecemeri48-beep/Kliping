@@ -206,7 +206,21 @@ function flap(){
   if(state==='play'){ bird.vy = FLAP; }
 }
 
+/* v85: TUTUP LOMBA sementara — 20 Sep 2026 22:00 WITA s.d. 21 Sep 2026 06:00 WITA.
+   Lewat jam buka, gim bisa dimainkan lagi untuk seru-seruan (skor tidak lagi
+   dicatat di papan lomba). Penjaga sebenarnya ada di server (rehat-tutup-lomba-v85.sql). */
+var TUTUP_LOMBA=new Date('2026-09-20T22:00:00+08:00').getTime();
+var BUKA_LAGI=new Date('2026-09-21T06:00:00+08:00').getTime();   /* ganti bila jam buka berbeda */
+function lombaTutup(){ var t=Date.now(); return t>=TUTUP_LOMBA && t<BUKA_LAGI }
+function tampilTutup(){
+  var b=document.getElementById('startBtn');
+  if(b){ b.disabled=true; b.textContent='DIBUKA LAGI 21 SEP 06.00 WITA'; b.style.filter='grayscale(.55) brightness(.85)'; b.style.cursor='not-allowed'; }
+  var t=document.querySelector('#startScreen .title'); if(t) t.innerHTML='ISTIRAHAT <span>SEBENTAR</span>';
+  var sb=document.querySelector('#startScreen .sub'); if(sb) sb.innerHTML='Lomba ditutup pada <b>20 Sep 2026, 22.00 WITA</b> untuk pengumuman pemenang. Gim dibuka lagi <b>21 Sep 2026, 06.00 WITA</b> — sampai jumpa!';
+}
+if(lombaTutup()) tampilTutup();
 function startGame(){
+  if(lombaTutup()){ tampilTutup(); return; }
   reset(); state='play'; _tMulai=performance.now(); _mainMs=0; _segel=null; mulaiRonde();
   try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playStart();}}catch(e){}
   document.getElementById('startScreen').classList.add('hidden');

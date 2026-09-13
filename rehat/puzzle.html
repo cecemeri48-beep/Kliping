@@ -13,21 +13,34 @@
     display:flex; align-items:center; justify-content:center; min-height:100vh; overflow:hidden; }
   #wrap{ position:relative; width:100%; max-width:440px; height:100vh; max-height:760px;
     box-shadow:0 20px 60px rgba(0,0,0,.5); overflow:hidden;
-    background:linear-gradient(170deg,#232a25,#141a17 60%); }
+    background:
+      radial-gradient(120% 60% at 50% -8%, rgba(255,206,74,.14), rgba(255,206,74,0) 55%),
+      radial-gradient(150% 90% at 50% 112%, rgba(46,125,79,.30), rgba(46,125,79,0) 60%),
+      linear-gradient(168deg,#1e2a23,#101711 58%,#0a0f0c); }
   @media(min-width:460px){ #wrap{ border-radius:18px; height:96vh; } }
   .back{ position:absolute; top:10px; left:10px; z-index:6; display:inline-flex; align-items:center;
     background:rgba(0,0,0,.38); color:#fff; text-decoration:none; font-size:12px; font-weight:700;
     padding:9px 13px; border-radius:999px; border:1px solid rgba(255,255,255,.25); backdrop-filter:blur(6px); min-height:36px; }
   #hud{ position:absolute; top:14px; left:0; right:0; z-index:4; pointer-events:none;
     color:#fff; font-weight:800; font-size:14px; letter-spacing:.04em; display:flex; justify-content:center; gap:10px; }
-  #hud span{ background:rgba(0,0,0,.35); padding:6px 11px; border-radius:999px; font-variant-numeric:tabular-nums; }
-  #stage{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:64px 22px 26px; }
+  #hud span{ background:rgba(8,12,10,.55); border:1px solid rgba(255,255,255,.14); box-shadow:0 4px 14px rgba(0,0,0,.35);
+    padding:6px 11px; border-radius:999px; font-variant-numeric:tabular-nums; }
+  #poinWrap{ display:flex; align-items:baseline; gap:9px; line-height:1; margin-bottom:-2px; }
+  #poinWrap #poin{ font-size:30px; font-weight:800; font-variant-numeric:tabular-nums;
+    background:linear-gradient(180deg,#ffe08a,#f0b93c); -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 16px rgba(255,206,74,.35)); }
+  #poinWrap small{ font-size:11px; font-weight:800; letter-spacing:.22em; color:rgba(255,255,255,.55); }
+  #stage{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:60px 22px 24px; }
   #board{ position:relative; width:min(88vw,380px); aspect-ratio:1/1; border-radius:16px; overflow:hidden;
-    background:#000; box-shadow:0 14px 34px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.08); }
+    background:#0a0d0b;
+    box-shadow:0 24px 54px rgba(0,0,0,.6), 0 0 74px rgba(255,206,74,.08),
+      inset 0 0 0 1px rgba(255,255,255,.09), inset 0 2px 18px rgba(0,0,0,.55); }
   .tile{ position:absolute; width:25%; height:25%; padding:2px; transition:transform .18s cubic-bezier(.34,1.4,.64,1); cursor:pointer; }
   .tile .in{ width:100%; height:100%; background-image:url('logo-puzzle.webp'); background-size:400% 400%;
-    border-radius:7px; box-shadow:0 2px 8px rgba(0,0,0,.4); transition:transform .18s ease, box-shadow .18s ease; }
-  .tile.sel .in{ box-shadow:0 0 0 3px var(--gold),0 4px 16px rgba(0,0,0,.55); }
+    border-radius:9px; box-shadow:0 3px 10px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.16);
+    transition:transform .18s ease, box-shadow .18s ease, filter .12s ease; }
+  .tile:active .in{ filter:brightness(1.22); }
+  .tile.sel .in{ box-shadow:0 0 0 3px var(--gold), 0 0 22px rgba(255,206,74,.55), 0 6px 18px rgba(0,0,0,.55); }
   .tile.done .in{ box-shadow:0 0 0 2px rgba(140,198,164,.75); }
   #board.solved .tile{ padding:0; }
   #board.solved .tile .in{ border-radius:0; box-shadow:none; }
@@ -62,11 +75,8 @@
     transition:opacity .18s ease, transform .42s cubic-bezier(.2,1.7,.4,1); }
   #winBadge.on{ opacity:1; transform:translate(-50%,-50%) scale(1) rotate(-3deg); }
   #progWrap{ width:min(88vw,380px); height:8px; background:rgba(255,255,255,.12); border-radius:99px; overflow:hidden; }
-  #progBar{ height:100%; width:0%; background:linear-gradient(90deg,#2E7D4F,#8cc6a4); border-radius:99px; transition:width .25s ease; }
-  .chips{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-  .chip{ background:rgba(255,255,255,.08); color:rgba(255,255,255,.85); border:1px solid rgba(255,255,255,.25);
-    border-radius:999px; padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer; min-height:40px; }
-  .chip.on{ background:var(--gold); color:#3a2a00; border-color:var(--gold); }
+  #progBar{ height:100%; width:0%; background:linear-gradient(90deg,#2E7D4F,#8cc6a4,#ffce4a); border-radius:99px; transition:width .25s ease; box-shadow:0 0 12px rgba(140,198,164,.5); }
+
   #peekBtn{ background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.3);
     font-weight:700; font-size:13.5px; padding:11px 20px; border-radius:12px; cursor:pointer; min-height:44px;
     user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
@@ -75,16 +85,25 @@
     background:rgba(10,14,11,.94) url('logo-puzzle.webp') center/88% no-repeat; }
   #peekView.on{ display:block; }
   .hint{ color:rgba(255,255,255,.75); font-size:13px; text-align:center; max-width:320px; line-height:1.5; }
+  .par{ color:rgba(255,255,255,.62); font-size:12px; font-weight:600; letter-spacing:.02em; text-align:center; max-width:340px; line-height:1.5; margin-top:-4px; }
+  .par b{ color:var(--gold); }
+  .rules{ color:rgba(255,255,255,.74); font-size:12.5px; font-weight:600; background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:9px 13px; max-width:330px; line-height:1.65; }
+  .rules b{ color:var(--gold); }
   .overlay{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:28px; gap:14px; z-index:9;
     background:radial-gradient(120% 90% at 50% 12%, rgba(255,255,255,.10), rgba(10,14,11,.88)); backdrop-filter:blur(2px); }
   .hidden{ display:none !important; }
-  .title{ color:#fff; font-weight:800; letter-spacing:1px; font-size:30px; line-height:1.05; text-shadow:0 3px 12px rgba(0,0,0,.5); }
-  .title span{ color:var(--gold); }
+  .title{ font-weight:800; letter-spacing:1px; font-size:30px; line-height:1.05; filter:drop-shadow(0 3px 12px rgba(0,0,0,.5));
+    background:linear-gradient(180deg,#ffffff 30%,#cfe3d6); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .title span{ background:linear-gradient(180deg,#ffe08a,#f0b93c);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
   .sub{ color:rgba(255,255,255,.92); font-size:15px; font-weight:600; max-width:320px; line-height:1.55; }
   .btn{ margin-top:6px; background:var(--gold); color:#3a2a00; border:none; cursor:pointer;
     font-weight:800; font-size:17px; padding:14px 34px; border-radius:14px;
-    box-shadow:0 8px 22px rgba(0,0,0,.4); transition:transform .08s ease, filter .15s ease; min-height:48px; }
+    background:linear-gradient(180deg,#ffe08a 0%,#ffce4a 55%,#f2b73a 100%);
+    box-shadow:0 10px 26px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.55);
+    transition:transform .08s ease, filter .15s ease; min-height:48px; }
   .btn:active{ transform:translateY(2px) scale(.98); }
   .scoreline{ color:#fff; font-size:15px; font-weight:700; }
   .big{ font-size:46px; font-weight:800; color:#fff; font-variant-numeric:tabular-nums;
@@ -156,13 +175,32 @@
     localStorage.setItem(S,V);
   }catch(e){}
 })();
+/* RESET SEKALI (v84): SUSUN tanpa tingkat — rekor, riwayat, dan penanda papan
+   SUSUN per tingkat (3x3/4x4/5x5) tidak relevan lagi; dibersihkan dari perangkat. */
+(function(){
+  try{
+    var S2='reichas_musim_puzzle', V2='v84';
+    if(localStorage.getItem(S2)===V2) return;
+    var buang2=['reichas_puzzle_best','reichas_puzzle_best_c','reichas_hist_puzzle'];
+    for(var i2=0;i2<buang2.length;i2++){ try{ localStorage.removeItem(buang2[i2]) }catch(e){} }
+    var sisa2=[];
+    for(var j2=0;j2<localStorage.length;j2++){
+      var k2=localStorage.key(j2);
+      if(k2 && k2.indexOf('reichas_top_puzzle')===0) sisa2.push(k2);
+    }
+    for(var m2=0;m2<sisa2.length;m2++){ try{ localStorage.removeItem(sisa2[m2]) }catch(e){} }
+    localStorage.setItem(S2,V2);
+  }catch(e){}
+})();
 </script>
 <div id="wrap">
   <a href="./" class="back">&#8592; Rehat</a>
-  <div id="hud"><span id="time">0:00</span><span id="tepat">0/16 tepat</span><span id="moves">0 tukar</span></div>
+  <div id="hud"><span id="time">0:00</span><span id="tepat">0/16 tepat</span><span id="moves">0 tukar · 0 putar</span></div>
   <div id="stage">
+    <div id="poinWrap"><span id="poin">6.000</span><small>POIN</small></div>
     <div id="board"></div>
     <div id="progWrap"><div id="progBar"></div></div>
+    <div class="par" id="par"></div>
     <div class="hint">Ketuk dua potongan untuk menukar posisinya.<br />Ketuk potongan yang sedang terpilih sekali lagi untuk <b>memutarnya</b> 90&deg;.</div>
     <button id="peekBtn" type="button">👁 Intip logo utuh (1,5 dtk) · +4 dtk</button>
   </div>
@@ -172,8 +210,9 @@
 
   <div class="overlay" id="startScreen">
     <div class="title">SUSUN<span> LOGO</span></div>
-    <div class="sub">Logo RCS.CBS HOPE tercecer di tengah alam — potongannya tertukar dan terputar. Tukar &amp; putar sampai utuh. <b>Makin cepat, makin besar poinnya.</b></div>
-    <div class="chips" id="chips"><button class="chip" data-n="3" type="button">Mudah 3×3</button><button class="chip on" data-n="4" type="button">Normal 4×4</button><button class="chip" data-n="5" type="button">Sulit 5×5</button></div>
+    <div class="sub">Logo RCS.CBS HOPE tercecer di tengah alam — <b>16 potongannya</b> tertukar dan terputar. Tukar &amp; putar sampai utuh kembali.</div>
+    <div class="rules">Poin penuh <b>6.000</b> · mencair <b>30/detik</b> · tukar <b>−8</b> · putar <b>−4</b> · intip <b>+4 dtk</b><br />Tiap acakan punya <b>batas minimal</b> tukar &amp; putar — makin hemat aksimu, makin besar poinnya.</div>
+    
     <div style="width:100%;max-width:260px"><input id="playerName" type="text" maxlength="24" placeholder="Nama pemain untuk Papan Rekor" autocomplete="off"
       style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.35);color:#fff;font-size:15px;text-align:center" /></div>
     <button class="btn" id="startBtn">MULAI MENYUSUN</button>
@@ -194,7 +233,7 @@
 (function(){
   var N=4, SIZE=N*N;
   var cell=[], rot=[], divs=[], sel=-1, moves=0, secs=0, timer=null, playing=false, won=false;
-  var putar=0, ronde=0, segel=null, awalCell=[], awalRot=[];
+  var putar=0, ronde=0, segel=null, awalCell=[], awalRot=[], _tepatLalu=0;
   var board=document.getElementById('board');
   var SUPA='https://nfeexstvdjgywonbtxtb.supabase.co';
   var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E';
@@ -202,9 +241,9 @@
 
   function el(id){return document.getElementById(id)}
   function fmt(s){return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2)}
+  function fmtPoin(v){ v=Math.max(0,Math.round(v)); var x=String(v), o=''; while(x.length>3){ o='.'+x.slice(-3)+o; x=x.slice(0,-3) } return x+o }
   function getar(ms){try{if(navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
 
-  function setN(n){ N=n; SIZE=N*N; build(); }
 
   function build(){
     board.innerHTML=''; divs=[];
@@ -225,7 +264,8 @@
     cell=[]; rot=[];
     for(var i=0;i<SIZE;i++){ cell[i]=i; rot[i]=0; }
     moves=0; secs=0; sel=-1; playing=false; won=false;
-    stopTimer(); el('moves').textContent='0 tukar'; el('time').textContent='0:00';
+    stopTimer(); el('moves').textContent='0 tukar · 0 putar'; el('time').textContent='0:00';
+    var pd0=el('par'); if(pd0)pd0.textContent='';
     board.classList.remove('solved');
     fxStop();
     place();
@@ -245,6 +285,9 @@
     var tampil=(playing||won)?tepat:0;
     var tp=el('tepat'); if(tp)tp.textContent=tampil+'/'+SIZE+' tepat';
     var pb=el('progBar'); if(pb)pb.style.width=(tampil/SIZE*100)+'%';
+    /* v84: bunyi 'kunci' tiap jumlah potongan tepat bertambah; nada makin tinggi */
+    if(playing && !won && tepat>_tepatLalu){ try{ pling(620+Math.min(10,tepat)*30) }catch(e){} }
+    _tepatLalu=tepat;
   }
   function posOf(piece){ return cell.indexOf(piece); }
   function solved(){
@@ -256,14 +299,14 @@
     if(!playing || won) return;
     if(jedaSejak){ lanjut(); return; } /* baru kembali dari layar lain: lanjutkan dulu */
     if(sel===piece){ /* ketuk ulang = putar 90° */
-      rot[piece]=(rot[piece]+1)%4; putar++; tick2(); getar(10); place();
+      rot[piece]=(rot[piece]+1)%4; putar++; el('moves').textContent=moves+' tukar · '+putar+' putar'; tick2(); getar(10); place();
       cekSelesai(); return;
     }
     if(sel===-1){ sel=piece; divs[piece].classList.add('sel'); getar(8); return; }
     var a=posOf(sel), b=posOf(piece);
     cell[a]=piece; cell[b]=sel;
     divs[sel].classList.remove('sel'); sel=-1;
-    moves++; el('moves').textContent=moves+' tukar';
+    moves++; el('moves').textContent=moves+' tukar · '+putar+' putar';
     tick2(); getar(12);
     place();
     cekSelesai();
@@ -291,7 +334,10 @@
     moves=0; putar=0; secs=0; sel=-1; won=false;
     awalCell=cell.slice(); awalRot=rot.slice(); /* kondisi awal, dipakai memeriksa keabsahan skor */
     ronde++; segel=null;
-    el('moves').textContent='0 tukar'; el('time').textContent='0:00';
+    el('moves').textContent='0 tukar · 0 putar'; el('time').textContent='0:00';
+    /* v84: tampilkan 'par' — batas minimal acakan ini, seperti golf */
+    var pd=el('par'); if(pd){ var m0=minAksi(awalCell,awalRot);
+      pd.innerHTML='Batas minimal acakan ini: <b>'+m0.tukar+' tukar · '+m0.putar+' putar</b>'; }
     board.classList.remove('solved');
     fxStop();
     place();
@@ -308,7 +354,10 @@
     var akhir=(jedaSejak||nowMs());
     return Math.max(0, Math.floor((akhir-mulaiMs-jedaMs)/1000)) + denda;
   }
-  function segarkanWaktu(){ secs=secsNow(); var t=el('time'); if(t)t.textContent=fmt(secs); return secs; }
+  function segarkanWaktu(){ secs=secsNow(); var t=el('time'); if(t)t.textContent=fmt(secs);
+    /* v84: poin LANGSUNG terlihat mencair — inilah jantung ketegangannya */
+    var pk=el('poin'); if(pk)pk.textContent=fmtPoin((playing||won)?points():basisPoin());
+    return secs; }
   function startTimer(){ stopTimer(); mulaiMs=nowMs(); jedaMs=0; jedaSejak=0; denda=0; secs=0;
     el('time').textContent='0:00'; timer=setInterval(segarkanWaktu,250); }
   function stopTimer(){ if(timer){ clearInterval(timer); timer=null } }
@@ -330,7 +379,7 @@
   try{var _bk=document.querySelector('.back'); if(_bk)_bk.addEventListener('click',keluarGame);}catch(e){}
 
   /* poin murni kecepatan, dasar menyesuaikan tingkat kesulitan */
-  function basisPoin(){ return N===3?3000:(N===5?9500:6000) }
+  function basisPoin(){ return 6000 }   /* v84: satu tingkat saja — 16 potongan */
   /* BUG SPORTIFITAS: dulu putaran tidak dikenai biaya sama sekali di sisi pemain,
      padahal server memotong 8 poin untuk SETIAP langkah (tukar + putar) yang dikirim.
      Akibatnya angka di layar kemenangan selalu lebih besar daripada yang tercatat di
@@ -412,7 +461,7 @@
     if(!n) n=Date.now().toString(36)+Math.random().toString(36).slice(2,10);
     if(rondeNonce) n=rondeNonce;   /* pakai nonce yang sudah terdaftar di jam server */
     return { ronde:ronde, poin:v.poin, waktu:v.waktu, tukar:v.tukar, putar:v.putar,
-             level:N+'x'+N, nonce:n, dipakai:false };
+             level:''   /* v84: tingkat dihapus — satu papan untuk semua */, nonce:n, dipakai:false };
   }
 
   /* ===== GERBANG KIRIM SKOR =====
@@ -633,7 +682,7 @@
     setTimeout(function(){ if(bd)bd.classList.add('on') },240);
     ding(); getar([40,60,40]);
     var pts=v?v.poin:0;
-    el('winStat').textContent=fmt(secs)+' \u00b7 '+moves+' tukar';
+    el('winStat').textContent=fmt(secs)+' \u00b7 '+moves+' tukar \u00b7 '+putar+' putar';
     var PH=['Mantap jiwa!','Mata elang!','Logo utuh, hati pun utuh.','Sabar itu kunci!','Pecinta alam sejati!','Tajam juga ingatanmu!'];
     var ph=el('winPhrase'); if(ph)ph.textContent=PH[(Math.random()*PH.length)|0];
     var best=bacaBest();
@@ -666,7 +715,21 @@
     },1250);
   }
 
+    /* v85: TUTUP LOMBA sementara — 20 Sep 2026 22:00 WITA s.d. 21 Sep 2026 06:00 WITA.
+     Lewat jam buka, gim bisa dimainkan lagi untuk seru-seruan (skor tidak lagi
+     dicatat di papan lomba). Penjaga sebenarnya ada di server (rehat-tutup-lomba-v85.sql). */
+  var TUTUP_LOMBA=new Date('2026-09-20T22:00:00+08:00').getTime();
+  var BUKA_LAGI=new Date('2026-09-21T06:00:00+08:00').getTime();   /* ganti bila jam buka berbeda */
+  function lombaTutup(){ var t=Date.now(); return t>=TUTUP_LOMBA && t<BUKA_LAGI }
+  function tampilTutup(){
+    var b=document.getElementById('startBtn');
+    if(b){ b.disabled=true; b.textContent='DIBUKA LAGI 21 SEP 06.00 WITA'; b.style.filter='grayscale(.55) brightness(.85)'; b.style.cursor='not-allowed'; }
+    var t=document.querySelector('#startScreen .title'); if(t) t.innerHTML='ISTIRAHAT <span>SEBENTAR</span>';
+    var sb=document.querySelector('#startScreen .sub'); if(sb) sb.innerHTML='Lomba ditutup pada <b>20 Sep 2026, 22.00 WITA</b> untuk pengumuman pemenang. Gim dibuka lagi <b>21 Sep 2026, 06.00 WITA</b> — sampai jumpa!';
+  }
+  if(lombaTutup()) tampilTutup();
   function mulai(){
+    if(lombaTutup()){ tampilTutup(); return; }
     sv(); fxStop(); segel=null; daftarMulai();
     var wb=el('winBadge'); if(wb)wb.classList.remove('on');
     var st=el('stars'); if(st)[].slice.call(st.children).forEach(function(b){ b.classList.remove('on') });
@@ -685,9 +748,6 @@
 
   el('bestStart').textContent=bacaBest();
 
-  /* tingkat kesulitan */
-  var chips=el('chips');
-  if(chips){chips.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;[].slice.call(chips.children).forEach(function(c){c.classList.remove('on')});b.classList.add('on');setN(+b.dataset.n);getar(12)});}
 
   /* intip: maksimal 3 kali per permainan — ketuk untuk melihat logo utuh 1,5 detik, +4 detik tiap intip */
   var pk=el('peekBtn'), pv=el('peekView'), pkT=null, pkSisa=3;
