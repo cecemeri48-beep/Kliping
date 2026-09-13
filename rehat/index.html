@@ -162,7 +162,7 @@
   /* papan rekor bersama */
   var cacheRank={};
   function renderRank(game,elm,lv){
-    var rows=(cacheRank[game]||[]).filter(function(x){return !lv || (x.level||'')===lv}).slice(0,10);
+    var rows=(cacheRank[game]||[]).filter(function(x){return !lv || (x.level||'')===lv}).slice(0,3);
     if(!rows.length){elm.innerHTML='<li class="kosong">Belum ada yang tercatat di tingkat ini.</li>';return}
     /* lencana REKOR BARU: teratas melampaui rekor yang terakhir dilihat perangkat ini, atau baru masuk <24 jam */
     var topSkor=rows[0].skor|0, rekBaru=false;
