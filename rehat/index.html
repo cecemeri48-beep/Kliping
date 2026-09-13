@@ -58,9 +58,42 @@
   .lvl{display:inline-block;margin-left:6px;background:var(--green-s);color:var(--green);font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle}
   footer{max-width:640px;margin:0 auto;padding:0 18px 40px;font-size:12.5px;color:var(--ink2)}
   footer a{color:var(--ink2)}
+  /* HEMAT DAYA DI HP (Android & iOS): backdrop-filter memaksa GPU menyusun ulang
+     seluruh layar tiap bingkai -> panas, gulir tersendat, baterai boros.
+     Di perangkat sentuh blur dimatikan; latar rgba tetap membuat teks terbaca. */
+  @media (hover:none),(prefers-reduced-motion:reduce){
+    *{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+  }
 </style>
 </head>
 <body>
+<script>
+/* ===== TANDING ULANG — PEMBERSIH REKOR LOKAL (MUSIM_V81) =====
+   Papan peringkat di server dikosongkan lewat rehat-reset-skor-v81.sql.
+   Blok ini membereskan sisa rekor & riwayat yang tersimpan di HP tiap pemain,
+   supaya papan dan rekor pribadi benar-benar mulai dari nol. Jalan SEKALI saja
+   per perangkat, lalu menandai dirinya sendiri. Nama pemain sengaja disimpan
+   agar tidak perlu diisi ulang. Harus berada sebelum skrip game membaca rekor. */
+(function(){
+  try{
+    var S='reichas_musim', V='v81';
+    if(localStorage.getItem(S)===V) return;
+    var buang=['reichas_best','reichas_best_c',
+               'reichas_ngopi_best','reichas_ngopi_best_c',
+               'reichas_puzzle_best','reichas_puzzle_best_c',
+               'reichas_hist_flyer','reichas_hist_ngopi','reichas_hist_puzzle'];
+    for(var i=0;i<buang.length;i++){ try{ localStorage.removeItem(buang[i]) }catch(e){} }
+    /* kumpulkan dulu, baru hapus: menghapus sambil menelusuri bisa melewati kunci */
+    var sisa=[];
+    for(var j=0;j<localStorage.length;j++){
+      var k=localStorage.key(j);
+      if(k && k.indexOf('reichas_top_')===0) sisa.push(k);
+    }
+    for(var m=0;m<sisa.length;m++){ try{ localStorage.removeItem(sisa[m]) }catch(e){} }
+    localStorage.setItem(S,V);
+  }catch(e){}
+})();
+</script>
 <header class="top"><div class="top-in"><img src="../logo.png" alt="Logo RCS.CBS" /><b>REHAT SEJENAK</b><a class="kembali" href="../">&#8592; Kliping</a></div></header>
 <main>
   <h1>Rehat Sejenak</h1>
@@ -100,7 +133,21 @@
   try{inp.value=localStorage.getItem(K)||''}catch(e){}
   inp.addEventListener('input',function(){try{localStorage.setItem(K,(inp.value||'').trim().slice(0,24))}catch(e){}});
   /* rekor perangkat */
-  function b(k){try{return parseInt(localStorage.getItem(k)||'0',10)||0}catch(e){return 0}}
+  /* rekor perangkat bersidik (v80): nilai yang diubah manual lewat devtools
+     punya sidik yang tidak cocok, jadi diabaikan (tidak ditampilkan). */
+  function _sd(k,v){
+    var g=(k==='reichas_best')?'flyer':(k==='reichas_ngopi_best'?'ngopi':'susun');
+    var s='rcs|'+g+'|'+v, h=5381;
+    for(var i=0;i<s.length;i++){ h=(((h*33)^s.charCodeAt(i))>>>0) }
+    return h.toString(36);
+  }
+  function b(k){try{
+    var v=parseInt(localStorage.getItem(k)||'0',10)||0;
+    if(v<=0 || v>100000) return 0;
+    var sg=localStorage.getItem(k+'_c');
+    if(sg && sg!==_sd(k,v)) return 0;
+    return v;
+  }catch(e){return 0}}
   function h(k){try{var a=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
   function tgl(t){try{return new Date(t).toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(e){return''}}
   function isi(elm,a){elm.innerHTML=a.length?a.map(function(x){return '<li>'+x.s+'<em>'+tgl(x.t)+'</em></li>'}).join(''):'<li class="kosong">Belum ada skor — mainkan dulu.</li>'}
