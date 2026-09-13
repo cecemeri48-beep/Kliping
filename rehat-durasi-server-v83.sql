@@ -25,8 +25,10 @@
 --                      jeda singkat sampai 3 menit tetap dimaafkan.
 --   3) Rem laju 30 kiriman/10 menit per nama kini dihitung dari SAAT SKOR
 --      DIKIRIM (kolom dipakai_at), bukan dari saat ronde mulai.
---   4) Klien lama (nonce baru dibuat saat kirim) TETAP DITERIMA dengan
---      perilaku lama — tidak ada pemain yang patah aplikasinya.
+--   4) MODE KETAT bawaan: kiriman tanpa jam-mulai server (nonce karangan /
+--      klien versi lama) DITOLAK — kalau tidak, injektor tinggal memakai nonce
+--      karangan dan mengaku durasi sepanjang apa pun. Bila perlu masa transisi
+--      untuk klien lama, ubah v_wajib_mulai di rehat_kirim_skor jadi false.
 -- ============================================================================
 
 -- ---------------------------------------------------------------------------
@@ -177,6 +179,7 @@ declare
   v_mulai  timestamptz;
   v_dur    integer;
   v_waktu  integer;
+  v_wajib_mulai boolean := true;   /* mode ketat: nonce wajib didaftarkan saat ronde mulai */
 begin
   -- ---------- nama ----------
   v_nama := btrim(coalesce(p_nama, ''));
@@ -222,14 +225,20 @@ begin
   -- ---------- nonce sekali-pakai + jangkar jam server (v83) ----------
   -- Nonce yang didaftarkan lewat rehat_mulai_ronde() saat ronde DIMULAI membawa
   -- jam mulai versi server; dikunci di sini supaya tidak bisa dipakai dua kali.
-  -- Nonce tak dikenal = klien lama: dicatat sekarang dan durasi tetap memakai
-  -- laporan klien seperti sediakala.
   update public.rehat_nonce
      set dipakai = true, nama = lower(v_nama), dipakai_at = now()
    where nonce = p_nonce
      and dipakai = false
    returning created_at into v_mulai;
   if not found then
+    -- MODE KETAT: nonce yang tidak didaftarkan saat ronde mulai DITOLAK, baik
+    -- karangan injektor maupun milik klien versi lama. Korbannya hanya pemain
+    -- dengan halaman usang: kehilangan satu kiriman, lalu normal setelah muat
+    -- ulang. Untuk masa transisi, set v_wajib_mulai := false.
+    if v_wajib_mulai then
+      return null;
+    end if;
+    -- mode transisi: klien lama dicatat sekarang, durasi laporan klien dipakai
     begin
       insert into public.rehat_nonce(nonce, game, nama, dipakai, dipakai_at)
       values (p_nonce, p_game, lower(v_nama), true, now());
@@ -365,3 +374,6 @@ select p.proname, p.prosecdef as security_definer
 --
 -- d) Anti replay masih berlaku (panggilan kedua nonce sama -> null):
 --    select public.rehat_kirim_skor('ngopi','UjiCurang',50,'',30,null,'ujicurang0001');
+--
+-- e) Injeksi tanpa jam-mulai server harus DITOLAK (null) selama mode ketat:
+--    select public.rehat_kirim_skor('ngopi','Injektor',93612,'',7200,null,'noncekarangan0001');
