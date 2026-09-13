@@ -1923,15 +1923,6 @@ body{font-feature-settings:"ss01","cv11";-webkit-font-smoothing:antialiased;text
 #klipingSplash .sp-art{width:min(44vw,180px)}
 #klipingSplash .sp-art svg{width:100%;height:auto;display:block}
 #klipingSplash .mpDash{transform-box:fill-box;transform-origin:center;animation:mpSpin 10s linear infinite}
-/* ===== HEMAT DAYA DI PERANGKAT SENTUH (v81) =====
-   backdrop-filter (blur latar) memaksa GPU menyusun ulang seluruh layar tiap bingkai,
-   dan animasi tanpa henti membuat GPU tidak pernah idle -> HP panas, gulir tersendat,
-   baterai cepat habis. Di HP hiasan ini dimatikan; spinner fungsional tetap jalan. */
-@media (hover:none){
-  *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-  .paper-hero,.paper-copy>div:after,.clip-img,.gbr-art,.podcast-wave.on i,
-  .mp-onboard-art .mpDash,#klipingSplash .mpDash{animation:none!important}
-}
 #klipingSplash .sp-brand{margin-top:22px;font-family:Outfit,-apple-system,"Segoe UI",sans-serif;font-weight:800;font-size:16px;letter-spacing:.24em;color:#fff}
 #klipingSplash .sp-sub{margin-top:6px;font-size:11.5px;letter-spacing:.06em;color:rgba(255,255,255,.5)}
 @media(prefers-reduced-motion:reduce){#klipingSplash{transition-duration:.15s}#klipingSplash .mpDash{animation:none}}

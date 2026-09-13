@@ -31,36 +31,13 @@
   .tile.done .in{ box-shadow:0 0 0 2px rgba(140,198,164,.75); }
   #board.solved .tile{ padding:0; }
   #board.solved .tile .in{ border-radius:0; box-shadow:none; }
-  #board.solved{ animation:pzPop .6s ease; box-shadow:0 0 0 3px var(--gold), 0 0 36px rgba(255,206,74,.42), 0 18px 44px rgba(0,0,0,.5); }
+  #board.solved{ animation:pzPop .6s ease; box-shadow:0 0 0 4px #8cc6a4, 0 18px 44px rgba(0,0,0,.5); }
   @keyframes pzPop{ 0%{transform:scale(1)} 40%{transform:scale(1.045)} 100%{transform:scale(1)} }
-
-  /* ===== REWARD VISUAL 1: potongan "mengunci" satu per satu ===== */
-  .tile.snap .in{ animation:pzSnap .5s cubic-bezier(.2,1.55,.4,1) both; }
-  @keyframes pzSnap{ 0%{transform:scale(1)} 34%{transform:scale(1.16)} 100%{transform:scale(1)} }
-  .tile .spark{ position:absolute; inset:0; border-radius:5px; pointer-events:none;
-    box-shadow:inset 0 0 0 2px rgba(255,255,255,.9), 0 0 18px rgba(255,206,74,.85);
-    animation:pzSpark .55s ease-out both; }
-  @keyframes pzSpark{ 0%{opacity:0; transform:scale(.82)} 30%{opacity:1} 100%{opacity:0; transform:scale(1.08)} }
-
-  /* ===== REWARD VISUAL 2: kilau menyapu papan ===== */
-  #shine{ position:absolute; inset:0; z-index:5; pointer-events:none; overflow:hidden; opacity:0; }
-  #shine.on{ opacity:1; }
-  #shine i{ position:absolute; top:-60%; left:-70%; width:42%; height:220%; transform:rotate(16deg); filter:blur(3px);
-    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.8) 50%,rgba(255,255,255,0)); }
-  #shine.on i{ animation:pzShine 1s ease-out both; }
-  @keyframes pzShine{ from{left:-70%} to{left:132%} }
-
-  /* ===== REWARD VISUAL 3: konfeti ===== */
-  #fx{ position:absolute; inset:0; z-index:10; pointer-events:none; }
-
-  /* ===== REWARD VISUAL 4: stempel "16/16 potong tepat" ===== */
-  #winBadge{ position:absolute; left:50%; top:50%; z-index:8; pointer-events:none;
-    background:rgba(14,22,18,.92); color:#fff; border:2px solid var(--gold); font-weight:800; font-size:17px;
-    padding:14px 22px; border-radius:16px; text-align:center; line-height:1.35; letter-spacing:.02em;
-    box-shadow:0 12px 34px rgba(0,0,0,.5), 0 0 26px rgba(255,206,74,.35);
-    opacity:0; transform:translate(-50%,-50%) scale(.6) rotate(-7deg);
-    transition:opacity .18s ease, transform .42s cubic-bezier(.2,1.7,.4,1); }
-  #winBadge.on{ opacity:1; transform:translate(-50%,-50%) scale(1) rotate(-3deg); }
+  #winBadge{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:8; pointer-events:none;
+    background:rgba(14,22,18,.92); color:#fff; border:2px solid #8cc6a4; font-weight:800; font-size:19px;
+    padding:14px 24px; border-radius:16px; opacity:0; transition:opacity .25s ease; text-align:center;
+    box-shadow:0 12px 34px rgba(0,0,0,.5); }
+  #winBadge.on{ opacity:1; }
   #progWrap{ width:min(88vw,380px); height:8px; background:rgba(255,255,255,.12); border-radius:99px; overflow:hidden; }
   #progBar{ height:100%; width:0%; background:linear-gradient(90deg,#2E7D4F,#8cc6a4); border-radius:99px; transition:width .25s ease; }
   .chips{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
@@ -87,76 +64,11 @@
     box-shadow:0 8px 22px rgba(0,0,0,.4); transition:transform .08s ease, filter .15s ease; min-height:48px; }
   .btn:active{ transform:translateY(2px) scale(.98); }
   .scoreline{ color:#fff; font-size:15px; font-weight:700; }
-  .big{ font-size:46px; font-weight:800; color:#fff; font-variant-numeric:tabular-nums;
-    display:flex; align-items:baseline; justify-content:center; gap:8px; text-shadow:0 0 28px rgba(255,206,74,.35); }
-  .big #winPts{ background:linear-gradient(180deg,#fff 35%,var(--gold));
-    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:var(--gold); }
-  .big .unit{ font-size:16px; font-weight:800; color:rgba(255,255,255,.7); letter-spacing:.1em; }
+  .big{ font-size:46px; font-weight:800; color:#fff; }
   .record{ color:var(--gold); font-weight:800; font-size:15px; letter-spacing:.5px; }
-  #stars{ display:flex; gap:12px; justify-content:center; font-size:28px; line-height:1; }
-  #stars b{ display:inline-block; color:var(--gold); opacity:.18; filter:grayscale(1); transform:scale(.76);
-    transition:transform .4s cubic-bezier(.2,1.7,.4,1), opacity .3s ease, filter .3s ease; }
-  #stars b.on{ opacity:1; filter:none; transform:scale(1); text-shadow:0 0 18px rgba(255,206,74,.85); }
-  /* layar kemenangan: perkuat kontras karena teks menumpuk foto logo */
-  #winScreen{ background:radial-gradient(120% 80% at 50% 42%, rgba(10,24,17,.58) 0%, rgba(6,15,11,.88) 60%, rgba(4,10,7,.96) 100%); }
-  @supports (backdrop-filter:blur(2px)){ #winScreen{ backdrop-filter:blur(3px) saturate(.92); } }
-  #winScreen > *{ text-shadow:0 2px 10px rgba(0,0,0,.65); }
-  #winScreen .btn{ text-shadow:none; }
-  #winScreen.show > *{ animation:pzRise .5s cubic-bezier(.2,1.3,.4,1) both; }
-  #winScreen.show > *:nth-child(2){ animation-delay:.07s }
-  #winScreen.show > *:nth-child(3){ animation-delay:.13s }
-  #winScreen.show > *:nth-child(4){ animation-delay:.19s }
-  #winScreen.show > *:nth-child(5){ animation-delay:.25s }
-  #winScreen.show > *:nth-child(6){ animation-delay:.31s }
-  #winScreen.show > *:nth-child(7){ animation-delay:.37s }
-  @keyframes pzRise{ from{opacity:0; transform:translateY(16px) scale(.95)} to{opacity:1; transform:none} }
-  @media (prefers-reduced-motion:reduce){
-    #board.solved, .tile.snap .in, .tile .spark, #shine.on i, #winScreen.show > *{ animation:none !important; }
-    #winBadge{ transform:translate(-50%,-50%) !important; }
-  }
-  /* HEMAT DAYA DI HP (Android & iOS): backdrop-filter memaksa GPU menyusun ulang
-     seluruh layar tiap bingkai. Di perangkat sentuh blur dimatikan; peredam gelap
-     radial pada #winScreen tetap menjaga kontras teks di atas foto logo. */
-  @media (hover:none){
-    *{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
-    /* Blur hilang, jadi peredam gelap layar mulai dipertebal supaya teks tetap tajam
-       di atas foto potongan logo. #winScreen tidak disentuh: peredam radialnya sudah
-       cukup dan logo utuh sengaja masih terlihat sebagai hadiah. */
-    /* Perhatikan: gradien aslinya nyaris BENING di tengah (rgba putih .10) — dulu
-       blur-lah yang menyamarkan foto di belakang teks. Tanpa blur, pusat gradien
-       harus ikut dirapatkan, bukan hanya tepinya. */
-    #startScreen{ background:radial-gradient(120% 90% at 50% 12%, rgba(18,26,20,.90), rgba(6,11,8,.985)) !important; }
-  }
 </style>
 </head>
 <body>
-<script>
-/* ===== TANDING ULANG — PEMBERSIH REKOR LOKAL (MUSIM_V81) =====
-   Papan peringkat di server dikosongkan lewat rehat-reset-skor-v81.sql.
-   Blok ini membereskan sisa rekor & riwayat yang tersimpan di HP tiap pemain,
-   supaya papan dan rekor pribadi benar-benar mulai dari nol. Jalan SEKALI saja
-   per perangkat, lalu menandai dirinya sendiri. Nama pemain sengaja disimpan
-   agar tidak perlu diisi ulang. Harus berada sebelum skrip game membaca rekor. */
-(function(){
-  try{
-    var S='reichas_musim', V='v81';
-    if(localStorage.getItem(S)===V) return;
-    var buang=['reichas_best','reichas_best_c',
-               'reichas_ngopi_best','reichas_ngopi_best_c',
-               'reichas_puzzle_best','reichas_puzzle_best_c',
-               'reichas_hist_flyer','reichas_hist_ngopi','reichas_hist_puzzle'];
-    for(var i=0;i<buang.length;i++){ try{ localStorage.removeItem(buang[i]) }catch(e){} }
-    /* kumpulkan dulu, baru hapus: menghapus sambil menelusuri bisa melewati kunci */
-    var sisa=[];
-    for(var j=0;j<localStorage.length;j++){
-      var k=localStorage.key(j);
-      if(k && k.indexOf('reichas_top_')===0) sisa.push(k);
-    }
-    for(var m=0;m<sisa.length;m++){ try{ localStorage.removeItem(sisa[m]) }catch(e){} }
-    localStorage.setItem(S,V);
-  }catch(e){}
-})();
-</script>
 <div id="wrap">
   <a href="./" class="back">&#8592; Rehat</a>
   <div id="hud"><span id="time">0:00</span><span id="tepat">0/16 tepat</span><span id="moves">0 tukar</span></div>
@@ -168,7 +80,6 @@
   </div>
   <div id="winBadge">&#10003; Susunan benar!<br /><span style="font-size:13px;font-weight:600;opacity:.85">Logo utuh kembali</span></div>
   <div id="peekView"></div>
-  <canvas id="fx"></canvas>
 
   <div class="overlay" id="startScreen">
     <div class="title">SUSUN<span> LOGO</span></div>
@@ -182,8 +93,7 @@
 
   <div class="overlay hidden" id="winScreen">
     <div class="title">SELESAI<span> &#10003; BENAR!</span></div>
-    <div id="stars"><b>&#9733;</b><b>&#9733;</b><b>&#9733;</b></div>
-    <div class="big"><span id="winPts">0</span><span class="unit">POIN</span></div>
+    <div class="big" id="winPts">0</div>
     <div class="scoreline" id="winStat"></div>
     <div class="record" id="winRecord"></div>
     <div class="sub" id="winPhrase" style="font-size:14px"></div>
@@ -193,8 +103,7 @@
 <script>
 (function(){
   var N=4, SIZE=N*N;
-  var cell=[], rot=[], divs=[], sel=-1, moves=0, secs=0, timer=null, playing=false, won=false;
-  var putar=0, ronde=0, segel=null, awalCell=[], awalRot=[];
+  var cell=[], rot=[], divs=[], sel=-1, moves=0, secs=0, timer=null, playing=false;
   var board=document.getElementById('board');
   var SUPA='https://nfeexstvdjgywonbtxtb.supabase.co';
   var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E';
@@ -217,17 +126,15 @@
       d.appendChild(inn); board.appendChild(d); divs[i]=d;
       (function(idx){ d.addEventListener('click',function(){ tap(idx); }); })(i);
     }
-    var sh=document.createElement('div'); sh.id='shine'; sh.innerHTML='<i></i>'; board.appendChild(sh);
     reset();
   }
 
   function reset(){
     cell=[]; rot=[];
     for(var i=0;i<SIZE;i++){ cell[i]=i; rot[i]=0; }
-    moves=0; secs=0; sel=-1; playing=false; won=false;
+    moves=0; secs=0; sel=-1; playing=false;
     stopTimer(); el('moves').textContent='0 tukar'; el('time').textContent='0:00';
     board.classList.remove('solved');
-    fxStop();
     place();
   }
 
@@ -239,12 +146,10 @@
       d.firstChild.style.transform='rotate('+(rot[piece]*90)+'deg)';
       var ok=(piece===c && rot[piece]%4===0);
       if(ok)tepat++;
-      d.classList.toggle('done', ok && (playing||won));
+      d.classList.toggle('done', ok);
     }
-    /* papan pratinjau di layar awal jangan tampil "sudah 16/16" */
-    var tampil=(playing||won)?tepat:0;
-    var tp=el('tepat'); if(tp)tp.textContent=tampil+'/'+SIZE+' tepat';
-    var pb=el('progBar'); if(pb)pb.style.width=(tampil/SIZE*100)+'%';
+    var tp=el('tepat'); if(tp)tp.textContent=tepat+'/'+SIZE+' tepat';
+    var pb=el('progBar'); if(pb)pb.style.width=(tepat/SIZE*100)+'%';
   }
   function posOf(piece){ return cell.indexOf(piece); }
   function solved(){
@@ -253,11 +158,9 @@
   }
 
   function tap(piece){
-    if(!playing || won) return;
-    if(jedaSejak){ lanjut(); return; } /* baru kembali dari layar lain: lanjutkan dulu */
+    if(!playing) return;
     if(sel===piece){ /* ketuk ulang = putar 90° */
-      rot[piece]=(rot[piece]+1)%4; putar++; tick2(); getar(10); place();
-      cekSelesai(); return;
+      rot[piece]=(rot[piece]+1)%4; tick2(); getar(10); place(); return;
     }
     if(sel===-1){ sel=piece; divs[piece].classList.add('sel'); getar(8); return; }
     var a=posOf(sel), b=posOf(piece);
@@ -266,19 +169,7 @@
     moves++; el('moves').textContent=moves+' tukar';
     tick2(); getar(12);
     place();
-    cekSelesai();
-  }
-
-  /* AUTO-SELESAI: dicek setelah SETIAP aksi — tukar maupun putar.
-     Begitu seluruh potongan tepat posisi dan rotasinya, permainan langsung
-     berhenti dan skor keluar sendiri tanpa perlu menekan tombol apa pun. */
-  function cekSelesai(){
-    if(won || !playing) return false;
-    if(!solved()) return false;
-    won=true;
-    if(sel!==-1){ divs[sel].classList.remove('sel'); sel=-1; }
-    win();
-    return true;
+    if(solved()) win();
   }
 
   function shuffle(){
@@ -288,137 +179,24 @@
     var idx=[]; for(var m=0;m<SIZE;m++) idx.push(m);
     for(var r=0;r<N+1;r++){ var pick=idx.splice((Math.random()*idx.length)|0,1)[0]; rot[pick]=1+((Math.random()*3)|0); }
     if(solved()) return shuffle();
-    moves=0; putar=0; secs=0; sel=-1; won=false;
-    awalCell=cell.slice(); awalRot=rot.slice(); /* kondisi awal, dipakai memeriksa keabsahan skor */
-    ronde++; segel=null;
+    moves=0; secs=0; sel=-1;
     el('moves').textContent='0 tukar'; el('time').textContent='0:00';
     board.classList.remove('solved');
-    fxStop();
     place();
   }
 
-  /* ===== WAKTU MONOTONIK =====
-     Dulu waktu dihitung dari cacahan setInterval (secs++), jadi bisa melambat
-     saat tab diperkecil/di-throttle atau dibekukan lewat devtools. Sekarang
-     dihitung dari performance.now() sehingga selalu jujur. */
-  function nowMs(){ try{ return performance.now() }catch(e){ return Date.now() } }
-  var mulaiMs=0, jedaMs=0, jedaSejak=0, denda=0;
-  function secsNow(){
-    if(!mulaiMs) return denda;
-    var akhir=(jedaSejak||nowMs());
-    return Math.max(0, Math.floor((akhir-mulaiMs-jedaMs)/1000)) + denda;
-  }
-  function segarkanWaktu(){ secs=secsNow(); var t=el('time'); if(t)t.textContent=fmt(secs); return secs; }
-  function startTimer(){ stopTimer(); mulaiMs=nowMs(); jedaMs=0; jedaSejak=0; denda=0; secs=0;
-    el('time').textContent='0:00'; timer=setInterval(segarkanWaktu,250); }
-  function stopTimer(){ if(timer){ clearInterval(timer); timer=null } }
-
-  /* JEDA OTOMATIS saat pindah tab / aplikasi.
-     Bug lama: 'pagehide' mematikan permainan permanen, jadi setelah kembali
-     dari layar lain papan terkunci dan tidak bisa diketuk lagi. */
-  function jeda(){ if(!playing || won || jedaSejak) return; jedaSejak=nowMs(); stopTimer(); }
-  function lanjut(){ if(!playing || won || !jedaSejak) return;
-    jedaMs+=nowMs()-jedaSejak; jedaSejak=0;
-    if(!timer) timer=setInterval(segarkanWaktu,250);
-    segarkanWaktu(); }
-  document.addEventListener('visibilitychange',function(){ if(document.hidden) jeda(); else lanjut(); });
-  window.addEventListener('pagehide',jeda);
-
+  function startTimer(){ stopTimer(); timer=setInterval(function(){ secs++; el('time').textContent=fmt(secs); },1000); }
+  function stopTimer(){ if(timer){clearInterval(timer);timer=null} }
   /* fungsi exit: hentikan timer & kunci papan saat beralih ke game lain */
-  function keluarGame(){ playing=false; stopTimer(); fxStop(); }
+  function keluarGame(){ playing=false; stopTimer(); }
+  window.addEventListener('pagehide',keluarGame);
   window.addEventListener('beforeunload',keluarGame);
   try{var _bk=document.querySelector('.back'); if(_bk)_bk.addEventListener('click',keluarGame);}catch(e){}
-
   /* poin murni kecepatan, dasar menyesuaikan tingkat kesulitan */
-  function basisPoin(){ return N===3?3000:(N===5?9500:6000) }
-  function hitungPoin(t,tukar){ var b=basisPoin(); return Math.max(10, Math.min(b, b - t*30 - tukar*8)); }
-  function points(){ return hitungPoin(secsNow(),moves); }
+  function points(){ var base=N===3?3000:(N===5?9500:6000); return Math.max(10, base - secs*30 - moves*8); }
 
-  /* ===== PEMERIKSA KEABSAHAN RONDE (anti-curang di sisi pemain) =====
-     Skor hanya sah bila ketiga hal ini benar:
-     1. papan memang tersusun utuh (dihitung ulang dari state, bukan dari DOM),
-     2. jumlah aksi tidak kurang dari minimum matematis untuk acakan ronde ini
-        (mustahil menyusun dengan aksi lebih sedikit),
-     3. waktunya tidak lebih cepat dari batas fisik ketukan manusia. */
-  function minAksi(c0,r0){
-    var n=c0.length, lihat={}, siklus=0, i, j;
-    for(i=0;i<n;i++){ if(lihat[i]) continue; siklus++; j=i; while(!lihat[j]){ lihat[j]=1; j=c0[j]; } }
-    var minTukar=n-siklus, minPutar=0;
-    for(i=0;i<n;i++) minPutar += (4-(r0[i]%4))%4;
-    return { tukar:minTukar, putar:minPutar, total:minTukar+minPutar };
-  }
-  function periksaRonde(){
-    if(!solved()) return null;
-    if(awalCell.length!==SIZE || awalRot.length!==SIZE) return null;
-    var m=minAksi(awalCell,awalRot);
-    if(moves<m.tukar || putar<m.putar) return null;      /* mustahil secara matematis */
-    var aksi=moves+putar;
-    if(aksi>20000) return null;
-    var t=secsNow();
-    if(t>7200) return null;
-    if((t+1) < aksi*0.08) return null;                   /* >12 aksi/detik: bukan manusia */
-    return { waktu:t, tukar:moves, putar:putar, poin:hitungPoin(t,moves) };
-  }
-
-  /* ===== REKOR PERANGKAT BERSIDIK =====
-     Nilai di localStorage diberi sidik; kalau diubah manual lewat devtools,
-     sidiknya tidak cocok dan rekor dianggap 0 (bukan rekor palsu). */
-  function sidik(v){ var s='rcs|susun|'+v, h=5381; for(var i=0;i<s.length;i++){ h=(((h*33)^s.charCodeAt(i))>>>0) } return h.toString(36) }
-  function bacaBest(){
-    try{
-      var v=parseInt(localStorage.getItem(BEST)||'0',10)||0;
-      if(v<=0) return 0;
-      if(v>100000){ localStorage.removeItem(BEST); return 0 }
-      var sg=localStorage.getItem(BEST+'_c');
-      if(!sg){ simpanBest(v); return v }          /* migrasi dari versi lama */
-      if(sg!==sidik(v)){ localStorage.removeItem(BEST); localStorage.removeItem(BEST+'_c'); return 0 }
-      return v;
-    }catch(e){ return 0 }
-  }
-  function simpanBest(v){ try{ localStorage.setItem(BEST,String(v)); localStorage.setItem(BEST+'_c',sidik(v)) }catch(e){} }
-
-  /* segel sekali-pakai: satu ronde sah = satu izin kirim */
-  function segelBaru(v){
-    var n='';
-    try{ var a=new Uint8Array(12);
-      if(window.crypto&&crypto.getRandomValues){ crypto.getRandomValues(a);
-        n=[].map.call(a,function(x){ return ('0'+x.toString(16)).slice(-2) }).join('') } }catch(e){}
-    if(!n) n=Date.now().toString(36)+Math.random().toString(36).slice(2,10);
-    return { ronde:ronde, poin:v.poin, waktu:v.waktu, tukar:v.tukar, putar:v.putar,
-             level:N+'x'+N, nonce:n, dipakai:false };
-  }
-
-  /* ===== GERBANG KIRIM SKOR =====
-     Fungsi ini TIDAK menerima angka dari luar. Ia hanya mau menerima objek
-     "segel" yang dibuat di dalam closure ini setelah periksaRonde() lolos.
-     Akibatnya skor tidak bisa disuntik manual dari console/bookmarklet, dan
-     satu ronde hanya bisa mengirim satu kali (nonce sekali-pakai).
-     Nilai akhir tetap dihitung ulang di server lewat RPC rehat_kirim_skor. */
-  function kirimSkor(tok){
-    if(!tok || tok!==segel || tok.dipakai || tok.ronde!==ronde) return;
-    tok.dipakai=true; segel=null;
-    if(!(tok.poin>0)) return;
-    var nama=''; try{ nama=(localStorage.getItem(NAMA)||'').trim().slice(0,24) }catch(e){}
-    if(!nama) return;
-    try{
-      if(navigator.onLine===false) return;
-      var ctl=new AbortController(), to=setTimeout(function(){ try{ctl.abort()}catch(e){} },9000);
-      fetch(SUPA+'/rest/v1/rpc/rehat_kirim_skor',{ method:'POST',
-        headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},
-        body:JSON.stringify({ p_game:'puzzle', p_nama:nama, p_level:tok.level, p_skor:tok.poin,
-          p_waktu:tok.waktu, p_langkah:tok.tukar+tok.putar, p_nonce:tok.nonce }),
-        signal:ctl.signal })
-      .then(function(r){ clearTimeout(to);
-        /* 404 = RPC aman belum dipasang di Supabase → sementara pakai jalur lama */
-        if(r.status===404) kirimLama('puzzle',nama,tok.poin,tok.level);
-      })
-      .catch(function(){ clearTimeout(to) });
-    }catch(e){}
-  }
-
-  /* jalur lama (insert REST langsung). Hanya cadangan sebelum SQL v80 dipasang;
-     setelah v80 dijalankan, insert publik dicabut di server. */
-  function kirimLama(game,nama,skor,level){
+  /* kirimSkor: anti-dobel — kirim hanya bila skor baru lebih tinggi dari yang tercatat untuk nama ini */
+  function kirimSkor(game,nama,skor,level){
     try{
       if(navigator.onLine===false)return;
       nama=nama.slice(0,24);
@@ -443,212 +221,49 @@
     }catch(e){}
   }
 
-  /* ===== SUARA: satu AudioContext dipakai bersama =====
-     Bug lama: setiap ketukan membuat AudioContext baru. Di iOS/Safari jatah
-     context cepat habis sehingga suara mati setelah puluhan ketukan. */
-  var _ac=null;
-  function senyap(){ try{ return localStorage.getItem('bwk_game_muted')==='1' }catch(e){ return false } }
-  function audio(){
-    if(senyap()) return null;
+  function tick2(){try{ if(localStorage.getItem('bwk_game_muted')==='1')return; }catch(e){}
+    try{var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;var ac=new AC();var o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=1150;var t0=ac.currentTime;g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(0.08,t0+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t0+0.07);o.connect(g);g.connect(ac.destination);o.start(t0);o.stop(t0+0.09);setTimeout(function(){try{ac.close()}catch(e){}},250)}catch(e){}}
+
+  /* lonceng kecil saat logo utuh — hormati tombol senyap */
+  function ding(){
+    try{ if(localStorage.getItem('bwk_game_muted')==='1')return; }catch(e){}
     try{
-      var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
-      if(!_ac) _ac=new AC();
-      if(_ac.state==='suspended'){ try{ _ac.resume() }catch(e){} }
-      return _ac;
-    }catch(e){ return null }
-  }
-  function nada(freq,tunda,durasi,puncak,bentuk){
-    var ac=audio(); if(!ac) return;
-    try{
-      var o=ac.createOscillator(), g=ac.createGain();
-      o.type=bentuk||'sine'; o.frequency.value=freq;
-      var d=durasi||0.2, t0=ac.currentTime+(tunda||0);
-      g.gain.setValueAtTime(0.0001,t0);
-      g.gain.exponentialRampToValueAtTime(puncak||0.12,t0+0.012);
-      g.gain.exponentialRampToValueAtTime(0.0001,t0+d);
-      o.connect(g); g.connect(ac.destination);
-      o.start(t0); o.stop(t0+d+0.04);
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+      var ac=new AC();
+      [523.25,783.99].forEach(function(f,i){
+        var o=ac.createOscillator(), g=ac.createGain();
+        o.type='sine'; o.frequency.value=f;
+        var t0=ac.currentTime+i*0.13;
+        g.gain.setValueAtTime(0.0001,t0);
+        g.gain.exponentialRampToValueAtTime(0.18,t0+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001,t0+0.28);
+        o.connect(g); g.connect(ac.destination);
+        o.start(t0); o.stop(t0+0.32);
+      });
+      setTimeout(function(){try{ac.close()}catch(e){}},900);
     }catch(e){}
   }
-  function tick2(){ nada(1150,0,0.08,0.07,'triangle') }
-
-  /* fanfare saat logo utuh — hormati tombol senyap */
-  function ding(){
-    [523.25,659.25,783.99,1046.5].forEach(function(f,i){
-      nada(f, i*0.105, i===3?0.75:0.3, i===3?0.2:0.15, 'sine');
-    });
-  }
-  function pling(f){ nada(f,0,0.34,0.16,'sine') }
-
-  /* ================= REWARD VISUAL ================= */
-  function hemat(){ try{ return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) }catch(e){ return false } }
-  /* Deteksi perangkat: HP kelas bawah atau layar sangat padat (dpr 3) perlu partikel
-     lebih sedikit dan kanvas lebih ringan, kalau tidak HP panas dan animasi tersendat. */
-  var _hpLemah=false; try{ _hpLemah=((navigator.hardwareConcurrency||4)<=4)||((window.devicePixelRatio||1)>=3) }catch(e){}
-  var _hpSentuh=false; try{ _hpSentuh=!!(window.matchMedia && matchMedia('(hover:none)').matches) }catch(e){}
-
-  /* 1. potongan "mengunci" satu per satu, menyapu diagonal */
-  function snapWave(){
-    if(hemat()) return;
-    for(var c=0;c<SIZE;c++){
-      (function(pos){
-        var d=divs[cell[pos]]; if(!d) return;
-        setTimeout(function(){
-          d.classList.add('snap');
-          var sp=document.createElement('div'); sp.className='spark'; d.appendChild(sp);
-          setTimeout(function(){ d.classList.remove('snap'); if(sp.parentNode) sp.parentNode.removeChild(sp); },560);
-        }, ((pos%N)+Math.floor(pos/N))*55);
-      })(c);
-    }
-  }
-
-  /* 2. kilau emas menyapu papan */
-  function shineSweep(){
-    if(hemat()) return;
-    var s=document.getElementById('shine'); if(!s) return;
-    s.classList.remove('on'); void s.offsetWidth; s.classList.add('on');
-    setTimeout(function(){ s.classList.remove('on') },1150);
-  }
-
-  /* 3. konfeti */
-  var fx=el('fx'), fxCtx=null, fxParts=[], fxRaf=null;
-  function fxUkur(){
-    if(!fx) return false;
-    var w=fx.clientWidth, h=fx.clientHeight; if(!w||!h) return false;
-    /* batasi kepadatan piksel: pada dpr 3 kanvas harus menggambar 9x piksel -> panas & lag */
-    var dpr=Math.min(_hpLemah?1:1.5, window.devicePixelRatio||1);
-    fx.width=Math.round(w*dpr); fx.height=Math.round(h*dpr);
-    fxCtx=fx.getContext('2d'); if(!fxCtx) return false;
-    fxCtx.setTransform(dpr,0,0,dpr,0,0); return true;
-  }
-  function konfeti(hujanSaja){
-    if(!fx || hemat()) return;
-    if(!fxUkur()) return;
-    var W=fx.clientWidth, i, warna=['#ffce4a','#ffe89a','#8cc6a4','#2E7D4F','#ffffff','#5fb98a'];
-    if(!hujanSaja){
-      var bb=board.getBoundingClientRect(), wb=el('wrap').getBoundingClientRect();
-      var ox=bb.left-wb.left+bb.width/2, oy=bb.top-wb.top+bb.height/2;
-      var nLedak=_hpLemah?45:(_hpSentuh?70:110);
-      for(i=0;i<nLedak;i++){
-        var a=Math.random()*Math.PI*2, sp=2.4+Math.random()*7.6;
-        fxParts.push({ x:ox, y:oy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-3.4,
-          w:4+Math.random()*6, h:6+Math.random()*8, c:warna[(Math.random()*warna.length)|0],
-          r:Math.random()*3.14, vr:(Math.random()-.5)*.38, life:0, max:85+((Math.random()*45)|0) });
-      }
-    }
-    var nHujan=(hujanSaja?60:45);
-    if(_hpLemah) nHujan=(nHujan*0.45)|0; else if(_hpSentuh) nHujan=(nHujan*0.7)|0;
-    for(i=0;i<nHujan;i++){
-      fxParts.push({ x:Math.random()*W, y:-20-Math.random()*120, vx:(Math.random()-.5)*1.4, vy:1.4+Math.random()*2.2,
-        w:4+Math.random()*5, h:6+Math.random()*7, c:warna[(Math.random()*warna.length)|0],
-        r:Math.random()*3.14, vr:(Math.random()-.5)*.3, life:0, max:170 });
-    }
-    var batas=_hpLemah?140:(_hpSentuh?260:420);
-    if(fxParts.length>batas) fxParts=fxParts.slice(-batas);
-    if(!fxRaf) fxRaf=requestAnimationFrame(fxLoop);
-  }
-  function fxLoop(){
-    fxRaf=null;
-    if(!fxCtx||!fx) return;
-    var W=fx.clientWidth, H=fx.clientHeight, hidup=0;
-    fxCtx.clearRect(0,0,W,H);
-    for(var i=0;i<fxParts.length;i++){
-      var p=fxParts[i]; if(p.life>p.max) continue;
-      p.life++; p.vy+=0.14; p.vx*=0.995; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr;
-      if(p.y>H+50){ p.life=p.max+1; continue }
-      hidup++;
-      var al=(p.life>p.max-25)?(p.max-p.life)/25:1;
-      fxCtx.save(); fxCtx.globalAlpha=Math.max(0,Math.min(1,al));
-      fxCtx.translate(p.x,p.y); fxCtx.rotate(p.r);
-      fxCtx.fillStyle=p.c; fxCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h); fxCtx.restore();
-    }
-    if(hidup>0) fxRaf=requestAnimationFrame(fxLoop);
-    else { fxParts=[]; fxCtx.clearRect(0,0,W,H) }
-  }
-  function fxStop(){
-    if(fxRaf){ cancelAnimationFrame(fxRaf); fxRaf=null }
-    fxParts=[];
-    try{ if(fxCtx&&fx) fxCtx.clearRect(0,0,fx.clientWidth,fx.clientHeight) }catch(e){}
-  }
-  window.addEventListener('resize',function(){ if(fxRaf) fxUkur() });
-
-  /* 4. angka poin berjalan naik */
-  function countUp(node,akhir,ms){
-    if(!node) return;
-    if(hemat()){ node.textContent=String(akhir); return }
-    var t0=0;
-    function step(ts){
-      if(!t0) t0=ts;
-      var k=Math.min(1,(ts-t0)/ms);
-      node.textContent=String(Math.round(akhir*(1-Math.pow(1-k,3))));
-      if(k<1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-
-  /* 5. bintang 1-3 sesuai kecepatan */
-  function bintang(pts){ var r=pts/basisPoin(); return r>=0.62?3:(r>=0.32?2:1) }
 
   function win(){
-    won=true; playing=false;
-    if(!jedaSejak) jedaSejak=nowMs();   /* bekukan jam: waktu akhir tidak boleh bergerak lagi */
-    stopTimer(); segarkanWaktu();
-    var v=periksaRonde();               /* nilai resmi ronde ini, dihitung sekali saja */
-    if(sel!==-1){ divs[sel].classList.remove('sel'); sel=-1; }
+    playing=false; stopTimer();
     board.classList.add('solved'); place();
-
-    /* reward visual berlapis: potongan mengunci → kilau → konfeti → stempel */
-    snapWave();
-    setTimeout(shineSweep,320);
-    konfeti();
-    var bd=el('winBadge');
-    if(bd) bd.innerHTML='&#10003; '+SIZE+'/'+SIZE+' POTONG TEPAT<br /><span style="font-size:13px;font-weight:600;opacity:.85">Logo utuh kembali</span>';
-    setTimeout(function(){ if(bd)bd.classList.add('on') },240);
+    var bd=el('winBadge'); if(bd)bd.classList.add('on');
     ding(); getar([40,60,40]);
-    var pts=v?v.poin:0;
+    var pts=points();
+    el('winPts').textContent=pts+' poin';
     el('winStat').textContent=fmt(secs)+' \u00b7 '+moves+' tukar';
     var PH=['Mantap jiwa!','Mata elang!','Logo utuh, hati pun utuh.','Sabar itu kunci!','Pecinta alam sejati!','Tajam juga ingatanmu!'];
     var ph=el('winPhrase'); if(ph)ph.textContent=PH[(Math.random()*PH.length)|0];
-    var best=bacaBest();
-    var rekorBaru=(!!v && pts>best);
-    if(!v){ el('winRecord').textContent='Skor tidak dicatat — ronde tidak sah'; }
-    else if(rekorBaru){ simpanBest(pts); el('winRecord').textContent='★ REKOR BARU!'; }
-    else { el('winRecord').textContent='Terbaik: '+best; }
-    if(v){
-      try{var h=JSON.parse(localStorage.getItem(HIST)||'[]');h.unshift({s:pts,t:Date.now()});localStorage.setItem(HIST,JSON.stringify(h.slice(0,10)))}catch(e){}
-      var bs=el('bestStart'); if(bs)bs.textContent=String(Math.max(pts,best));
-      segel=segelBaru(v);          /* satu ronde sah = satu izin kirim */
-      kirimSkor(segel);
-    }
-    /* skor keluar otomatis — tanpa tombol apa pun */
-    setTimeout(function(){
-      if(bd)bd.classList.remove('on');
-      var ws=el('winScreen');
-      ws.classList.remove('hidden'); ws.classList.add('show');
-      setTimeout(function(){ ws.classList.remove('show') },1250);
-      var pn=el('winPts'); if(pn){ pn.textContent='0'; countUp(pn,pts,760) }
-      var st=el('stars');
-      if(st){
-        var bn=v?bintang(pts):0;
-        [].slice.call(st.children).forEach(function(b,i){
-          b.classList.remove('on');
-          if(i<bn) setTimeout(function(){ b.classList.add('on'); pling(659.25+i*190) }, 820+i*210);
-        });
-      }
-      if(rekorBaru) setTimeout(function(){ konfeti(true) },720);
-    },1250);
+    var best=0; try{best=parseInt(localStorage.getItem(BEST)||'0',10)||0}catch(e){}
+    if(pts>best){ try{localStorage.setItem(BEST,String(pts))}catch(e){} el('winRecord').textContent='Rekor baru!'; }
+    else el('winRecord').textContent='Terbaik: '+best;
+    try{var h=JSON.parse(localStorage.getItem(HIST)||'[]');h.unshift({s:pts,t:Date.now()});localStorage.setItem(HIST,JSON.stringify(h.slice(0,10)))}catch(e){}
+    try{var n=(localStorage.getItem(NAMA)||'').trim();
+      if(n){kirimSkor('puzzle',n,pts,N+'x'+N)}}catch(e){}
+    setTimeout(function(){ if(bd)bd.classList.remove('on'); el('winScreen').classList.remove('hidden'); },1600);
   }
 
-  function mulai(){
-    sv(); fxStop(); segel=null;
-    var wb=el('winBadge'); if(wb)wb.classList.remove('on');
-    var st=el('stars'); if(st)[].slice.call(st.children).forEach(function(b){ b.classList.remove('on') });
-    pkSisa=3; peekLabel(); peekTutup();
-    el('startScreen').classList.add('hidden');
-    var ws=el('winScreen'); ws.classList.add('hidden'); ws.classList.remove('show');
-    shuffle(); playing=true; startTimer();
-    audio(); /* buka kunci audio pada ketukan pengguna (syarat iOS) */
-  }
+  function mulai(){ sv(); var wb=el('winBadge'); if(wb)wb.classList.remove('on'); pkSisa=3; peekLabel(); peekTutup(); el('startScreen').classList.add('hidden'); el('winScreen').classList.add('hidden'); shuffle(); playing=true; startTimer(); }
   el('startBtn').addEventListener('click',mulai);
   el('againBtn').addEventListener('click',mulai);
 
@@ -656,7 +271,8 @@
   function sv(){try{localStorage.setItem(NAMA,(inp.value||'').trim().slice(0,24))}catch(e){}}
   if(inp){try{inp.value=localStorage.getItem(NAMA)||''}catch(e){}inp.addEventListener('input',sv);}
 
-  el('bestStart').textContent=bacaBest();
+  var best=0; try{best=parseInt(localStorage.getItem(BEST)||'0',10)||0}catch(e){}
+  el('bestStart').textContent=best;
 
   /* tingkat kesulitan */
   var chips=el('chips');
@@ -671,7 +287,7 @@
     if(!playing || pkSisa<=0)return;
     if(pv.classList.contains('on')){ peekTutup(); return; }
     pkSisa--; peekLabel();
-    pv.classList.add('on'); denda+=4; segarkanWaktu(); getar(25);
+    pv.classList.add('on'); secs+=4; el('time').textContent=fmt(secs); getar(25);
     pkT=setTimeout(peekTutup,1500);
   }
   if(pk&&pv){
