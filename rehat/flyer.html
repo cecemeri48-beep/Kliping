@@ -117,7 +117,25 @@ logo.onload = ()=> logoReady = true;
 // State
 let state = 'start'; // start | play | over
 let score = 0;
-let best = parseInt(localStorage.getItem('reichas_best')||'0',10);
+/* ===== REKOR PERANGKAT BERSIDIK (v80) =====
+   Nilai di localStorage diberi sidik. Kalau diubah manual lewat devtools,
+   sidiknya tidak cocok dan rekor dianggap 0 — bukan rekor palsu. */
+const REKOR_KEY='reichas_best';
+function sidikRekor(v){ var s='rcs|flyer|'+v, h=5381; for(var i=0;i<s.length;i++){ h=(((h*33)^s.charCodeAt(i))>>>0) } return h.toString(36) }
+function simpanRekor(v){ try{ localStorage.setItem(REKOR_KEY,String(v)); localStorage.setItem(REKOR_KEY+'_c',sidikRekor(v)) }catch(e){} }
+function bacaRekor(){
+  try{
+    var v=parseInt(localStorage.getItem(REKOR_KEY)||'0',10)||0;
+    if(v<=0) return 0;
+    if(v>100000){ localStorage.removeItem(REKOR_KEY); return 0 }
+    var sg=localStorage.getItem(REKOR_KEY+'_c');
+    if(!sg){ simpanRekor(v); return v }   /* migrasi dari versi lama */
+    if(sg!==sidikRekor(v)){ localStorage.removeItem(REKOR_KEY); localStorage.removeItem(REKOR_KEY+'_c'); return 0 }
+    return v;
+  }catch(e){ return 0 }
+}
+let best = bacaRekor();
+let _tMulai = 0;   /* jam ronde, dipakai memeriksa kewajaran skor */
 
 const bird = { x: W*0.28, y: H*0.45, r: 26, vy: 0, rot: 0 };
 const GRAV = 0.45, FLAP = -7.6, MAXV = 11;
@@ -145,7 +163,7 @@ function flap(){
 }
 
 function startGame(){
-  reset(); state='play';
+  reset(); state='play'; _tMulai=performance.now(); _segel=null;
   try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playStart();}}catch(e){}
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('overScreen').classList.add('hidden');
@@ -155,7 +173,7 @@ function endGame(){try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAu
   getar(90);
   try{if(!lowFx){canvas.classList.remove('shake');void canvas.offsetWidth;canvas.classList.add('shake')}}catch(e){}
   const newRecord = score > best;
-  if(newRecord){ best = score; localStorage.setItem('reichas_best', String(best));try{var _h=JSON.parse(localStorage.getItem('reichas_hist_flyer')||'[]');_h.unshift({s:score,t:Date.now()});localStorage.setItem('reichas_hist_flyer',JSON.stringify(_h.slice(0,10)))}catch(e){};try{var _n=(localStorage.getItem('reichas_player_name')||'').trim();if(_n&&(score|0)>0){kirimSkor('flyer',_n,Math.max(0,Math.floor(score)||0))}}catch(e){}; spawnConfetti(); }
+  if(newRecord){ best = score; simpanRekor(best);try{var _h=JSON.parse(localStorage.getItem('reichas_hist_flyer')||'[]');_h.unshift({s:score,t:Date.now()});localStorage.setItem('reichas_hist_flyer',JSON.stringify(_h.slice(0,10)))}catch(e){};try{var _d=Math.max(1,Math.round((performance.now()-_tMulai)/1000));var _t=segelRonde(Math.max(0,Math.floor(score)||0),_d);if(_t)kirimSkor(_t)}catch(e){}; spawnConfetti(); }
   document.getElementById('finalScore').textContent = score;
   document.getElementById('bestScore').textContent = best;
   var SENYUM=['Nyaris! Coba sekali lagi.','Anginnya lagi usil.','Fokus, tarik napas, ulangi.','Hampir sampai ke puncak!','Istirahat dulu, ngopi, lanjut lagi.'];
@@ -309,7 +327,49 @@ function drawGround(){
 /* kirimSkor: anti-dobel — kirim hanya bila skor baru lebih tinggi dari yang tercatat untuk nama ini */
 const SUPA_URL='https://nfeexstvdjgywonbtxtb.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZWV4c3R2ZGpneXdvbmJ0eHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTEyNzgsImV4cCI6MjEwMDk2NzI3OH0.rStSOT85A0IIy1Qes6A92b5Jpe4CrBZyrpVNQDC3o1E';
-function kirimSkor(game,nama,skor){
+/* ===== GERBANG KIRIM SKOR (v80) =====
+   kirimSkor tidak lagi menerima angka bebas. Ia hanya mau menerima "segel"
+   sekali-pakai yang dibuat segelRonde() di akhir ronde yang wajar, jadi skor
+   tidak bisa disuntik dari console/bookmarklet. Nilai akhir tetap divalidasi
+   dan dibatasi ulang di server lewat RPC rehat_kirim_skor (SQL v80). */
+var _segel=null;
+function _nonce(){
+  var n='';
+  try{ var a=new Uint8Array(12);
+    if(window.crypto&&crypto.getRandomValues){ crypto.getRandomValues(a);
+      n=[].map.call(a,function(x){ return ('0'+x.toString(16)).slice(-2) }).join('') } }catch(e){}
+  return n||(Date.now().toString(36)+Math.random().toString(36).slice(2,10));
+}
+function segelRonde(skor,detik){
+  if(!(skor>0) || !(detik>=1) || detik>7200) return null;
+  if(skor > 3+Math.ceil(detik*1.3)) return null;   /* >1 pipa per 0,77 detik: mustahil */
+  _segel={ skor:skor, waktu:detik, nonce:_nonce(), dipakai:false };
+  return _segel;
+}
+function kirimSkor(tok){
+  if(!tok || tok!==_segel || tok.dipakai) return;
+  tok.dipakai=true; _segel=null;
+  var nama=''; try{ nama=(localStorage.getItem('reichas_player_name')||'').trim().slice(0,24) }catch(e){}
+  if(!nama) return;
+  try{
+    if(navigator.onLine===false) return;
+    var ctl=new AbortController(), to=setTimeout(function(){ try{ctl.abort()}catch(e){} },9000);
+    fetch(SUPA_URL+'/rest/v1/rpc/rehat_kirim_skor',{ method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({ p_game:'flyer', p_nama:nama, p_level:'', p_skor:tok.skor,
+        p_waktu:tok.waktu, p_langkah:null, p_nonce:tok.nonce }),
+      signal:ctl.signal })
+    .then(function(r){ clearTimeout(to);
+      /* 404 = RPC aman belum dipasang di Supabase → sementara pakai jalur lama */
+      if(r.status===404) kirimLama('flyer',nama,tok.skor);
+    })
+    .catch(function(){ clearTimeout(to) });
+  }catch(e){}
+}
+
+/* jalur lama (insert REST langsung). Cadangan sebelum SQL v80 dijalankan;
+   setelah v80 dipasang, insert publik sudah dicabut di server. */
+function kirimLama(game,nama,skor){
   try{
     if(navigator.onLine===false)return;
     nama=nama.slice(0,24);

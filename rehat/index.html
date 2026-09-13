@@ -100,7 +100,21 @@
   try{inp.value=localStorage.getItem(K)||''}catch(e){}
   inp.addEventListener('input',function(){try{localStorage.setItem(K,(inp.value||'').trim().slice(0,24))}catch(e){}});
   /* rekor perangkat */
-  function b(k){try{return parseInt(localStorage.getItem(k)||'0',10)||0}catch(e){return 0}}
+  /* rekor perangkat bersidik (v80): nilai yang diubah manual lewat devtools
+     punya sidik yang tidak cocok, jadi diabaikan (tidak ditampilkan). */
+  function _sd(k,v){
+    var g=(k==='reichas_best')?'flyer':(k==='reichas_ngopi_best'?'ngopi':'susun');
+    var s='rcs|'+g+'|'+v, h=5381;
+    for(var i=0;i<s.length;i++){ h=(((h*33)^s.charCodeAt(i))>>>0) }
+    return h.toString(36);
+  }
+  function b(k){try{
+    var v=parseInt(localStorage.getItem(k)||'0',10)||0;
+    if(v<=0 || v>100000) return 0;
+    var sg=localStorage.getItem(k+'_c');
+    if(sg && sg!==_sd(k,v)) return 0;
+    return v;
+  }catch(e){return 0}}
   function h(k){try{var a=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
   function tgl(t){try{return new Date(t).toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(e){return''}}
   function isi(elm,a){elm.innerHTML=a.length?a.map(function(x){return '<li>'+x.s+'<em>'+tgl(x.t)+'</em></li>'}).join(''):'<li class="kosong">Belum ada skor — mainkan dulu.</li>'}
