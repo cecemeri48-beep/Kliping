@@ -52,6 +52,10 @@
   ol.ranks .tgl{font-size:11px;color:var(--ink2)}
   .badge-rek{display:inline-block;margin-left:6px;background:linear-gradient(135deg,#ffce4a,#ff9a3c);color:#3a2a00;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;letter-spacing:.4px;vertical-align:middle;animation:rekPulse 1.6s ease-in-out infinite}
   @keyframes rekPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  .lvchips{display:flex;gap:6px;margin:2px 0 8px;flex-wrap:wrap}
+  .lvchip{background:var(--soft2);border:1px solid var(--line);color:var(--ink2);border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer;min-height:32px}
+  .lvchip.on{background:var(--green);border-color:var(--green);color:#fff}
+  .lvl{display:inline-block;margin-left:6px;background:var(--green-s);color:var(--green);font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle}
   footer{max-width:640px;margin:0 auto;padding:0 18px 40px;font-size:12.5px;color:var(--ink2)}
   footer a{color:var(--ink2)}
 </style>
@@ -75,7 +79,7 @@
     <h2>Papan Rekor Bersama</h2>
     <div class="brow"><h3>FLYER</h3><ol class="ranks" id="rankFlyer"><li class="kosong">Memuat&#8230;</li></ol></div>
     <div class="brow"><h3>NGOPI</h3><ol class="ranks" id="rankNgopi"><li class="kosong">Memuat&#8230;</li></ol></div>
-    <div class="brow"><h3>SUSUN</h3><ol class="ranks" id="rankPuzzle"><li class="kosong">Memuat&#8230;</li></ol></div>
+    <div class="brow"><h3>SUSUN</h3><div class="lvchips" id="lvPuzzle"><button class="lvchip on" data-lv="" type="button">Semua</button><button class="lvchip" data-lv="3x3" type="button">3×3</button><button class="lvchip" data-lv="4x4" type="button">4×4</button><button class="lvchip" data-lv="5x5" type="button">5×5</button></div><ol class="ranks" id="rankPuzzle"><li class="kosong">Memuat&#8230;</li></ol></div>
   </section>
 
   <section class="board">
@@ -109,33 +113,52 @@
   document.getElementById('rekorPuzzle').textContent=bp;document.getElementById('bestPuzzle').textContent=bp;
   isi(document.getElementById('histPuzzle'),h('reichas_hist_puzzle'));
   /* papan rekor bersama */
+  var cacheRank={};
+  function renderRank(game,elm,lv){
+    var rows=(cacheRank[game]||[]).filter(function(x){return !lv || (x.level||'')===lv}).slice(0,10);
+    if(!rows.length){elm.innerHTML='<li class="kosong">Belum ada yang tercatat di tingkat ini.</li>';return}
+    /* lencana REKOR BARU: teratas melampaui rekor yang terakhir dilihat perangkat ini, atau baru masuk <24 jam */
+    var topSkor=rows[0].skor|0, rekBaru=false;
+    try{
+      var kunci='reichas_top_'+game+'_'+(lv||'semua');
+      var sebelum=parseInt(localStorage.getItem(kunci)||'-1',10);
+      if(sebelum>=0 && topSkor>sebelum) rekBaru=true;
+      localStorage.setItem(kunci,String(topSkor));
+    }catch(e){}
+    var segar=false; try{ segar=(Date.now()-new Date(rows[0].created_at).getTime())<24*3600*1000; }catch(e){}
+    var tag=(rekBaru||segar)?'<span class="badge-rek">🔥 REKOR BARU</span>':'';
+    elm.innerHTML=rows.map(function(x,i){
+      var lvc=(game==='puzzle'&&x.level)?'<span class="lvl">'+esc(String(x.level).replace('x','×'))+'</span>':'';
+      return '<li><span class="no">'+(i+1)+'</span><span class="nm">'+esc(x.nama)+lvc+(i===0?tag:'')+'</span><span class="tgl">'+tgl(x.created_at)+'</span><b>'+esc(x.skor)+'</b></li>'
+    }).join('');
+  }
   function loadRank(game,elm){
-    fetch(SUPA+'/rest/v1/rehat_skor?game=eq.'+game+'&select=nama,skor,created_at&order=skor.desc,created_at.asc&limit=50',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+    fetch(SUPA+'/rest/v1/rehat_skor?game=eq.'+game+'&select=nama,skor,created_at,level&order=skor.desc,created_at.asc&limit=80',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
     .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
     .then(function(rows){
-      var seen={},uniq=[]; /* satu nama = satu baris saja: skor tertinggi (urutan sudah desc) */
-      (rows||[]).forEach(function(x){var k=(x.nama||'').trim().toLowerCase(); if(k&&!seen[k]){seen[k]=1;uniq.push(x)}});
-      rows=uniq.slice(0,10);
-      if(!rows.length){elm.innerHTML='<li class="kosong">Belum ada yang tercatat — jadilah yang pertama.</li>';return}
-      /* lencana REKOR BARU: teratas melampaui rekor yang terakhir dilihat perangkat ini, atau baru masuk <24 jam */
-      var topSkor=rows[0].skor|0, rekBaru=false;
-      try{
-        var kunci='reichas_top_'+game;
-        var sebelum=parseInt(localStorage.getItem(kunci)||'-1',10);
-        if(sebelum>=0 && topSkor>sebelum) rekBaru=true;
-        localStorage.setItem(kunci,String(topSkor));
-      }catch(e){}
-      var segar=false; try{ segar=(Date.now()-new Date(rows[0].created_at).getTime())<24*3600*1000; }catch(e){}
-      var tag=(rekBaru||segar)?'<span class="badge-rek">🔥 REKOR BARU</span>':'';
-      elm.innerHTML=rows.map(function(x,i){
-        return '<li><span class="no">'+(i+1)+'</span><span class="nm">'+esc(x.nama)+(i===0?tag:'')+'</span><span class="tgl">'+tgl(x.created_at)+'</span><b>'+esc(x.skor)+'</b></li>'
-      }).join('');
+      var seen={},uniq=[]; /* satu nama = satu baris per tingkat (urutan sudah desc) */
+      (rows||[]).forEach(function(x){var k=(x.nama||'').trim().toLowerCase()+'|'+(x.level||''); if(!seen[k]){seen[k]=1;uniq.push(x)}});
+      cacheRank[game]=uniq;
+      renderRank(game,elm,'');
     })
-    .catch(function(){elm.innerHTML='<li class="kosong">Papan rekor bersama butuh jaringan.</li>'});
+    .catch(function(){ /* kolom level belum ada? mundur ke kueri lama tanpa level */
+      fetch(SUPA+'/rest/v1/rehat_skor?game=eq.'+game+'&select=nama,skor,created_at&order=skor.desc,created_at.asc&limit=50',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
+      .then(function(rows){
+        var seen={},uniq=[];
+        (rows||[]).forEach(function(x){var k=(x.nama||'').trim().toLowerCase(); if(!seen[k]){seen[k]=1;uniq.push(x)}});
+        cacheRank[game]=uniq;
+        renderRank(game,elm,'');
+      })
+      .catch(function(){elm.innerHTML='<li class="kosong">Papan rekor bersama butuh jaringan.</li>'});
+    });
   }
   loadRank('flyer',document.getElementById('rankFlyer'));
   loadRank('ngopi',document.getElementById('rankNgopi'));
   loadRank('puzzle',document.getElementById('rankPuzzle'));
+  /* filter tingkat untuk papan SUSUN */
+  var lvp=document.getElementById('lvPuzzle');
+  if(lvp){lvp.addEventListener('click',function(e){var b=e.target.closest('.lvchip');if(!b)return;[].slice.call(lvp.children).forEach(function(c){c.classList.remove('on')});b.classList.add('on');renderRank('puzzle',document.getElementById('rankPuzzle'),b.dataset.lv)});}
 })();
 </script>
 </body>

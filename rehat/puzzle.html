@@ -45,7 +45,9 @@
     border-radius:999px; padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer; min-height:40px; }
   .chip.on{ background:var(--gold); color:#3a2a00; border-color:var(--gold); }
   #peekBtn{ background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.3);
-    font-weight:700; font-size:13.5px; padding:11px 20px; border-radius:12px; cursor:pointer; min-height:44px; touch-action:none; }
+    font-weight:700; font-size:13.5px; padding:11px 20px; border-radius:12px; cursor:pointer; min-height:44px;
+    user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
+  #peekBtn:disabled{ opacity:.45; }
   #peekView{ position:absolute; inset:0; z-index:7; display:none;
     background:rgba(10,14,11,.94) url('logo-puzzle.webp') center/88% no-repeat; }
   #peekView.on{ display:block; }
@@ -74,7 +76,7 @@
     <div id="board"></div>
     <div id="progWrap"><div id="progBar"></div></div>
     <div class="hint">Ketuk dua potongan untuk menukar posisinya.<br />Ketuk potongan yang sedang terpilih sekali lagi untuk <b>memutarnya</b> 90&deg;.</div>
-    <button id="peekBtn" type="button">👁 Tahan untuk mengintip · +4 dtk</button>
+    <button id="peekBtn" type="button">👁 Intip logo utuh (1,5 dtk) · +4 dtk</button>
   </div>
   <div id="winBadge">&#10003; Susunan benar!<br /><span style="font-size:13px;font-weight:600;opacity:.85">Logo utuh kembali</span></div>
   <div id="peekView"></div>
@@ -194,19 +196,27 @@
   function points(){ var base=N===3?3000:(N===5?9500:6000); return Math.max(10, base - secs*30 - moves*8); }
 
   /* kirimSkor: anti-dobel — kirim hanya bila skor baru lebih tinggi dari yang tercatat untuk nama ini */
-  function kirimSkor(game,nama,skor){
+  function kirimSkor(game,nama,skor,level){
     try{
       if(navigator.onLine===false)return;
       nama=nama.slice(0,24);
       var H={apikey:KEY,Authorization:'Bearer '+KEY};
-      fetch(SUPA+'/rest/v1/rehat_skor?game=eq.'+game+'&nama=ilike.'+encodeURIComponent(nama.trim())+'&select=skor&order=skor.desc&limit=1',{headers:H})
+      var qs=SUPA+'/rest/v1/rehat_skor?game=eq.'+game+'&nama=ilike.'+encodeURIComponent(nama.trim())+(level?'&level=eq.'+encodeURIComponent(level):'')+'&select=skor&order=skor.desc&limit=1';
+      fetch(qs,{headers:H})
       .then(function(r){return r.ok?r.json():[]})
       .then(function(rows){
         var ex=(rows&&rows[0])?(rows[0].skor|0):-1;
         if(skor<=ex)return; /* sudah ada skor sama/lebih tinggi — jangan dobel */
         var ctl=new AbortController();var to=setTimeout(function(){try{ctl.abort()}catch(e){}},8000);
-        fetch(SUPA+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:game,nama:nama,skor:skor}),signal:ctl.signal})
-        .then(function(){clearTimeout(to)}).catch(function(){clearTimeout(to)});
+        var data={game:game,nama:nama,skor:skor}; if(level)data.level=level;
+        fetch(SUPA+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(data),signal:ctl.signal})
+        .then(function(r){
+          clearTimeout(to);
+          if(!r.ok && level){ /* kolom level belum tersedia? kirim ulang tanpa level */
+            delete data.level;
+            fetch(SUPA+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(data)}).catch(function(){});
+          }
+        }).catch(function(){clearTimeout(to)});
       }).catch(function(){});
     }catch(e){}
   }
@@ -249,11 +259,11 @@
     else el('winRecord').textContent='Terbaik: '+best;
     try{var h=JSON.parse(localStorage.getItem(HIST)||'[]');h.unshift({s:pts,t:Date.now()});localStorage.setItem(HIST,JSON.stringify(h.slice(0,10)))}catch(e){}
     try{var n=(localStorage.getItem(NAMA)||'').trim();
-      if(n){kirimSkor('puzzle',n,pts)}}catch(e){}
+      if(n){kirimSkor('puzzle',n,pts,N+'x'+N)}}catch(e){}
     setTimeout(function(){ if(bd)bd.classList.remove('on'); el('winScreen').classList.remove('hidden'); },1600);
   }
 
-  function mulai(){ sv(); var wb=el('winBadge'); if(wb)wb.classList.remove('on'); el('startScreen').classList.add('hidden'); el('winScreen').classList.add('hidden'); shuffle(); playing=true; startTimer(); }
+  function mulai(){ sv(); var wb=el('winBadge'); if(wb)wb.classList.remove('on'); pkSisa=3; peekLabel(); peekTutup(); el('startScreen').classList.add('hidden'); el('winScreen').classList.add('hidden'); shuffle(); playing=true; startTimer(); }
   el('startBtn').addEventListener('click',mulai);
   el('againBtn').addEventListener('click',mulai);
 
@@ -268,11 +278,24 @@
   var chips=el('chips');
   if(chips){chips.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;[].slice.call(chips.children).forEach(function(c){c.classList.remove('on')});b.classList.add('on');setN(+b.dataset.n);getar(12)});}
 
-  /* intip: tahan untuk melihat logo utuh, +4 detik tiap intip */
-  var pk=el('peekBtn'), pv=el('peekView');
-  function peekOn(e){ if(e&&e.preventDefault)e.preventDefault(); if(!playing)return; pv.classList.add('on'); secs+=4; el('time').textContent=fmt(secs); getar(25); }
-  function peekOff(){ pv.classList.remove('on'); }
-  if(pk&&pv){ pk.addEventListener('pointerdown',peekOn); pk.addEventListener('pointerup',peekOff); pk.addEventListener('pointerleave',peekOff); }
+  /* intip: maksimal 3 kali per permainan — ketuk untuk melihat logo utuh 1,5 detik, +4 detik tiap intip */
+  var pk=el('peekBtn'), pv=el('peekView'), pkT=null, pkSisa=3;
+  function peekLabel(){ if(!pk)return; pk.innerHTML= pkSisa>0 ? ('👁 Intip logo utuh (1,5 dtk) · sisa '+pkSisa+'×') : '👁 Intip habis'; pk.disabled=(pkSisa<=0); }
+  function peekTutup(){ pv.classList.remove('on'); if(pkT){clearTimeout(pkT);pkT=null} }
+  function peekBuka(e){
+    if(e&&e.preventDefault)e.preventDefault();
+    if(!playing || pkSisa<=0)return;
+    if(pv.classList.contains('on')){ peekTutup(); return; }
+    pkSisa--; peekLabel();
+    pv.classList.add('on'); secs+=4; el('time').textContent=fmt(secs); getar(25);
+    pkT=setTimeout(peekTutup,1500);
+  }
+  if(pk&&pv){
+    pk.addEventListener('click',peekBuka);
+    pk.addEventListener('contextmenu',function(e){e.preventDefault()});
+    pv.addEventListener('click',peekTutup);
+  }
+  peekLabel();
 
   build();
 })();

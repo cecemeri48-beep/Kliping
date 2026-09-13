@@ -55,3 +55,27 @@ begin
 end $$;
 drop trigger if exists rehat_skor_guard on rehat_skor;
 create trigger rehat_skor_guard before insert on rehat_skor for each row execute function rehat_skor_guard();
+
+-- v79: tingkat kesulitan puzzle masuk papan skor (jalankan sekali, aman diulang)
+-- 1) kolom level: '3x3' / '4x4' / '5x5' untuk puzzle; '' untuk game lain
+alter table rehat_skor add column if not exists level text not null default '';
+-- 2) skor puzzle lama (sebelum ada tingkat) dianggap Normal 4x4
+update rehat_skor set level='4x4' where game='puzzle' and level='';
+-- 3) kunci unik diperbarui: satu nama per game PER tingkat
+drop index if exists rehat_skor_unik;
+create unique index if not exists rehat_skor_unik on rehat_skor (game, lower(trim(nama)), level);
+-- 4) penjaga diperbarui: membandingkan juga tingkat
+create or replace function rehat_skor_guard() returns trigger
+language plpgsql security definer set search_path=public as $$
+declare old_id bigint; old_skor int;
+begin
+  select id,skor into old_id,old_skor from rehat_skor
+   where game=new.game and lower(trim(nama))=lower(trim(new.nama)) and level=new.level limit 1;
+  if old_id is not null then
+    if new.skor>old_skor then
+      update rehat_skor set skor=new.skor, created_at=now() where id=old_id;
+    end if;
+    return null;
+  end if;
+  return new;
+end $$;
