@@ -256,7 +256,7 @@ function drawPipe(p){
   // top
   roundRect(p.x, 0, PIPE_W, p.top, 10); ctx.fill();
   // bottom
-  const by = p.top + GAP;
+  const by = p.top + gapNow;
   roundRect(p.x, by, PIPE_W, H-by, 10); ctx.fill();
   // caps
   ctx.fillStyle='#2f7346';
@@ -329,9 +329,14 @@ let last = performance.now();
 /* mode ringan adaptif: bila bingkai rata-rata berat (HP panas/berat), hiasan non-esensial dimatikan sementara */
 let _msAvg=16;
 let lowFx=false; try{lowFx=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+var _exit=false; /* fungsi exit: matikan loop & audio saat beralih ke game lain agar tidak tabrakan/hang */
+function keluarGame(){ _exit=true; try{if(window.BWKAudio&&BWKAudio.ctx&&BWKAudio.ctx.suspend)BWKAudio.ctx.suspend()}catch(e){} }
+window.addEventListener('pagehide',keluarGame);
+window.addEventListener('beforeunload',keluarGame);
+try{var _bk=document.querySelector('.back'); if(_bk)_bk.addEventListener('click',keluarGame);}catch(e){}
 document.addEventListener('visibilitychange',function(){ if(!document.hidden){ last=performance.now(); requestAnimationFrame(loop);} });
 function loop(now){
-  if(document.hidden)return; /* hemat daya: tab tidak terlihat = berhenti */
+  if(_exit||document.hidden)return; /* berhenti total saat tab hilang atau pindah game */
   const rawMs=now-last; _msAvg=_msAvg*0.94+Math.min(rawMs,120)*0.06;
   if(!lowFx&&_msAvg>26)lowFx=true; else if(lowFx&&_msAvg<17)lowFx=false;
   const dt = Math.min(2, (now-last)/16.67); last = now;
@@ -358,7 +363,7 @@ function loop(now){
       if(!p.passed && p.x + PIPE_W < bird.x){ p.passed=true; score++; try{if(window.BWKAudio)window.BWKAudio.playPoint();}catch(e){} }
       // collision
       if(bird.x+bird.r*0.7 > p.x && bird.x-bird.r*0.7 < p.x+PIPE_W){
-        if(bird.y-bird.r*0.7 < p.top || bird.y+bird.r*0.7 > p.top+GAP){ endGame(); }
+        if(bird.y-bird.r*0.7 < p.top || bird.y+bird.r*0.7 > p.top+gapNow){ endGame(); }
       }
     }
     if(bird.y+bird.r > H-24 || bird.y-bird.r < 0){ bird.y=Math.max(bird.r, bird.y); if(bird.y+bird.r>=H-24) endGame(); }

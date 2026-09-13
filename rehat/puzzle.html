@@ -38,6 +38,8 @@
     padding:14px 24px; border-radius:16px; opacity:0; transition:opacity .25s ease; text-align:center;
     box-shadow:0 12px 34px rgba(0,0,0,.5); }
   #winBadge.on{ opacity:1; }
+  #progWrap{ width:min(88vw,380px); height:8px; background:rgba(255,255,255,.12); border-radius:99px; overflow:hidden; }
+  #progBar{ height:100%; width:0%; background:linear-gradient(90deg,#2E7D4F,#8cc6a4); border-radius:99px; transition:width .25s ease; }
   .chips{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
   .chip{ background:rgba(255,255,255,.08); color:rgba(255,255,255,.85); border:1px solid rgba(255,255,255,.25);
     border-radius:999px; padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer; min-height:40px; }
@@ -70,6 +72,7 @@
   <div id="hud"><span id="time">0:00</span><span id="tepat">0/16 tepat</span><span id="moves">0 tukar</span></div>
   <div id="stage">
     <div id="board"></div>
+    <div id="progWrap"><div id="progBar"></div></div>
     <div class="hint">Ketuk dua potongan untuk menukar posisinya.<br />Ketuk potongan yang sedang terpilih sekali lagi untuk <b>memutarnya</b> 90&deg;.</div>
     <button id="peekBtn" type="button">👁 Tahan untuk mengintip · +4 dtk</button>
   </div>
@@ -87,7 +90,7 @@
   </div>
 
   <div class="overlay hidden" id="winScreen">
-    <div class="title">LOGO UTUH<span> &#127881;</span></div>
+    <div class="title">SELESAI<span> &#10003; BENAR!</span></div>
     <div class="big" id="winPts">0</div>
     <div class="scoreline" id="winStat"></div>
     <div class="record" id="winRecord"></div>
@@ -144,6 +147,7 @@
       d.classList.toggle('done', ok);
     }
     var tp=el('tepat'); if(tp)tp.textContent=tepat+'/'+SIZE+' tepat';
+    var pb=el('progBar'); if(pb)pb.style.width=(tepat/SIZE*100)+'%';
   }
   function posOf(piece){ return cell.indexOf(piece); }
   function solved(){
@@ -181,6 +185,11 @@
 
   function startTimer(){ stopTimer(); timer=setInterval(function(){ secs++; el('time').textContent=fmt(secs); },1000); }
   function stopTimer(){ if(timer){clearInterval(timer);timer=null} }
+  /* fungsi exit: hentikan timer & kunci papan saat beralih ke game lain */
+  function keluarGame(){ playing=false; stopTimer(); }
+  window.addEventListener('pagehide',keluarGame);
+  window.addEventListener('beforeunload',keluarGame);
+  try{var _bk=document.querySelector('.back'); if(_bk)_bk.addEventListener('click',keluarGame);}catch(e){}
   /* poin murni kecepatan, dasar menyesuaikan tingkat kesulitan */
   function points(){ var base=N===3?3000:(N===5?9500:6000); return Math.max(10, base - secs*30 - moves*8); }
 
