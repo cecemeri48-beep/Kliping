@@ -38,6 +38,17 @@
   .logo{ width:104px; height:104px; border-radius:50%;
     box-shadow:0 8px 26px rgba(0,0,0,.45), 0 0 0 4px rgba(255,255,255,.14);
     animation:bob 2.4s ease-in-out infinite; }
+  /* HEMAT DAYA DI HP (Android & iOS): backdrop-filter memaksa GPU menyusun ulang
+     seluruh layar tiap bingkai di atas kanvas yang bergerak -> panas, lag, baterai boros.
+     Di perangkat sentuh blur dimatikan; latar rgba yang sudah ada tetap membuatnya terbaca. */
+  @media (hover:none),(prefers-reduced-motion:reduce){
+    *{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+    /* Blur hilang -> peredam gelap panel dipertebal, kalau tidak teks jadi tipis
+       di atas langit & pipa yang terus bergerak. */
+    /* Gradien aslinya nyaris BENING di tengah — dulu blur yang menyamarkan kanvas
+       di belakang teks. Tanpa blur, pusat gradien harus ikut dirapatkan. */
+    .overlay{ background:radial-gradient(120% 90% at 50% 15%, rgba(10,26,38,.88), rgba(4,14,22,.985)) !important; }
+  }
   @keyframes bob{ 0%,100%{transform:translateY(0) rotate(-4deg);} 50%{transform:translateY(-10px) rotate(4deg);} }
   .title{ color:#fff; font-weight:800; letter-spacing:1px; font-size:30px; line-height:1.05;
     text-shadow:0 3px 12px rgba(0,0,0,.5); }
@@ -66,6 +77,33 @@
 </style>
 </head>
 <body>
+<script>
+/* ===== TANDING ULANG — PEMBERSIH REKOR LOKAL (MUSIM_V81) =====
+   Papan peringkat di server dikosongkan lewat rehat-reset-skor-v81.sql.
+   Blok ini membereskan sisa rekor & riwayat yang tersimpan di HP tiap pemain,
+   supaya papan dan rekor pribadi benar-benar mulai dari nol. Jalan SEKALI saja
+   per perangkat, lalu menandai dirinya sendiri. Nama pemain sengaja disimpan
+   agar tidak perlu diisi ulang. Harus berada sebelum skrip game membaca rekor. */
+(function(){
+  try{
+    var S='reichas_musim', V='v81';
+    if(localStorage.getItem(S)===V) return;
+    var buang=['reichas_best','reichas_best_c',
+               'reichas_ngopi_best','reichas_ngopi_best_c',
+               'reichas_puzzle_best','reichas_puzzle_best_c',
+               'reichas_hist_flyer','reichas_hist_ngopi','reichas_hist_puzzle'];
+    for(var i=0;i<buang.length;i++){ try{ localStorage.removeItem(buang[i]) }catch(e){} }
+    /* kumpulkan dulu, baru hapus: menghapus sambil menelusuri bisa melewati kunci */
+    var sisa=[];
+    for(var j=0;j<localStorage.length;j++){
+      var k=localStorage.key(j);
+      if(k && k.indexOf('reichas_top_')===0) sisa.push(k);
+    }
+    for(var m=0;m<sisa.length;m++){ try{ localStorage.removeItem(sisa[m]) }catch(e){} }
+    localStorage.setItem(S,V);
+  }catch(e){}
+})();
+</script>
 <div id="wrap">
   <a href="./" aria-label="Kembali ke Rehat Sejenak" style="position:absolute;top:10px;left:10px;z-index:6;display:inline-flex;align-items:center;background:rgba(0,0,0,.38);color:#fff;text-decoration:none;font-size:12px;font-weight:700;padding:9px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(6px);min-height:36px">&#8592; Rehat</a>
   <canvas id="game"></canvas>
@@ -216,13 +254,20 @@ function _lc(a,b,t){
         bb=(parseInt(a.substr(5,2),16)+(parseInt(b.substr(5,2),16)-parseInt(a.substr(5,2),16))*t)|0;
   return 'rgb('+r+','+gg+','+bb+')';
 }
+var _skyG=null,_skyK=-1;
 function drawSky(){
   const t = Math.min(1, score/70); _skyT = t; /* siang -> senja: makin jauh makin menantang */
-  const g = ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,_lc('#6cc4ef','#33406e',t));
-  g.addColorStop(0.55,_lc('#bfe9fb','#c97a52',t));
-  g.addColorStop(1,_lc('#eaf7ff','#f2d0a2',t));
-  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  /* gradien langit di-cache per langkah kecil; membuat gradien tiap bingkai = biang HP panas */
+  const k=Math.round(t*20);
+  if(k!==_skyK){
+    _skyK=k;
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,_lc('#6cc4ef','#33406e',t));
+    g.addColorStop(0.55,_lc('#bfe9fb','#c97a52',t));
+    g.addColorStop(1,_lc('#eaf7ff','#f2d0a2',t));
+    _skyG=g;
+  }
+  ctx.fillStyle=_skyG; ctx.fillRect(0,0,W,H);
   // matahari turun dan memerah
   const sy = H*0.16 + t*H*0.46, sr = 42 + t*16;
   ctx.fillStyle='rgba(255,'+Math.round(241-80*t)+','+Math.round(190-120*t)+',.92)';
@@ -249,10 +294,13 @@ function drawClouds(){
     ctx.beginPath(); ctx.moveTo(bx-8,by); ctx.quadraticCurveTo(bx-3,by-5,bx,by); ctx.quadraticCurveTo(bx+3,by-5,bx+8,by); ctx.stroke();
   }
 }
+var _vigG=null;
 function drawVignette(){
-  const v=ctx.createRadialGradient(W/2,H*0.42,H*0.32,W/2,H*0.5,H*0.85);
-  v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,'rgba(10,20,30,.18)');
-  ctx.fillStyle=v; ctx.fillRect(0,0,W,H);
+  if(!_vigG){ /* dibuat sekali, dipakai seumur ronde */
+    _vigG=ctx.createRadialGradient(W/2,H*0.42,H*0.32,W/2,H*0.5,H*0.85);
+    _vigG.addColorStop(0,'rgba(0,0,0,0)'); _vigG.addColorStop(1,'rgba(10,20,30,.18)');
+  }
+  ctx.fillStyle=_vigG; ctx.fillRect(0,0,W,H);
 }
 function drawMountains(off, base, color, height){
   ctx.fillStyle=color;
@@ -387,8 +435,12 @@ function kirimLama(game,nama,skor){
 }
 let last = performance.now();
 /* mode ringan adaptif: bila bingkai rata-rata berat (HP panas/berat), hiasan non-esensial dimatikan sementara */
-let _msAvg=16;
+let _msAvg=8;
 let lowFx=false; try{lowFx=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+/* anggaran waktu per bingkai: 15,4ms ~ 60fps. Di layar 90/120Hz kelebihan bingkai dibuang
+   karena gerak tetap dihitung dengan dt, jadi kecepatan main TIDAK berubah. */
+var _budget=15.4;
+try{ if((navigator.hardwareConcurrency||4)<=4){ lowFx=true; _budget=23.5 } }catch(e){}
 var _exit=false; /* fungsi exit: matikan loop & audio saat beralih ke game lain agar tidak tabrakan/hang */
 function keluarGame(){ _exit=true; try{if(window.BWKAudio&&BWKAudio.ctx&&BWKAudio.ctx.suspend)BWKAudio.ctx.suspend()}catch(e){} }
 window.addEventListener('pagehide',keluarGame);
@@ -397,8 +449,8 @@ try{var _bk=document.querySelector('.back'); if(_bk)_bk.addEventListener('click'
 document.addEventListener('visibilitychange',function(){ if(!document.hidden){ last=performance.now(); requestAnimationFrame(loop);} });
 function loop(now){
   if(_exit||document.hidden)return; /* berhenti total saat tab hilang atau pindah game */
-  const rawMs=now-last; _msAvg=_msAvg*0.94+Math.min(rawMs,120)*0.06;
-  if(!lowFx&&_msAvg>26)lowFx=true; else if(lowFx&&_msAvg<17)lowFx=false;
+  /* lewati bingkai berlebih di layar 90/120Hz: kerja 1,5-2x lipat tanpa manfaat visual */
+  if(now-last < _budget){ requestAnimationFrame(loop); return; }
   const dt = Math.min(2, (now-last)/16.67); last = now;
   ctx.clearRect(0,0,W,H);
   drawSky();
@@ -445,6 +497,11 @@ function loop(now){
     ctx.fillStyle=c.c; ctx.fillRect(-c.s/2,-c.s/2,c.s,c.s*0.6); ctx.restore();
   }
 
+  /* ukur biaya render sebenarnya (bukan jeda bingkai) untuk memutuskan mode ringan.
+     Bila satu bingkai >11ms, hiasan dimatikan dan target turun ~42fps supaya HP dingin. */
+  var _cost=performance.now()-now;
+  _msAvg=_msAvg*0.9+Math.min(_cost,120)*0.1;
+  if(!lowFx&&_msAvg>11){ lowFx=true; _budget=23.5 } else if(lowFx&&_msAvg<6){ lowFx=false; _budget=15.4 }
   requestAnimationFrame(loop);
 }
 reset();

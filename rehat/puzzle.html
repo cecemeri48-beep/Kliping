@@ -114,9 +114,49 @@
     #board.solved, .tile.snap .in, .tile .spark, #shine.on i, #winScreen.show > *{ animation:none !important; }
     #winBadge{ transform:translate(-50%,-50%) !important; }
   }
+  /* HEMAT DAYA DI HP (Android & iOS): backdrop-filter memaksa GPU menyusun ulang
+     seluruh layar tiap bingkai. Di perangkat sentuh blur dimatikan; peredam gelap
+     radial pada #winScreen tetap menjaga kontras teks di atas foto logo. */
+  @media (hover:none){
+    *{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+    /* Blur hilang, jadi peredam gelap layar mulai dipertebal supaya teks tetap tajam
+       di atas foto potongan logo. #winScreen tidak disentuh: peredam radialnya sudah
+       cukup dan logo utuh sengaja masih terlihat sebagai hadiah. */
+    /* Perhatikan: gradien aslinya nyaris BENING di tengah (rgba putih .10) — dulu
+       blur-lah yang menyamarkan foto di belakang teks. Tanpa blur, pusat gradien
+       harus ikut dirapatkan, bukan hanya tepinya. */
+    #startScreen{ background:radial-gradient(120% 90% at 50% 12%, rgba(18,26,20,.90), rgba(6,11,8,.985)) !important; }
+  }
 </style>
 </head>
 <body>
+<script>
+/* ===== TANDING ULANG — PEMBERSIH REKOR LOKAL (MUSIM_V81) =====
+   Papan peringkat di server dikosongkan lewat rehat-reset-skor-v81.sql.
+   Blok ini membereskan sisa rekor & riwayat yang tersimpan di HP tiap pemain,
+   supaya papan dan rekor pribadi benar-benar mulai dari nol. Jalan SEKALI saja
+   per perangkat, lalu menandai dirinya sendiri. Nama pemain sengaja disimpan
+   agar tidak perlu diisi ulang. Harus berada sebelum skrip game membaca rekor. */
+(function(){
+  try{
+    var S='reichas_musim', V='v81';
+    if(localStorage.getItem(S)===V) return;
+    var buang=['reichas_best','reichas_best_c',
+               'reichas_ngopi_best','reichas_ngopi_best_c',
+               'reichas_puzzle_best','reichas_puzzle_best_c',
+               'reichas_hist_flyer','reichas_hist_ngopi','reichas_hist_puzzle'];
+    for(var i=0;i<buang.length;i++){ try{ localStorage.removeItem(buang[i]) }catch(e){} }
+    /* kumpulkan dulu, baru hapus: menghapus sambil menelusuri bisa melewati kunci */
+    var sisa=[];
+    for(var j=0;j<localStorage.length;j++){
+      var k=localStorage.key(j);
+      if(k && k.indexOf('reichas_top_')===0) sisa.push(k);
+    }
+    for(var m=0;m<sisa.length;m++){ try{ localStorage.removeItem(sisa[m]) }catch(e){} }
+    localStorage.setItem(S,V);
+  }catch(e){}
+})();
+</script>
 <div id="wrap">
   <a href="./" class="back">&#8592; Rehat</a>
   <div id="hud"><span id="time">0:00</span><span id="tepat">0/16 tepat</span><span id="moves">0 tukar</span></div>
@@ -442,6 +482,10 @@
 
   /* ================= REWARD VISUAL ================= */
   function hemat(){ try{ return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) }catch(e){ return false } }
+  /* Deteksi perangkat: HP kelas bawah atau layar sangat padat (dpr 3) perlu partikel
+     lebih sedikit dan kanvas lebih ringan, kalau tidak HP panas dan animasi tersendat. */
+  var _hpLemah=false; try{ _hpLemah=((navigator.hardwareConcurrency||4)<=4)||((window.devicePixelRatio||1)>=3) }catch(e){}
+  var _hpSentuh=false; try{ _hpSentuh=!!(window.matchMedia && matchMedia('(hover:none)').matches) }catch(e){}
 
   /* 1. potongan "mengunci" satu per satu, menyapu diagonal */
   function snapWave(){
@@ -471,7 +515,8 @@
   function fxUkur(){
     if(!fx) return false;
     var w=fx.clientWidth, h=fx.clientHeight; if(!w||!h) return false;
-    var dpr=Math.min(2, window.devicePixelRatio||1);
+    /* batasi kepadatan piksel: pada dpr 3 kanvas harus menggambar 9x piksel -> panas & lag */
+    var dpr=Math.min(_hpLemah?1:1.5, window.devicePixelRatio||1);
     fx.width=Math.round(w*dpr); fx.height=Math.round(h*dpr);
     fxCtx=fx.getContext('2d'); if(!fxCtx) return false;
     fxCtx.setTransform(dpr,0,0,dpr,0,0); return true;
@@ -483,19 +528,23 @@
     if(!hujanSaja){
       var bb=board.getBoundingClientRect(), wb=el('wrap').getBoundingClientRect();
       var ox=bb.left-wb.left+bb.width/2, oy=bb.top-wb.top+bb.height/2;
-      for(i=0;i<110;i++){
+      var nLedak=_hpLemah?45:(_hpSentuh?70:110);
+      for(i=0;i<nLedak;i++){
         var a=Math.random()*Math.PI*2, sp=2.4+Math.random()*7.6;
         fxParts.push({ x:ox, y:oy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-3.4,
           w:4+Math.random()*6, h:6+Math.random()*8, c:warna[(Math.random()*warna.length)|0],
           r:Math.random()*3.14, vr:(Math.random()-.5)*.38, life:0, max:85+((Math.random()*45)|0) });
       }
     }
-    for(i=0;i<(hujanSaja?60:45);i++){
+    var nHujan=(hujanSaja?60:45);
+    if(_hpLemah) nHujan=(nHujan*0.45)|0; else if(_hpSentuh) nHujan=(nHujan*0.7)|0;
+    for(i=0;i<nHujan;i++){
       fxParts.push({ x:Math.random()*W, y:-20-Math.random()*120, vx:(Math.random()-.5)*1.4, vy:1.4+Math.random()*2.2,
         w:4+Math.random()*5, h:6+Math.random()*7, c:warna[(Math.random()*warna.length)|0],
         r:Math.random()*3.14, vr:(Math.random()-.5)*.3, life:0, max:170 });
     }
-    if(fxParts.length>420) fxParts=fxParts.slice(-420);
+    var batas=_hpLemah?140:(_hpSentuh?260:420);
+    if(fxParts.length>batas) fxParts=fxParts.slice(-batas);
     if(!fxRaf) fxRaf=requestAnimationFrame(fxLoop);
   }
   function fxLoop(){

@@ -51,9 +51,47 @@
   #hud .lives{ font-size:22px; letter-spacing:2px; }
   .credit{ position:absolute; bottom:8px; left:0; right:0; text-align:center;
     color:rgba(255,255,255,.5); font-size:11px; z-index:6; letter-spacing:.5px; }
+  /* HEMAT DAYA DI HP (Android & iOS): backdrop-filter memaksa GPU menyusun ulang
+     seluruh layar tiap bingkai di atas kanvas yang bergerak -> panas, lag, baterai boros.
+     Di perangkat sentuh blur dimatikan; latar rgba yang sudah ada tetap membuatnya terbaca. */
+  @media (hover:none),(prefers-reduced-motion:reduce){
+    *{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+    /* Blur hilang -> peredam gelap panel dipertebal, kalau tidak teks jadi tipis
+       di atas latar kafe & benda yang terus jatuh. */
+    /* Gradien aslinya nyaris BENING di tengah — dulu blur yang menyamarkan kanvas
+       di belakang teks. Tanpa blur, pusat gradien harus ikut dirapatkan. */
+    .overlay{ background:radial-gradient(120% 90% at 50% 12%, rgba(40,25,15,.90), rgba(20,12,7,.985)) !important; }
+  }
 </style>
 </head>
 <body>
+<script>
+/* ===== TANDING ULANG — PEMBERSIH REKOR LOKAL (MUSIM_V81) =====
+   Papan peringkat di server dikosongkan lewat rehat-reset-skor-v81.sql.
+   Blok ini membereskan sisa rekor & riwayat yang tersimpan di HP tiap pemain,
+   supaya papan dan rekor pribadi benar-benar mulai dari nol. Jalan SEKALI saja
+   per perangkat, lalu menandai dirinya sendiri. Nama pemain sengaja disimpan
+   agar tidak perlu diisi ulang. Harus berada sebelum skrip game membaca rekor. */
+(function(){
+  try{
+    var S='reichas_musim', V='v81';
+    if(localStorage.getItem(S)===V) return;
+    var buang=['reichas_best','reichas_best_c',
+               'reichas_ngopi_best','reichas_ngopi_best_c',
+               'reichas_puzzle_best','reichas_puzzle_best_c',
+               'reichas_hist_flyer','reichas_hist_ngopi','reichas_hist_puzzle'];
+    for(var i=0;i<buang.length;i++){ try{ localStorage.removeItem(buang[i]) }catch(e){} }
+    /* kumpulkan dulu, baru hapus: menghapus sambil menelusuri bisa melewati kunci */
+    var sisa=[];
+    for(var j=0;j<localStorage.length;j++){
+      var k=localStorage.key(j);
+      if(k && k.indexOf('reichas_top_')===0) sisa.push(k);
+    }
+    for(var m=0;m<sisa.length;m++){ try{ localStorage.removeItem(sisa[m]) }catch(e){} }
+    localStorage.setItem(S,V);
+  }catch(e){}
+})();
+</script>
 <div id="wrap">
   <div id="flash"></div>
   <a href="./" aria-label="Kembali ke Rehat Sejenak" style="position:absolute;top:10px;left:10px;z-index:6;display:inline-flex;align-items:center;background:rgba(0,0,0,.38);color:#fff;text-decoration:none;font-size:12px;font-weight:700;padding:9px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(6px);min-height:36px">&#8592; Rehat</a>
@@ -180,22 +218,27 @@ document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('retryBtn').addEventListener('click', startGame);
 
 // draw
+var _bgG=null,_glowG=null,_wgG=null;
 function drawBg(){
-  const g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#7a4a2b'); g.addColorStop(0.45,'#c98a4e'); g.addColorStop(1,'#f3e2c7');
-  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  /* gradien statis dibuat SEKALI lalu dipakai ulang; membuatnya tiap bingkai = biang HP panas */
+  if(!_bgG){ _bgG=ctx.createLinearGradient(0,0,0,H);
+    _bgG.addColorStop(0,'#7a4a2b'); _bgG.addColorStop(0.45,'#c98a4e'); _bgG.addColorStop(1,'#f3e2c7'); }
+  ctx.fillStyle=_bgG; ctx.fillRect(0,0,W,H);
   // lampu string kafe (festoon) — berpendar lembut
   const segs=6, segW=W/segs;
   ctx.strokeStyle='rgba(40,22,12,.65)'; ctx.lineWidth=2; ctx.beginPath();
   ctx.moveTo(0,24);
   for(let i=1;i<=segs;i++){ ctx.quadraticCurveTo(i*segW-segW/2, 58, i*segW, 24); }
   ctx.stroke();
+  /* satu gradien pendar dipakai ulang untuk 6 lampu; kecerahan kedip diatur globalAlpha
+     (sebelumnya 6 gradien baru per bingkai = 360 gradien/detik) */
+  if(!_glowG){ _glowG=ctx.createRadialGradient(0,0,2,0,0,26);
+    _glowG.addColorStop(0,'rgba(255,214,120,1)'); _glowG.addColorStop(1,'rgba(255,214,120,0)'); }
   for(let i=0;i<segs;i++){
     const bx=i*segW+segW/2, by=41;
     const flick=lowFx?0.85:(0.72+0.28*Math.sin(tick*0.08+i*1.7));
-    const glow=ctx.createRadialGradient(bx,by,2,bx,by,26);
-    glow.addColorStop(0,'rgba(255,214,120,'+(0.8*flick).toFixed(2)+')'); glow.addColorStop(1,'rgba(255,214,120,0)');
-    ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(bx,by,26,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.translate(bx,by); ctx.globalAlpha=0.8*flick;
+    ctx.fillStyle=_glowG; ctx.beginPath(); ctx.arc(0,0,26,0,Math.PI*2); ctx.fill(); ctx.restore();
     ctx.fillStyle='#ffdf9a'; ctx.beginPath(); ctx.arc(bx,by,5,0,Math.PI*2); ctx.fill();
   }
   if(!lowFx){
@@ -211,9 +254,9 @@ function drawBg(){
   }
   // meja kayu di dasar — cangkir berdiri di atasnya
   const my=H-48;
-  const wg=ctx.createLinearGradient(0,my,0,H);
-  wg.addColorStop(0,'#8a5a33'); wg.addColorStop(1,'#6b4423');
-  ctx.fillStyle=wg; ctx.fillRect(0,my,W,48);
+  if(!_wgG){ _wgG=ctx.createLinearGradient(0,my,0,H);
+    _wgG.addColorStop(0,'#8a5a33'); _wgG.addColorStop(1,'#6b4423'); }
+  ctx.fillStyle=_wgG; ctx.fillRect(0,my,W,48);
   ctx.fillStyle='rgba(255,255,255,.12)'; ctx.fillRect(0,my,W,3);
   ctx.strokeStyle='rgba(60,32,16,.35)'; ctx.lineWidth=1.4;
   for(let i=0;i<4;i++){ const gy=my+9+i*11; ctx.beginPath(); ctx.moveTo(0,gy); ctx.bezierCurveTo(W*0.3,gy+3,W*0.7,gy-3,W,gy); ctx.stroke(); }
@@ -255,7 +298,8 @@ function drawItem(it){
   ctx.save(); ctx.translate(it.x, it.y); ctx.rotate(it.rot);
   const r=it.t.w/2;
   if(it.t.isLogo && logoReady){
-    ctx.shadowColor='rgba(255,206,74,.9)'; ctx.shadowBlur=16;
+    /* shadowBlur kanvas sangat mahal di HP; di mode ringan cukup cincin solid */
+    if(!lowFx){ ctx.shadowColor='rgba(255,206,74,.9)'; ctx.shadowBlur=16; }
     ctx.beginPath(); ctx.arc(0,0,r+3,0,Math.PI*2); ctx.fillStyle='#ffce4a'; ctx.fill();
     ctx.shadowBlur=0;
     ctx.save(); ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.clip();
@@ -351,8 +395,12 @@ function kirimLama(game,nama,skor){
 }
 let last=performance.now();
 /* mode ringan adaptif: bila bingkai rata-rata berat (HP panas/berat), hiasan non-esensial dimatikan sementara */
-let _msAvg=16;
+let _msAvg=8;
 let lowFx=false; try{lowFx=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+/* anggaran waktu per bingkai: 15,4ms ~ 60fps. Di layar 90/120Hz kelebihan bingkai dibuang
+   karena gerak tetap dihitung dengan dt, jadi kecepatan main TIDAK berubah. */
+var _budget=15.4;
+try{ if((navigator.hardwareConcurrency||4)<=4){ lowFx=true; _budget=23.5 } }catch(e){}
 var _exit=false; /* fungsi exit: matikan loop & audio saat beralih ke game lain agar tidak tabrakan/hang */
 function keluarGame(){ _exit=true; try{if(window.BWKAudio&&BWKAudio.ctx&&BWKAudio.ctx.suspend)BWKAudio.ctx.suspend()}catch(e){} }
 window.addEventListener('pagehide',keluarGame);
@@ -361,8 +409,8 @@ try{var _bk=document.querySelector('.back'); if(_bk)_bk.addEventListener('click'
 document.addEventListener('visibilitychange',function(){ if(!document.hidden){ last=performance.now(); requestAnimationFrame(loop);} });
 function loop(now){
   if(_exit||document.hidden)return; /* berhenti total saat tab hilang atau pindah game */
-  const rawMs=now-last; _msAvg=_msAvg*0.94+Math.min(rawMs,120)*0.06;
-  if(!lowFx&&_msAvg>26)lowFx=true; else if(lowFx&&_msAvg<17)lowFx=false;
+  /* lewati bingkai berlebih di layar 90/120Hz: kerja 1,5-2x lipat tanpa manfaat visual */
+  if(now-last < _budget){ requestAnimationFrame(loop); return; }
   const dt=Math.min(2,(now-last)/16.67); last=now; tick+=dt;
   drawBg();
 
@@ -397,6 +445,11 @@ function loop(now){
   for(let i=floats.length-1;i>=0;i--){ const f=floats[i]; f.y-=1.2*dt; f.a-=0.02*dt; if(f.a<=0) floats.splice(i,1); }
   drawFloats();
 
+  /* ukur biaya render sebenarnya (bukan jeda bingkai) untuk memutuskan mode ringan.
+     Bila satu bingkai >11ms, hiasan dimatikan dan target turun ~42fps supaya HP dingin. */
+  var _cost=performance.now()-now;
+  _msAvg=_msAvg*0.9+Math.min(_cost,120)*0.1;
+  if(!lowFx&&_msAvg>11){ lowFx=true; _budget=23.5 } else if(lowFx&&_msAvg<6){ lowFx=false; _budget=15.4 }
   requestAnimationFrame(loop);
 }
 reset();
