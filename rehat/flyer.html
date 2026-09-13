@@ -207,7 +207,7 @@ function flap(){
 }
 
 function startGame(){
-  reset(); state='play'; _tMulai=performance.now(); _mainMs=0; _segel=null;
+  reset(); state='play'; _tMulai=performance.now(); _mainMs=0; _segel=null; mulaiRonde();
   try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playStart();}}catch(e){}
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('overScreen').classList.add('hidden');
@@ -392,7 +392,19 @@ const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
    sekali-pakai yang dibuat segelRonde() di akhir ronde yang wajar, jadi skor
    tidak bisa disuntik dari console/bookmarklet. Nilai akhir tetap divalidasi
    dan dibatasi ulang di server lewat RPC rehat_kirim_skor (SQL v80). */
-var _segel=null;
+var _segel=null, _rondeNonce=null;
+/* v83: nonce didaftarkan ke server SAAT ronde mulai (rehat_mulai_ronde), supaya
+   durasi ronde diukur jam server dan tidak bisa diaku-aku. Gagal (offline / RPC
+   belum dipasang) tidak apa-apa: server jatuh ke perilaku lama. */
+function mulaiRonde(){
+  _rondeNonce=_nonce();
+  try{
+    if(navigator.onLine===false) return;
+    fetch(SUPA_URL+'/rest/v1/rpc/rehat_mulai_ronde',{ method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({ p_game:'flyer', p_nonce:_rondeNonce }) }).catch(function(){});
+  }catch(e){}
+}
 function _nonce(){
   var n='';
   try{ var a=new Uint8Array(12);
@@ -403,7 +415,7 @@ function _nonce(){
 function segelRonde(skor,detik){
   if(!(skor>0) || !(detik>=1) || detik>7200) return null;
   if(skor > 3+Math.ceil(detik*1.3)) return null;   /* >1 pipa per 0,77 detik: mustahil */
-  _segel={ skor:skor, waktu:detik, nonce:_nonce(), dipakai:false };
+  _segel={ skor:skor, waktu:detik, nonce:_rondeNonce||_nonce(), dipakai:false };
   return _segel;
 }
 function kirimSkor(tok){

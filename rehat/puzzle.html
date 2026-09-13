@@ -385,6 +385,24 @@
   }
   function simpanBest(v){ try{ localStorage.setItem(BEST,String(v)); localStorage.setItem(BEST+'_c',sidik(v)) }catch(e){} }
 
+  /* v83: nonce didaftarkan ke server SAAT ronde mulai (rehat_mulai_ronde), supaya
+     durasi ronde diukur jam server dan tidak bisa diaku-aku. Gagal (offline / RPC
+     belum dipasang) tidak apa-apa: server jatuh ke perilaku lama. */
+  var rondeNonce=null;
+  function daftarMulai(){
+    rondeNonce=null;
+    try{ var a=new Uint8Array(12);
+      if(window.crypto&&crypto.getRandomValues){ crypto.getRandomValues(a);
+        rondeNonce=[].map.call(a,function(x){ return ('0'+x.toString(16)).slice(-2) }).join('') } }catch(e){}
+    if(!rondeNonce) rondeNonce=Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+    try{
+      if(navigator.onLine===false) return;
+      fetch(SUPA+'/rest/v1/rpc/rehat_mulai_ronde',{ method:'POST',
+        headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},
+        body:JSON.stringify({ p_game:'puzzle', p_nonce:rondeNonce }) }).catch(function(){});
+    }catch(e){}
+  }
+
   /* segel sekali-pakai: satu ronde sah = satu izin kirim */
   function segelBaru(v){
     var n='';
@@ -392,6 +410,7 @@
       if(window.crypto&&crypto.getRandomValues){ crypto.getRandomValues(a);
         n=[].map.call(a,function(x){ return ('0'+x.toString(16)).slice(-2) }).join('') } }catch(e){}
     if(!n) n=Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+    if(rondeNonce) n=rondeNonce;   /* pakai nonce yang sudah terdaftar di jam server */
     return { ronde:ronde, poin:v.poin, waktu:v.waktu, tukar:v.tukar, putar:v.putar,
              level:N+'x'+N, nonce:n, dipakai:false };
   }
@@ -648,7 +667,7 @@
   }
 
   function mulai(){
-    sv(); fxStop(); segel=null;
+    sv(); fxStop(); segel=null; daftarMulai();
     var wb=el('winBadge'); if(wb)wb.classList.remove('on');
     var st=el('stars'); if(st)[].slice.call(st.children).forEach(function(b){ b.classList.remove('on') });
     pkSisa=3; peekLabel(); peekTutup();
