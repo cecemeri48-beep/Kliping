@@ -450,7 +450,7 @@ function loop(now){
          ditangkap. Laju kini dibatasi, dan yang diuji adalah LINTASAN antar-bingkai. */
       if(it.y > cup.y-cup.h/2 && yLama < cup.y+cup.h/2 && Math.abs(it.x-cup.x) < cup.w/2){
         if(it.t.good){ score+=it.t.pts; combo++; addFloat('+'+it.t.pts, it.x, it.y, it.t.isLogo?'#b8860b':'#2f7346'); if(combo>=3)addFloat('\ud83d\udd25x'+combo, it.x, it.y-26, '#e67e22'); if(combo>0&&combo%10===0&&lives<3){ lives++; addFloat('+1 \❤', cup.x, cup.y-44, '#ff6b5d'); } try{if(window.BWKAudio)window.BWKAudio.playPoint();}catch(e){} getar(12); }
-        else { lives--; combo=0; addFloat('-1', it.x, it.y, '#c0392b'); flashRed(); getar(70); if(lives<=0) endGame(); }
+        else { lives--; combo=0; addFloat('-1', it.x, it.y, '#c0392b'); flashRed(); getar(70); try{if(window.BWKAudio)window.BWKAudio.playBad();}catch(e){} if(lives<=0) endGame(); }
         items.splice(i,1); updateHud(); continue;
       }
       if(it.y>H+30){ // missed
@@ -537,6 +537,9 @@ window.addEventListener('message',function(e){if(!e.data||e.data.type!=='pintu-g
     unlock: unlock,
     playStart: function(){ sweep([523.25, 659.25, 783.99], 220, 'triangle', 0.9); },
     playPoint:  function(){ blip(880, 70, 'square', 0.5); },
+    /* buzzer 'salah': dua nada seminada berbenturan (A#3 vs A3) bergoyang,
+       lalu jatuh ke F3 — sengaja dibuat cempreng dan tidak enak didengar */
+    playBad:    function(){ sweep([233.08, 220, 233.08, 220, 174.61], 340, 'sawtooth', 0.95); },
     playGameOver: function(){ sweep([440, 349.23, 261.63], 420, 'sawtooth', 0.8); },
     isMuted: function(){ return muted; },
     setMuted: function(m){
