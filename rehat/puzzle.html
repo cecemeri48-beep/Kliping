@@ -327,9 +327,9 @@
   function shuffle(){
     cell=[]; rot=[];
     for(var i=0;i<SIZE;i++){ cell[i]=i; rot[i]=0; }
-    for(var k=SIZE-1;k>0;k--){ var j=(Math.random()*(k+1))|0; var t=cell[k]; cell[k]=cell[j]; cell[j]=t; }
+    for(var k=SIZE-1;k>0;k--){ var j=(rnd()*(k+1))|0; var t=cell[k]; cell[k]=cell[j]; cell[j]=t; } /* v86: rnd berbenih server */
     var idx=[]; for(var m=0;m<SIZE;m++) idx.push(m);
-    for(var r=0;r<N+1;r++){ var pick=idx.splice((Math.random()*idx.length)|0,1)[0]; rot[pick]=1+((Math.random()*3)|0); }
+    for(var r=0;r<N+1;r++){ var pick=idx.splice((rnd()*idx.length)|0,1)[0]; rot[pick]=1+((rnd()*3)|0); } /* v86 */
     if(solved()) return shuffle();
     moves=0; putar=0; secs=0; sel=-1; won=false;
     awalCell=cell.slice(); awalRot=rot.slice(); /* kondisi awal, dipakai memeriksa keabsahan skor */
@@ -437,19 +437,30 @@
   /* v83: nonce didaftarkan ke server SAAT ronde mulai (rehat_mulai_ronde), supaya
      durasi ronde diukur jam server dan tidak bisa diaku-aku. Gagal (offline / RPC
      belum dipasang) tidak apa-apa: server jatuh ke perilaku lama. */
+  /* v86: KUNCI ANTI-SUNTIK — acakan papan diikat ke ronde server.
+     Benih datang dari rehat_mulai_ronde(); server meregenerasi papan yang sama
+     dari benih itu dan menolak skor yang langkahnya mustahil untuk papan tsb.
+     Tanpa benih (offline / RPC belum v86), main tetap jalan untuk seru-seruan,
+     tapi skor tidak akan lolos verifikasi server. */
+  function mulberry32(a){ return function(){ a|=0; a=(a+0x6D2B79F5)|0; var t=Math.imul(a^(a>>>15),1|a); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296 } }
+  var rnd=Math.random;   /* sumber acak acakan; diganti mulberry32(benih) bila server memberi benih */
+  var benihRonde=null;
   var rondeNonce=null;
   function daftarMulai(){
-    rondeNonce=null;
+    rondeNonce=null; benihRonde=null; rnd=Math.random;
     try{ var a=new Uint8Array(12);
       if(window.crypto&&crypto.getRandomValues){ crypto.getRandomValues(a);
         rondeNonce=[].map.call(a,function(x){ return ('0'+x.toString(16)).slice(-2) }).join('') } }catch(e){}
     if(!rondeNonce) rondeNonce=Date.now().toString(36)+Math.random().toString(36).slice(2,10);
     try{
-      if(navigator.onLine===false) return;
-      fetch(SUPA+'/rest/v1/rpc/rehat_mulai_ronde',{ method:'POST',
+      if(navigator.onLine===false) return Promise.resolve(null);
+      return fetch(SUPA+'/rest/v1/rpc/rehat_mulai_ronde',{ method:'POST',
         headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},
-        body:JSON.stringify({ p_game:'puzzle', p_nonce:rondeNonce }) }).catch(function(){});
-    }catch(e){}
+        body:JSON.stringify({ p_game:'puzzle', p_nonce:rondeNonce }) })
+        .then(function(r){ return r.json() })
+        .then(function(b){ if(typeof b==='number' && isFinite(b) && b>0){ benihRonde=b; rnd=mulberry32(b); } })
+        .catch(function(){});
+    }catch(e){ return Promise.resolve(null); }
   }
 
   /* segel sekali-pakai: satu ronde sah = satu izin kirim */
@@ -730,13 +741,16 @@
   if(lombaTutup()) tampilTutup();
   function mulai(){
     if(lombaTutup()){ tampilTutup(); return; }
-    sv(); fxStop(); segel=null; daftarMulai();
+    sv(); fxStop(); segel=null;
+    /* v86: papan baru boleh diacak SETELAH benih server diterima — kalau tidak,
+       papan dan benih bisa tidak cocok dan skor ditolak server */
+    var mulaiAcak=function(){ shuffle(); playing=true; startTimer(); };
+    Promise.resolve(daftarMulai()).then(mulaiAcak,mulaiAcak);
     var wb=el('winBadge'); if(wb)wb.classList.remove('on');
     var st=el('stars'); if(st)[].slice.call(st.children).forEach(function(b){ b.classList.remove('on') });
     pkSisa=3; peekLabel(); peekTutup();
     el('startScreen').classList.add('hidden');
     var ws=el('winScreen'); ws.classList.add('hidden'); ws.classList.remove('show');
-    shuffle(); playing=true; startTimer();
     audio(); /* buka kunci audio pada ketukan pengguna (syarat iOS) */
   }
   el('startBtn').addEventListener('click',mulai);
