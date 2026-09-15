@@ -112,7 +112,7 @@
     </div>
     <div style="width:100%;max-width:260px"><input id="playerName" type="text" maxlength="24" placeholder="Nama pemain untuk Papan Rekor" autocomplete="off" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.35);color:#fff;font-size:15px;text-align:center" /></div>
     <button class="btn" id="startBtn">MULAI NGOPI</button>
-    <div class="hint">Geser jari / gerakkan mouse / panah ← →</div>
+    <div class="hint">Geser jari / gerakkan mouse / panah ← →<br><b>Maksimal 15 menit per ronde</b></div>
   </div>
 
   <div class="overlay hidden" id="overScreen">
@@ -381,8 +381,8 @@ function _nonce(){
   return n||(Date.now().toString(36)+Math.random().toString(36).slice(2,10));
 }
 function segelRonde(skor,detik){
-  if(!(skor>0) || !(detik>=1) || detik>7200) return null;
-  if(skor > 12+Math.ceil(detik*13)) return null;   /* di atas laju maksimum permainan */
+  if(!(skor>0) || !(detik>=1) || detik>900) return null;
+  if(skor > 12+Math.ceil(detik*4.8)) return null;  /* kunci v90 */
   _segel={ skor:skor, waktu:detik, nonce:_rondeNonce||_nonce(), dipakai:false };
   return _segel;
 }
@@ -401,31 +401,14 @@ function kirimSkor(tok){
       signal:ctl.signal })
     .then(function(r){ clearTimeout(to);
       /* 404 = RPC aman belum dipasang di Supabase → sementara pakai jalur lama */
-      if(r.status===404){ kirimLama('ngopi',nama,tok.skor); _kirimOK=Math.max(_kirimOK,tok.skor); return; }
+      if(r.status===404){ return; } /* fail-closed */
       if(r.ok) _kirimOK=Math.max(_kirimOK,tok.skor);   /* gagal? sengaja dibiarkan, ronde depan mengulang */
     })
     .catch(function(){ clearTimeout(to) });
   }catch(e){}
 }
 
-/* jalur lama (insert REST langsung). Cadangan sebelum SQL v80 dijalankan;
-   setelah v80 dipasang, insert publik sudah dicabut di server. */
-function kirimLama(game,nama,skor){
-  try{
-    if(navigator.onLine===false)return;
-    nama=nama.slice(0,24);
-    const H={apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY};
-    fetch(SUPA_URL+'/rest/v1/rehat_skor?game=eq.'+game+'&nama=ilike.'+encodeURIComponent(nama.trim())+'&select=skor&order=skor.desc&limit=1',{headers:H})
-    .then(function(r){return r.ok?r.json():[]})
-    .then(function(rows){
-      const ex=(rows&&rows[0])?(rows[0].skor|0):-1;
-      if(skor<=ex)return; /* sudah ada skor sama/lebih tinggi — jangan dobel */
-      const ctl=new AbortController(); const to=setTimeout(function(){try{ctl.abort()}catch(e){}},8000);
-      fetch(SUPA_URL+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:game,nama:nama,skor:skor}),signal:ctl.signal})
-      .then(function(){clearTimeout(to)}).catch(function(){clearTimeout(to)});
-    }).catch(function(){});
-  }catch(e){}
-}
+/* v90: fallback REST langsung dihapus. */
 let last=performance.now();
 /* mode ringan adaptif: bila bingkai rata-rata berat (HP panas/berat), hiasan non-esensial dimatikan sementara */
 let _msAvg=8;
@@ -454,7 +437,8 @@ function loop(now){
        membuat targetX melayang jauh di luar layar, lalu cangkir terasa macet saat balik. */
     targetX=Math.max(cup.w/2, Math.min(W-cup.w/2, targetX));
     cup.x += (targetX-cup.x)*0.25*dt;
-    _mainMs += dt*16.67;   /* dt dibatasi 2, jadi jeda tab tersembunyi tidak menggelembungkan durasi */
+    _mainMs += dt*16.67;   /* dt dibatasi 2 */
+    if(_mainMs>=900000){ endGame(); } /* v90: maksimal 15 menit */
     cup.x=Math.max(cup.w/2, Math.min(W-cup.w/2, cup.x));
 
     timer+=dt;

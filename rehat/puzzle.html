@@ -497,38 +497,13 @@
         signal:ctl.signal })
       .then(function(r){ clearTimeout(to);
         /* 404 = RPC aman belum dipasang di Supabase → sementara pakai jalur lama */
-        if(r.status===404) kirimLama('puzzle',nama,tok.poin,tok.level);
+        if(r.status===404) return; /* fail-closed */
       })
       .catch(function(){ clearTimeout(to) });
     }catch(e){}
   }
 
-  /* jalur lama (insert REST langsung). Hanya cadangan sebelum SQL v80 dipasang;
-     setelah v80 dijalankan, insert publik dicabut di server. */
-  function kirimLama(game,nama,skor,level){
-    try{
-      if(navigator.onLine===false)return;
-      nama=nama.slice(0,24);
-      var H={apikey:KEY,Authorization:'Bearer '+KEY};
-      var qs=SUPA+'/rest/v1/rehat_skor?game=eq.'+game+'&nama=ilike.'+encodeURIComponent(nama.trim())+(level?'&level=eq.'+encodeURIComponent(level):'')+'&select=skor&order=skor.desc&limit=1';
-      fetch(qs,{headers:H})
-      .then(function(r){return r.ok?r.json():[]})
-      .then(function(rows){
-        var ex=(rows&&rows[0])?(rows[0].skor|0):-1;
-        if(skor<=ex)return; /* sudah ada skor sama/lebih tinggi — jangan dobel */
-        var ctl=new AbortController();var to=setTimeout(function(){try{ctl.abort()}catch(e){}},8000);
-        var data={game:game,nama:nama,skor:skor}; if(level)data.level=level;
-        fetch(SUPA+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(data),signal:ctl.signal})
-        .then(function(r){
-          clearTimeout(to);
-          if(!r.ok && level){ /* kolom level belum tersedia? kirim ulang tanpa level */
-            delete data.level;
-            fetch(SUPA+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(data)}).catch(function(){});
-          }
-        }).catch(function(){clearTimeout(to)});
-      }).catch(function(){});
-    }catch(e){}
-  }
+  /* v90: fallback REST langsung dihapus. */
 
   /* ===== SUARA: satu AudioContext dipakai bersama =====
      Bug lama: setiap ketukan membuat AudioContext baru. Di iOS/Safari jatah

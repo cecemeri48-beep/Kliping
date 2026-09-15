@@ -447,31 +447,14 @@ function kirimSkor(tok){
       signal:ctl.signal })
     .then(function(r){ clearTimeout(to);
       /* 404 = RPC aman belum dipasang di Supabase → sementara pakai jalur lama */
-      if(r.status===404){ kirimLama('flyer',nama,tok.skor); _kirimOK=Math.max(_kirimOK,tok.skor); return; }
+      if(r.status===404){ return; } /* fail-closed */
       if(r.ok) _kirimOK=Math.max(_kirimOK,tok.skor);   /* gagal? sengaja dibiarkan, ronde depan mengulang */
     })
     .catch(function(){ clearTimeout(to) });
   }catch(e){}
 }
 
-/* jalur lama (insert REST langsung). Cadangan sebelum SQL v80 dijalankan;
-   setelah v80 dipasang, insert publik sudah dicabut di server. */
-function kirimLama(game,nama,skor){
-  try{
-    if(navigator.onLine===false)return;
-    nama=nama.slice(0,24);
-    const H={apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY};
-    fetch(SUPA_URL+'/rest/v1/rehat_skor?game=eq.'+game+'&nama=ilike.'+encodeURIComponent(nama.trim())+'&select=skor&order=skor.desc&limit=1',{headers:H})
-    .then(function(r){return r.ok?r.json():[]})
-    .then(function(rows){
-      const ex=(rows&&rows[0])?(rows[0].skor|0):-1;
-      if(skor<=ex)return; /* sudah ada skor sama/lebih tinggi — jangan dobel */
-      const ctl=new AbortController(); const to=setTimeout(function(){try{ctl.abort()}catch(e){}},8000);
-      fetch(SUPA_URL+'/rest/v1/rehat_skor',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({game:game,nama:nama,skor:skor}),signal:ctl.signal})
-      .then(function(){clearTimeout(to)}).catch(function(){clearTimeout(to)});
-    }).catch(function(){});
-  }catch(e){}
-}
+/* v90: fallback REST langsung dihapus. */
 let last = performance.now();
 /* mode ringan adaptif: bila bingkai rata-rata berat (HP panas/berat), hiasan non-esensial dimatikan sementara */
 let _msAvg=8;
