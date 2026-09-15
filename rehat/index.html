@@ -238,13 +238,13 @@
   loadRank('puzzle',document.getElementById('rankPuzzle'));
 
   /* ===== v85: HITUNG MUNDUR, TUTUP SEMENTARA & PENGUMUMAN PEMENANG =====
-     Lomba berjalan s.d. 20 Sep 2026 22:00 WITA, lalu gim ditutup SEMENTARA dan
+     v87: Lomba musim ini berjalan 15 Sep 2026 17:00 WITA s.d. 18 Sep 2026 17:00 WITA, lalu gim ditutup SEMENTARA dan
      dibuka lagi 21 Sep 2026 06:00 WITA (ubah BUKA_LAGI bila jamnya berbeda).
      Setelah dibuka, gim boleh dimainkan untuk seru-seruan — skor tidak lagi
      dicatat di papan lomba (server membekukan papan), hasil final tetap
      terpampang di panel pemenang. */
-  var TUTUP_LOMBA=new Date('2026-09-20T22:00:00+08:00').getTime();
-  var BUKA_LAGI  =new Date('2026-09-21T06:00:00+08:00').getTime();   /* jam buka lagi */
+  var TUTUP_LOMBA=new Date('2026-09-18T17:00:00+08:00').getTime();
+  var BUKA_LAGI  =new Date('2026-09-19T06:00:00+08:00').getTime();   /* jam buka lagi */
   function lombaSudahTutup(){ return Date.now()>=TUTUP_LOMBA }
   function renderPemenang(){
     var sec=document.getElementById('pemenang'); if(!sec) return;
@@ -271,14 +271,14 @@
       var m=Math.floor(sisa/60000);    sisa-=m*60000;
       var dt=Math.floor(sisa/1000);
       if(el){ el.className='hitung';
-        el.innerHTML='&#9200; Lomba berakhir dalam <b>'+(d>0?d+' hari ':'')+dua(h)+':'+dua(m)+':'+dua(dt)+'</b> — 20 Sep 2026, 22.00 WITA'; }
+        el.innerHTML='&#9200; Lomba berakhir dalam <b>'+(d>0?d+' hari ':'')+dua(h)+':'+dua(m)+':'+dua(dt)+'</b> — 18 Sep 2026, 17.00 WITA'; }
       setTimeout(segarkanLomba,1000);
       return;
     }
     renderPemenang();
     if(kini<BUKA_LAGI){   /* fase 2: ditutup sementara (pengumuman pemenang) */
       if(el){ el.className='hitung abis';
-        el.innerHTML='<b>Lomba sudah ditutup</b> — hasil final di bawah. Gim dibuka lagi <b>21 Sep 2026, 06.00 WITA</b> untuk seru-seruan.'; }
+        el.innerHTML='<b>Lomba sudah ditutup</b> — hasil final di bawah. Gim dibuka lagi <b>19 Sep 2026, 06.00 WITA</b> untuk seru-seruan.'; }
       for(i=0;i<g.length;i++) g[i].classList.add('tutup');
       setTimeout(segarkanLomba,30000);   /* halaman yg dibiarkan terbuka ikut terbuka lagi */
       return;
