@@ -192,7 +192,7 @@
   document.getElementById('rekorPuzzle').textContent=bp;document.getElementById('bestPuzzle').textContent=bp;
   isi(document.getElementById('histPuzzle'),h('reichas_hist_puzzle'));
   /* papan rekor bersama */
-  var cacheRank={};
+  var cacheRank={},cacheFinal={};
   function renderRank(game,elm,lv){
     var rows=(cacheRank[game]||[]).filter(function(x){return !lv || (x.level||'')===lv}).slice(0,3);
     if(!rows.length){elm.innerHTML='<li class="kosong">Belum ada yang tercatat di tingkat ini.</li>';return}
@@ -211,7 +211,7 @@
     }).join('');
   }
   function loadRank(game,elm){
-    fetch(SUPA+'/rest/v1/rehat_klasemen_final?game=eq.'+game+'&select=nama,skor,created_at,level&order=skor.desc,created_at.asc&limit=80',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+    fetch(SUPA+'/rest/v1/rehat_klasemen_aktif?game=eq.'+game+'&select=nama,skor,created_at,level&order=skor.desc,created_at.asc&limit=80',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
     .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
     .then(function(rows){
       var seen={},uniq=[]; /* satu nama = satu baris per tingkat (urutan sudah desc) */
@@ -221,7 +221,7 @@
       if(lombaSudahTutup()) renderPemenang();
     })
     .catch(function(){ /* kolom level belum ada? mundur ke kueri lama tanpa level */
-      fetch(SUPA+'/rest/v1/rehat_klasemen_final?game=eq.'+game+'&select=nama,skor,created_at&order=skor.desc,created_at.asc&limit=50',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+      fetch(SUPA+'/rest/v1/rehat_klasemen_aktif?game=eq.'+game+'&select=nama,skor,created_at&order=skor.desc,created_at.asc&limit=50',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
       .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
       .then(function(rows){
         var seen={},uniq=[];
@@ -238,9 +238,20 @@
     loadRank('ngopi',document.getElementById('rankNgopi'));
     loadRank('puzzle',document.getElementById('rankPuzzle'));
   }
+  function loadFinalWinners(){
+    fetch(SUPA+'/rest/v1/rehat_klasemen_final?select=game,peringkat,nama,skor,created_at,level&order=game,peringkat',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
+    .then(function(rows){
+      cacheFinal={};
+      (rows||[]).forEach(function(x){(cacheFinal[x.game]||(cacheFinal[x.game]=[])).push(x)});
+      renderPemenang();
+    })
+    .catch(function(){});
+  }
   muatSemuaPeringkat();
+  loadFinalWinners();
   /* Pengguna yang membiarkan halaman terbuka tetap menerima klasemen final. */
-  setInterval(muatSemuaPeringkat,30000);
+  setInterval(function(){muatSemuaPeringkat();loadFinalWinners()},30000);
 
   /* ===== v92: HITUNG MUNDUR, FINALISASI & PENGUMUMAN PEMENANG =====
      v92: Lomba musim ini berjalan 15 Sep 2026 17:00 WITA s.d. 18 Sep 2026 17:00 WITA, lalu gim ditutup SEMENTARA dan
@@ -249,13 +260,13 @@
      dicatat di papan lomba (server membekukan papan), hasil final tetap
      terpampang di panel pemenang. */
   var TUTUP_LOMBA=new Date('2026-09-18T16:55:00+08:00').getTime();
-  var BUKA_LAGI  =new Date('2026-09-19T06:00:00+08:00').getTime();   /* jam buka lagi */
+  var BUKA_LAGI  =0;   /* dibuka segera setelah deployment */
   function lombaSudahTutup(){ return Date.now()>=TUTUP_LOMBA }
   function renderPemenang(){
     var sec=document.getElementById('pemenang'); if(!sec) return;
     var medali=['\u{1F947}','\u{1F948}','\u{1F949}'];
     [['flyer','winFlyer'],['ngopi','winNgopi'],['puzzle','winPuzzle']].forEach(function(g){
-      var rows=(cacheRank[g[0]]||[]).slice(0,3);
+      var rows=(cacheFinal[g[0]]||[]).slice(0,3);
       var ol=document.getElementById(g[1]); if(!ol) return;
       if(!rows.length){ ol.innerHTML='<li class="kosong">Belum ada skor tercatat.</li>'; return }
       ol.innerHTML=rows.map(function(x,i){
