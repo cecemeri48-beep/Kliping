@@ -391,7 +391,7 @@
      dihitung dari performance.now() sehingga selalu jujur. */
   function nowMs(){ try{ return performance.now() }catch(e){ return Date.now() } }
   var mulaiMs=0, jedaMs=0, jedaSejak=0, denda=0, panikSudah=false;
-  function suaraPanik(){if(panikSudah)return;panikSudah=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();var u=new SpeechSynthesisUtterance('Panik yah, santai Losari bro');u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
+  function suaraPanik(){if(panikSudah)return;panikSudah=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();var u=new SpeechSynthesisUtterance('Santai Losari kawan');u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
   function secsNow(){
     if(!mulaiMs) return denda;
     var akhir=(jedaSejak||nowMs());

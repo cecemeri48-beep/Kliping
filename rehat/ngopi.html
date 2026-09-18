@@ -246,7 +246,7 @@ function startGame(){ if(lombaTutup()){ tampilTutup(); return; } reset(); state=
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('overScreen').classList.add('hidden'); }
 function ucapSuara(teks){try{if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(teks);u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
-function suaraPanik(){if(panikSudah)return;panikSudah=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Panik yah, santai Losari bro')}}catch(e){}}
+function suaraPanik(){if(panikSudah)return;panikSudah=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Santai Losari kawan')}}catch(e){}}
 function suaraGameOver(){setTimeout(function(){ucapSuara('Jangan emosi, coba lagi gratis')},850)}
 function suaraMiss(){try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Goblok kali!')}}catch(e){}}
 function endGame(){if(!panikSudah)suaraPanik();suaraGameOver();try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'ngopi',score:score},'*')}catch(e){} state='over';

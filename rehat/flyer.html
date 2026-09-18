@@ -266,7 +266,7 @@ function startGame(){
   document.getElementById('overScreen').classList.add('hidden');
 }
 function ucapSuara(teks){try{if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(teks);u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
-function suaraPanik(){if(panikPeringatan)return;panikPeringatan=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Panik yah, santai Losari bro')}}catch(e){}}
+function suaraPanik(){if(panikPeringatan)return;panikPeringatan=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Santai Losari kawan')}}catch(e){}}
 function suaraGameOver(){setTimeout(function(){ucapSuara('Jangan emosi, coba lagi gratis')},850)}
 function endGame(){suaraPanik();suaraGameOver();try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'flyer',score:score},'*')}catch(e){}
   state='over';
@@ -399,6 +399,23 @@ function drawPipe(p){
   // snow caps decoration
   ctx.fillStyle='rgba(255,255,255,.75)';
   roundRect(p.x+6, p.top-14, PIPE_W-12, 6, 3); ctx.fill();
+  if(score>=30) drawSnake(p);
+}
+function drawSnake(p){
+  var by=p.top+(p.gap||gapNow), y=p.top+Math.min(34,(p.gap||gapNow)*.2);
+  ctx.save(); ctx.strokeStyle='#2b5d38'; ctx.lineWidth=7; ctx.lineCap='round'; ctx.shadowColor='rgba(0,0,0,.28)'; ctx.shadowBlur=5;
+  ctx.beginPath(); ctx.moveTo(p.x+8,y); ctx.bezierCurveTo(p.x+28,y-18,p.x+48,y+20,p.x+PIPE_W-8,y+2); ctx.stroke();
+  ctx.strokeStyle='#82b85e'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(p.x+8,y-1); ctx.bezierCurveTo(p.x+28,y-18,p.x+48,y+20,p.x+PIPE_W-8,y+2); ctx.stroke();
+  ctx.shadowBlur=0; ctx.fillStyle='#9bc86b'; ctx.beginPath(); ctx.arc(p.x+8,y,7,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#161b12'; ctx.beginPath(); ctx.arc(p.x+5,y-2,1.5,0,Math.PI*2); ctx.arc(p.x+10,y-2,1.5,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+function drawGhost(){
+  var x=W*.72+Math.sin(dist*.018)*26, y=145+Math.sin(dist*.025)*22, r=22;
+  ctx.save(); ctx.globalAlpha=.42; ctx.translate(x,y); ctx.fillStyle='#d9e5ef';
+  ctx.beginPath(); ctx.arc(0,-4,r,Math.PI,0); ctx.lineTo(r,25); ctx.lineTo(r*.5,18); ctx.lineTo(0,25); ctx.lineTo(-r*.5,18); ctx.lineTo(-r,25); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#273747'; ctx.beginPath(); ctx.arc(-7,-5,3,0,Math.PI*2); ctx.arc(7,-5,3,0,Math.PI*2); ctx.fill();
+  ctx.restore();
 }
 function roundRect(x,y,w,h,r){
   r=Math.min(r,w/2,Math.abs(h)/2);
@@ -554,6 +571,7 @@ function loop(now){
   }
 
   for(const p of pipes) drawPipe(p);
+  if(score>=30) drawGhost();
   drawGround();
   if(!lowFx)drawVignette();
   if(state!=='start') drawBird();
