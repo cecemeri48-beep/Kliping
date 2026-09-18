@@ -246,7 +246,7 @@ function startGame(){ if(lombaTutup()){ tampilTutup(); return; } reset(); state=
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('overScreen').classList.add('hidden'); }
 function ucapSuara(teks){try{if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(teks);u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
-function suaraPanik(){if(panikSudah)return;panikSudah=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Santai Losari Ko, Kawan!')}}catch(e){}}
+function suaraPanik(){if(panikSudah)return;panikSudah=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Santai Losari Ko… Mang Odong')}}catch(e){}}
 function suaraGameOver(){setTimeout(function(){ucapSuara('Jangan emosi, coba lagi gratis')},850)}
 var suaraMissTerakhir=0;
 function suaraMiss(){var kini=Date.now();if(kini-suaraMissTerakhir<1200)return;suaraMissTerakhir=kini;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Goblok kali!')}}catch(e){}}
