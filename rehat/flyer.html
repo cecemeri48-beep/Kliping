@@ -74,6 +74,44 @@
     text-shadow:0 3px 10px rgba(0,0,0,.45); }
   .credit{ position:absolute; bottom:10px; left:0; right:0; text-align:center;
     color:rgba(255,255,255,.55); font-size:11px; z-index:6; letter-spacing:.5px; }
+
+  /* v102: polish mobile — safe areas, readable controls, no accidental scroll */
+  html{background:#0f1715;}
+  body{min-height:100dvh; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);}
+  #wrap{height:100dvh; min-height:100dvh; max-height:none; isolation:isolate;}
+  button,input{font:inherit;}
+  button:focus-visible,input:focus-visible{outline:3px solid rgba(255,206,74,.95); outline-offset:3px;}
+  input{min-height:48px;}
+  .overlay{padding:clamp(20px,5vw,32px) 20px calc(24px + env(safe-area-inset-bottom));}
+  .overlay > .title{max-width:100%; text-wrap:balance;}
+  .overlay > .sub{line-height:1.5;}
+  .btn{width:min(100%,340px); min-height:52px; touch-action:manipulation;}
+  #playerName{width:100% !important; min-height:50px; font-size:16px !important; border-color:rgba(255,255,255,.48) !important; box-shadow:0 8px 24px rgba(0,0,0,.18);}
+  @media(max-width:459px){
+    #wrap{border-radius:0; box-shadow:none;}
+    .logo{width:clamp(76px,23vw,104px); height:clamp(76px,23vw,104px);}
+    .title{font-size:clamp(25px,8vw,30px);}
+    .big{font-size:clamp(42px,13vw,52px);}
+  }
+  @media(max-height:680px){
+    .overlay{gap:9px; padding-top:14px;}
+    .logo{width:76px; height:76px;}
+    .title{font-size:25px;}
+    .sub{font-size:14px;}
+    .btn{min-height:48px; padding:12px 22px;}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{scroll-behavior:auto !important; animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+
+  /* v102: graphical polish — FLYER / langit, badge, HUD */
+  #wrap::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(circle at 50% 12%,rgba(255,255,255,.22),transparent 28%),linear-gradient(180deg,rgba(255,255,255,.06),transparent 45%);mix-blend-mode:screen;}
+  #hud{top:calc(14px + env(safe-area-inset-top));}
+  #hud .n{display:inline-block;padding:6px 18px 8px;border:1px solid rgba(255,255,255,.32);border-radius:999px;background:rgba(12,35,48,.34);box-shadow:0 8px 22px rgba(0,0,0,.18);font-variant-numeric:tabular-nums;}
+  #startScreen .title,#winScreen .title{letter-spacing:.06em;text-transform:uppercase;}
+  #startScreen .milad{transform:rotate(-2deg);}
+  #winScreen{background:radial-gradient(circle at 50% 35%,rgba(212,43,39,.2),rgba(6,20,30,.92) 62%,rgba(3,10,15,.98));}
+  #winScreen .big{color:#fff;letter-spacing:-.03em;}
 </style>
 </head>
 <body>
@@ -226,7 +264,10 @@ function startGame(){
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('overScreen').classList.add('hidden');
 }
-function endGame(){try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'flyer',score:score},'*')}catch(e){}
+function ucapSuara(teks){try{if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(teks);u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
+function suaraPanik(){try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Panik yah, santai Losari bro')}}catch(e){}}
+function suaraGameOver(){setTimeout(function(){ucapSuara('Jangan emosi, coba lagi gratis')},850)}
+function endGame(){suaraPanik();suaraGameOver();try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'flyer',score:score},'*')}catch(e){}
   state='over';
   getar(90);
   try{if(!lowFx){canvas.classList.remove('shake');void canvas.offsetWidth;canvas.classList.add('shake')}}catch(e){}

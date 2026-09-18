@@ -62,6 +62,44 @@
        di belakang teks. Tanpa blur, pusat gradien harus ikut dirapatkan. */
     .overlay{ background:radial-gradient(120% 90% at 50% 12%, rgba(40,25,15,.90), rgba(20,12,7,.985)) !important; }
   }
+
+  /* v102: polish mobile — safe areas, readable controls, no accidental scroll */
+  html{background:#0f1715;}
+  body{min-height:100dvh; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);}
+  #wrap{height:100dvh; min-height:100dvh; max-height:none; isolation:isolate;}
+  button,input{font:inherit;}
+  button:focus-visible,input:focus-visible{outline:3px solid rgba(255,206,74,.95); outline-offset:3px;}
+  input{min-height:48px;}
+  .overlay{padding:clamp(20px,5vw,32px) 20px calc(24px + env(safe-area-inset-bottom));}
+  .overlay > .title{max-width:100%; text-wrap:balance;}
+  .overlay > .sub{line-height:1.5;}
+  .btn{width:min(100%,340px); min-height:52px; touch-action:manipulation;}
+  #playerName{width:100% !important; min-height:50px; font-size:16px !important; border-color:rgba(255,255,255,.48) !important; box-shadow:0 8px 24px rgba(0,0,0,.18);}
+  @media(max-width:459px){
+    #wrap{border-radius:0; box-shadow:none;}
+    .logo{width:clamp(76px,23vw,104px); height:clamp(76px,23vw,104px);}
+    .title{font-size:clamp(25px,8vw,30px);}
+    .big{font-size:clamp(42px,13vw,52px);}
+  }
+  @media(max-height:680px){
+    .overlay{gap:9px; padding-top:14px;}
+    .logo{width:76px; height:76px;}
+    .title{font-size:25px;}
+    .sub{font-size:14px;}
+    .btn{min-height:48px; padding:12px 22px;}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{scroll-behavior:auto !important; animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+
+  /* v102: graphical polish — NGOPI / warm cafe HUD */
+  #wrap::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(circle at 18% 10%,rgba(255,224,138,.15),transparent 28%),radial-gradient(circle at 82% 20%,rgba(255,155,73,.12),transparent 25%);}
+  #hud{top:calc(12px + env(safe-area-inset-top));}
+  #hud .score,#hud .lives{display:inline-block;padding:5px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(46,27,17,.34);box-shadow:0 8px 20px rgba(0,0,0,.18);}
+  #hud .lives{margin-left:6px;}
+  #startScreen .title,#winScreen .title{letter-spacing:.06em;text-transform:uppercase;}
+  #startScreen .legend{padding:9px 13px;border:1px solid rgba(255,224,138,.22);border-radius:14px;background:rgba(46,27,17,.25);}
+  #winScreen{background:radial-gradient(circle at 50% 34%,rgba(255,206,74,.16),rgba(34,20,14,.91) 62%,rgba(14,9,7,.98));}
 </style>
 </head>
 <body>
@@ -141,7 +179,7 @@ canvas.width = W; canvas.height = H;
 const logo = new Image(); logo.src = LOGO_SRC; let logoReady=false; logo.onload=()=>logoReady=true;
 
 let state='start';
-let score=0, lives=3;
+let score=0, lives=3, panikSudah=false;
 /* ===== REKOR PERANGKAT BERSIDIK (v80) =====
    Nilai di localStorage diberi sidik. Kalau diubah manual lewat devtools,
    sidiknya tidak cocok dan rekor dianggap 0 — bukan rekor palsu. */
@@ -176,7 +214,7 @@ const TYPES=[
 ];
 
 let combo=0;
-function reset(){ score=0; lives=3; combo=0; items.length=0; floats.length=0; timer=0; spawnEvery=52; tick=0; cup.x=W/2; updateHud(); }
+function reset(){ score=0; lives=3; panikSudah=false; combo=0; items.length=0; floats.length=0; timer=0; spawnEvery=52; tick=0; cup.x=W/2; updateHud(); }
 function updateHud(){ document.getElementById('hudScore').textContent=score;
   document.getElementById('hudLives').textContent='❤️'.repeat(Math.max(0,lives)); }
 
@@ -207,7 +245,10 @@ function startGame(){ if(lombaTutup()){ tampilTutup(); return; } reset(); state=
   try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playStart();}}catch(e){}
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('overScreen').classList.add('hidden'); }
-function endGame(){try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'ngopi',score:score},'*')}catch(e){} state='over';
+function ucapSuara(teks){try{if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(teks);u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
+function suaraPanik(){if(panikSudah)return;panikSudah=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Panik yah, santai Losari bro')}}catch(e){}}
+function suaraGameOver(){setTimeout(function(){ucapSuara('Jangan emosi, coba lagi gratis')},850)}
+function endGame(){if(!panikSudah)suaraPanik();suaraGameOver();try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'ngopi',score:score},'*')}catch(e){} state='over';
   const nr=score>best; if(nr){ best=score; simpanRekor(best);try{var _h=JSON.parse(localStorage.getItem('reichas_hist_ngopi')||'[]');_h.unshift({s:score,t:Date.now()});localStorage.setItem('reichas_hist_ngopi',JSON.stringify(_h.slice(0,10)))}catch(e){}; }
   /* BUG: skor dulu hanya dikirim saat memecahkan rekor PERANGKAT. Kalau kiriman gagal
      (sinyal putus) atau rekor lokal berasal dari perangkat lain, skor sah tidak pernah
@@ -459,7 +500,7 @@ function loop(now){
          ditangkap. Laju kini dibatasi, dan yang diuji adalah LINTASAN antar-bingkai. */
       if(it.y > cup.y-cup.h/2 && yLama < cup.y+cup.h/2 && Math.abs(it.x-cup.x) < cup.w/2){
         if(it.t.good){ score+=it.t.pts; combo++; addFloat('+'+it.t.pts, it.x, it.y, it.t.isLogo?'#b8860b':'#2f7346'); if(combo>=3)addFloat('\ud83d\udd25x'+combo, it.x, it.y-26, '#e67e22'); if(combo>0&&combo%10===0&&lives<3){ lives++; addFloat('+1 \❤', cup.x, cup.y-44, '#ff6b5d'); } try{if(window.BWKAudio)window.BWKAudio.playPoint();}catch(e){} getar(12); }
-        else { lives--; combo=0; addFloat('-1', it.x, it.y, '#c0392b'); flashRed(); getar(70); try{if(window.BWKAudio)window.BWKAudio.playBad();}catch(e){} if(lives<=0) endGame(); }
+        else { lives--; if(lives===1)suaraPanik(); combo=0; addFloat('-1', it.x, it.y, '#c0392b'); flashRed(); getar(70); try{if(window.BWKAudio)window.BWKAudio.playBad();}catch(e){} if(lives<=0) endGame(); }
         items.splice(i,1); updateHud(); continue;
       }
       if(it.y>H+30){ // missed
