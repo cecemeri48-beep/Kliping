@@ -266,7 +266,7 @@ function startGame(){
   document.getElementById('overScreen').classList.add('hidden');
 }
 function ucapSuara(teks){try{if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(teks);u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
-function suaraPanik(){if(panikPeringatan)return;panikPeringatan=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Santai Losari kawan')}}catch(e){}}
+function suaraPanik(){if(panikPeringatan)return;panikPeringatan=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Santai Losari Ko, Kawan!')}}catch(e){}}
 function suaraGameOver(){setTimeout(function(){ucapSuara('Jangan emosi, coba lagi gratis')},850)}
 function endGame(){suaraPanik();suaraGameOver();try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'flyer',score:score},'*')}catch(e){}
   state='over';
@@ -401,14 +401,24 @@ function drawPipe(p){
   roundRect(p.x+6, p.top-14, PIPE_W-12, 6, 3); ctx.fill();
   if(score>=30) drawSnake(p);
 }
-function drawSnake(p){
-  var by=p.top+(p.gap||gapNow), y=p.top+Math.min(34,(p.gap||gapNow)*.2);
-  ctx.save(); ctx.strokeStyle='#2b5d38'; ctx.lineWidth=7; ctx.lineCap='round'; ctx.shadowColor='rgba(0,0,0,.28)'; ctx.shadowBlur=5;
-  ctx.beginPath(); ctx.moveTo(p.x+8,y); ctx.bezierCurveTo(p.x+28,y-18,p.x+48,y+20,p.x+PIPE_W-8,y+2); ctx.stroke();
-  ctx.strokeStyle='#82b85e'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(p.x+8,y-1); ctx.bezierCurveTo(p.x+28,y-18,p.x+48,y+20,p.x+PIPE_W-8,y+2); ctx.stroke();
-  ctx.shadowBlur=0; ctx.fillStyle='#9bc86b'; ctx.beginPath(); ctx.arc(p.x+8,y,7,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#161b12'; ctx.beginPath(); ctx.arc(p.x+5,y-2,1.5,0,Math.PI*2); ctx.arc(p.x+10,y-2,1.5,0,Math.PI*2); ctx.fill();
+function drawSnakeCoil(p,y,arah){
+  ctx.save(); ctx.strokeStyle='#294f32'; ctx.lineWidth=lowFx?7:9; ctx.lineCap='round';
+  if(!lowFx){ctx.shadowColor='rgba(0,0,0,.3)';ctx.shadowBlur=5;}
+  ctx.beginPath(); ctx.moveTo(p.x-5,y);
+  ctx.bezierCurveTo(p.x+12,y-14*arah,p.x+22,y+14*arah,p.x+36,y);
+  ctx.bezierCurveTo(p.x+50,y-14*arah,p.x+62,y+14*arah,p.x+PIPE_W+5,y); ctx.stroke();
+  ctx.strokeStyle='#82b85e'; ctx.lineWidth=lowFx?3.5:5; ctx.shadowBlur=0;
+  ctx.beginPath(); ctx.moveTo(p.x-5,y-1); ctx.bezierCurveTo(p.x+12,y-14*arah,p.x+22,y+14*arah,p.x+36,y-1); ctx.bezierCurveTo(p.x+50,y-14*arah,p.x+62,y+14*arah,p.x+PIPE_W+5,y-1); ctx.stroke();
   ctx.restore();
+}
+function drawSnake(p){
+  var by=p.top+(p.gap||gapNow);
+  /* dua lilitan menempel di badan pipa, bukan di area celah */
+  drawSnakeCoil(p,Math.max(28,p.top-34),1);
+  drawSnakeCoil(p,Math.min(H-30,by+34),-1);
+  var hx=p.x+PIPE_W-2, hy=Math.max(20,p.top-48);
+  ctx.save(); ctx.fillStyle='#9bc86b'; ctx.beginPath(); ctx.arc(hx,hy,8,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#182015'; ctx.beginPath(); ctx.arc(hx-3,hy-2,1.6,0,Math.PI*2); ctx.arc(hx+2,hy-2,1.6,0,Math.PI*2); ctx.fill(); ctx.restore();
 }
 function drawGhost(){
   var x=W*.72+Math.sin(dist*.018)*26, y=145+Math.sin(dist*.025)*22, r=22;
