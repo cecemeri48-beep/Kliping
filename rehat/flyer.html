@@ -193,6 +193,7 @@ logo.onload = ()=> logoReady = true;
 // State
 let state = 'start'; // start | play | over
 let score = 0;
+let panikPeringatan = false;
 /* ===== REKOR PERANGKAT BERSIDIK (v80) =====
    Nilai di localStorage diberi sidik. Kalau diubah manual lewat devtools,
    sidiknya tidak cocok dan rekor dianggap 0 — bukan rekor palsu. */
@@ -227,7 +228,7 @@ const confetti = [];
 
 function reset(){
   bird.y = H*0.45; bird.vy = 0; bird.rot = 0;
-  pipes.length = 0; dist = 0; score = 0; speed = 2.7;
+  pipes.length = 0; dist = 0; score = 0; speed = 2.7; panikPeringatan = false;
   for(let i=0;i<3;i++) addPipe(W + 160 + i*SPACING);
 }
 function addPipe(x){
@@ -265,7 +266,7 @@ function startGame(){
   document.getElementById('overScreen').classList.add('hidden');
 }
 function ucapSuara(teks){try{if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(teks);u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
-function suaraPanik(){try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Panik yah, santai Losari bro')}}catch(e){}}
+function suaraPanik(){if(panikPeringatan)return;panikPeringatan=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Panik yah, santai Losari bro')}}catch(e){}}
 function suaraGameOver(){setTimeout(function(){ucapSuara('Jangan emosi, coba lagi gratis')},850)}
 function endGame(){suaraPanik();suaraGameOver();try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'flyer',score:score},'*')}catch(e){}
   state='over';
@@ -537,11 +538,15 @@ function loop(now){
 
     for(const p of pipes){
       if(!p.passed && p.x + PIPE_W < bird.x){ p.passed=true; score++; try{if(window.BWKAudio)window.BWKAudio.playPoint();}catch(e){} }
+      // peringatan suara saat burung sudah mendekati tepi celah/pipa
+      if(!panikPeringatan && bird.x+bird.r*0.7 > p.x-30 && bird.x-bird.r*0.7 < p.x+PIPE_W+30 &&
+         (bird.y-bird.r*0.7 < p.top+18 || bird.y+bird.r*0.7 > p.top+(p.gap || gapNow)-18)) suaraPanik();
       // collision
       if(bird.x+bird.r*0.7 > p.x && bird.x-bird.r*0.7 < p.x+PIPE_W){
         if(bird.y-bird.r*0.7 < p.top || bird.y+bird.r*0.7 > p.top+(p.gap || gapNow)){ endGame(); }
       }
     }
+    if(!panikPeringatan && bird.y+bird.r > H-60) suaraPanik();
     if(bird.y+bird.r > H-24 || bird.y-bird.r < 0){ bird.y=Math.max(bird.r, bird.y); if(bird.y+bird.r>=H-24) endGame(); }
     document.getElementById('hudScore').textContent = score;
   } else if(state==='start'){
