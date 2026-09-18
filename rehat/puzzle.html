@@ -705,7 +705,7 @@
      Lewat jam buka, gim bisa dimainkan lagi untuk seru-seruan (skor tidak lagi
      dicatat di papan lomba). Penjaga sebenarnya ada di server (rehat-tutup-lomba-v85.sql). */
   var TUTUP_LOMBA=new Date('2026-09-18T17:00:00+08:00').getTime();
-  var BUKA_LAGI=new Date('2026-09-19T06:00:00+08:00').getTime();   /* ganti bila jam buka berbeda */
+  var BUKA_LAGI=0;   /* dibuka segera setelah deployment */
   function lombaTutup(){ var t=Date.now(); return t>=TUTUP_LOMBA && t<BUKA_LAGI }
   function tampilTutup(){
     var b=document.getElementById('startBtn');
