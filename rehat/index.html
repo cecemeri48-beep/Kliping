@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Rehat Sejenak · Kliping RCS.CBS</title>
-<meta name="description" content="Tiga gim kecil untuk jeda di antara bacaan — FLYER, NGOPI, dan SUSUN, dengan Papan Rekor Bersama seluruh pembaca." />
+<meta name="description" content="Lima gim kecil untuk jeda di antara bacaan — FLYER, NGOPI, dan SUSUN, dengan Papan Rekor Bersama seluruh pembaca." />
 <link rel="icon" type="image/png" href="../favicon.png" />
 <style>
   :root{--ink:#2C2C2B;--ink2:#6B6863;--soft:#F9F8F7;--soft2:#F0EFED;--line:#E6E5E3;--green:#2E7D4F;--green-s:#E8F1EC;--gold:#D9A441}
@@ -119,7 +119,7 @@
 <header class="top"><div class="top-in"><img src="../logo.png" alt="Logo RCS.CBS" /><b>REHAT SEJENAK</b><a class="kembali" href="../">&#8592; Kliping</a></div></header>
 <main>
   <h1>Rehat Sejenak</h1>
-  <p class="lead">Lima gim kecil untuk jeda di antara bacaan. Isi namamu sekali, lalu skormu ikut tercatat di Papan Rekor Bersama seluruh pembaca.</p>
+  <p class="lead">Empat gim kecil untuk jeda di antara bacaan. Isi namamu sekali, lalu skormu ikut tercatat di Papan Rekor Bersama seluruh pembaca.</p>
   <p class="pesan-jujur">Satu pesan sebelum kau mulai: papan ini bukan piala — ia cermin. Skor jujur yang kecil tetap milikmu sepenuhnya; skor dusta yang tertinggi tidak pernah benar-benar menjadi milikmu. Menanglah dengan kedua tanganmu sendiri, atau kalahlah dengan kepala tegak — karena jauh setelah gim ini terlupakan, nama yang kau tulis di papan itu akan tetap mengingat caramu bermain. Rehat yang sesungguhnya hanya lahir dari hati yang tenang. &#129293;</p>
 
   <div class="nama-card"><label for="namaPemain">Nama</label><input id="namaPemain" type="text" maxlength="24" placeholder="mis. Anoa Makassar" autocomplete="off" /></div>
@@ -131,6 +131,7 @@
     <a class="game" href="flyer.html"><span class="ic">&#128764;</span><span><b>FLYER</b><p>Terbangkan logo melewati celah pegunungan. Ketuk layar untuk mengepak.</p></span><span class="rk"><b id="rekorFlyer">0</b><span>Rekor</span></span></a>
     <a class="game" href="ngopi.html"><span class="ic">&#9749;</span><span><b>NGOPI</b><p>Geser cangkir menangkap kopi yang berjatuhan. Jangan sampai tumpah.</p></span><span class="rk"><b id="rekorNgopi">0</b><span>Rekor</span></span></a>
     <a class="game" href="puzzle.html"><span class="ic">&#129513;</span><span><b>SUSUN</b><p>Susun 16 potongan logo RCS.CBS — tukar, putar, utuhkan. Makin cepat, makin besar poin.</p></span><span class="rk"><b id="rekorPuzzle">0</b><span>Rekor</span></span></a>
+    <a class="game" href="warna.html"><span class="ic" style="background:#fff4d1">&#127912;</span><span><b>WARNAI</b><p>Warnai ilustrasi realistis Pantai Losari dan kapal Pinisi dengan sapuan jari.</p></span><span class="rk"><b>PROTOTIPE</b><span>Uji coba</span></span></a>
     <a class="game" href="tts.html"><span class="ic">🧩</span><span><b>TTS JELAJAH ALAM</b><p>Isi teka-teki silang bertema hutan, satwa, pendakian, dan konservasi.</p></span><span class="rk"><b>NEW</b><span>Game 05</span></span></a>
   </div>
 
@@ -193,7 +194,7 @@
   document.getElementById('rekorPuzzle').textContent=bp;document.getElementById('bestPuzzle').textContent=bp;
   isi(document.getElementById('histPuzzle'),h('reichas_hist_puzzle'));
   /* papan rekor bersama */
-  var cacheRank={};
+  var cacheRank={},cacheFinal={};
   function renderRank(game,elm,lv){
     var rows=(cacheRank[game]||[]).filter(function(x){return !lv || (x.level||'')===lv}).slice(0,3);
     if(!rows.length){elm.innerHTML='<li class="kosong">Belum ada yang tercatat di tingkat ini.</li>';return}
@@ -212,7 +213,7 @@
     }).join('');
   }
   function loadRank(game,elm){
-    fetch(SUPA+'/rest/v1/rehat_klasemen_final?game=eq.'+game+'&select=nama,skor,created_at,level&order=skor.desc,created_at.asc&limit=80',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+    fetch(SUPA+'/rest/v1/rehat_klasemen_aktif?game=eq.'+game+'&select=nama,skor,created_at,level&order=skor.desc,created_at.asc&limit=80',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
     .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
     .then(function(rows){
       var seen={},uniq=[]; /* satu nama = satu baris per tingkat (urutan sudah desc) */
@@ -222,7 +223,7 @@
       if(lombaSudahTutup()) renderPemenang();
     })
     .catch(function(){ /* kolom level belum ada? mundur ke kueri lama tanpa level */
-      fetch(SUPA+'/rest/v1/rehat_klasemen_final?game=eq.'+game+'&select=nama,skor,created_at&order=skor.desc,created_at.asc&limit=50',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+      fetch(SUPA+'/rest/v1/rehat_klasemen_aktif?game=eq.'+game+'&select=nama,skor,created_at&order=skor.desc,created_at.asc&limit=50',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
       .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
       .then(function(rows){
         var seen={},uniq=[];
@@ -239,9 +240,20 @@
     loadRank('ngopi',document.getElementById('rankNgopi'));
     loadRank('puzzle',document.getElementById('rankPuzzle'));
   }
+  function loadFinalWinners(){
+    fetch(SUPA+'/rest/v1/rehat_klasemen_final?select=game,peringkat,nama,skor,created_at,level&order=game,peringkat',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
+    .then(function(rows){
+      cacheFinal={};
+      (rows||[]).forEach(function(x){(cacheFinal[x.game]||(cacheFinal[x.game]=[])).push(x)});
+      renderPemenang();
+    })
+    .catch(function(){});
+  }
   muatSemuaPeringkat();
+  loadFinalWinners();
   /* Pengguna yang membiarkan halaman terbuka tetap menerima klasemen final. */
-  setInterval(muatSemuaPeringkat,30000);
+  setInterval(function(){muatSemuaPeringkat();loadFinalWinners()},30000);
 
   /* ===== v92: HITUNG MUNDUR, FINALISASI & PENGUMUMAN PEMENANG =====
      v92: Lomba musim ini berjalan 15 Sep 2026 17:00 WITA s.d. 18 Sep 2026 17:00 WITA, lalu gim ditutup SEMENTARA dan
@@ -250,13 +262,13 @@
      dicatat di papan lomba (server membekukan papan), hasil final tetap
      terpampang di panel pemenang. */
   var TUTUP_LOMBA=new Date('2026-09-18T16:55:00+08:00').getTime();
-  var BUKA_LAGI  =new Date('2026-09-19T06:00:00+08:00').getTime();   /* jam buka lagi */
+  var BUKA_LAGI  =0;   /* dibuka segera setelah deployment */
   function lombaSudahTutup(){ return Date.now()>=TUTUP_LOMBA }
   function renderPemenang(){
     var sec=document.getElementById('pemenang'); if(!sec) return;
     var medali=['\u{1F947}','\u{1F948}','\u{1F949}'];
     [['flyer','winFlyer'],['ngopi','winNgopi'],['puzzle','winPuzzle']].forEach(function(g){
-      var rows=(cacheRank[g[0]]||[]).slice(0,3);
+      var rows=(cacheFinal[g[0]]||[]).slice(0,3);
       var ol=document.getElementById(g[1]); if(!ol) return;
       if(!rows.length){ ol.innerHTML='<li class="kosong">Belum ada skor tercatat.</li>'; return }
       ol.innerHTML=rows.map(function(x,i){
