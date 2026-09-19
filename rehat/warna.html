@@ -23,6 +23,8 @@ h1 span{color:#e0a926}
 .stat b{display:block;color:var(--ink);font-size:20px;line-height:1.1}
 #board{width:min(82vw,330px);aspect-ratio:1;border-radius:24px;padding:9px;background:#26302b;box-shadow:0 18px 42px rgba(44,65,52,.22);display:grid;grid-template-columns:repeat(4,1fr);gap:7px;touch-action:manipulation}
 .cell{border:0;border-radius:12px;min-width:0;cursor:pointer;box-shadow:inset 0 0 0 2px rgba(255,255,255,.45),0 3px 7px rgba(0,0,0,.16);transition:transform .12s,filter .12s}
+.cell .target-dot{display:block;width:24px;height:24px;margin:auto;border-radius:50%;background:var(--target);box-shadow:0 0 0 3px rgba(255,255,255,.78),0 2px 7px rgba(0,0,0,.18)}
+.cell.done .target-dot{display:none}
 .cell:active{transform:scale(.94)}
 .cell.done{filter:saturate(1.2) brightness(1.05);box-shadow:inset 0 0 0 3px #fff,0 0 0 3px var(--green)}
 .cell.wrong{animation:bad .24s ease}
@@ -43,7 +45,7 @@ h1 span{color:#e0a926}
   <main>
     <div class="eyebrow">Prototype · Game ke-4</div>
     <h1>WARNAI <span>LOSARI</span></h1>
-    <p class="intro">Pilih warna yang cocok untuk setiap bidang. Selesaikan semua bidang sebelum waktu habis.</p>
+    <p class="intro">Lihat titik warna di setiap bidang. Pilih warna yang sama, lalu ketuk bidangnya sebelum waktu habis.</p>
     <div id="hud"><div class="stat">Waktu<b id="time">60</b></div><div class="stat">Skor<b id="score">0</b></div><div class="stat">Kombo<b id="combo">0</b></div></div>
     <div id="board" aria-label="Papan mewarnai"></div>
     <div id="palette" aria-label="Palet warna"></div>
@@ -57,7 +59,7 @@ const COLORS=['#e84c3d','#f2b632','#3c91c9','#43a66b','#9b67c6','#ef8b38'];
 const TARGET=[0,2,4,1,3,5,2,0,3,4,1,5];
 const board=document.getElementById('board'),palette=document.getElementById('palette'),start=document.getElementById('start');
 let chosen=0,score=0,combo=0,time=60,running=false,timer=0,done=0;
-function makeBoard(){board.innerHTML='';TARGET.forEach((target,i)=>{const b=document.createElement('button');b.className='cell';b.dataset.target=target;b.dataset.index=i;b.style.background='#dfe5df';b.setAttribute('aria-label','Bidang '+(i+1));b.onclick=()=>paint(b);board.appendChild(b)})}
+function makeBoard(){board.innerHTML='';TARGET.forEach((target,i)=>{const b=document.createElement('button');b.className='cell';b.dataset.target=target;b.dataset.index=i;b.style.background='#dfe5df';b.style.setProperty('--target',COLORS[target]);b.innerHTML='<span class="target-dot" aria-hidden="true"></span>';b.setAttribute('aria-label','Bidang '+(i+1)+', cocokkan titik warna');b.onclick=()=>paint(b);board.appendChild(b)})}
 function makePalette(){
   palette.innerHTML='';
   for(let i=0;i<COLORS.length;i++){
