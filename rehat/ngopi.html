@@ -179,7 +179,7 @@ canvas.width = W; canvas.height = H;
 const logo = new Image(); logo.src = LOGO_SRC; let logoReady=false; logo.onload=()=>logoReady=true;
 
 let state='start';
-let score=0, lives=3, panikSudah=false;
+let score=0, lives=3;
 /* ===== REKOR PERANGKAT BERSIDIK (v80) =====
    Nilai di localStorage diberi sidik. Kalau diubah manual lewat devtools,
    sidiknya tidak cocok dan rekor dianggap 0 — bukan rekor palsu. */
@@ -214,7 +214,7 @@ const TYPES=[
 ];
 
 let combo=0;
-function reset(){ score=0; lives=3; panikSudah=false; combo=0; items.length=0; floats.length=0; timer=0; spawnEvery=52; tick=0; cup.x=W/2; updateHud(); }
+function reset(){ score=0; lives=3; combo=0; items.length=0; floats.length=0; timer=0; spawnEvery=52; tick=0; cup.x=W/2; suaraMissTerakhir=0; updateHud(); }
 function updateHud(){ document.getElementById('hudScore').textContent=score;
   document.getElementById('hudLives').textContent='❤️'.repeat(Math.max(0,lives)); }
 
@@ -246,11 +246,19 @@ function startGame(){ if(lombaTutup()){ tampilTutup(); return; } reset(); state=
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('overScreen').classList.add('hidden'); }
 function ucapSuara(teks){try{if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(teks);u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
-function suaraPanik(){if(panikSudah)return;panikSudah=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Santai Losari Ko… Mang Odong')}}catch(e){}}
 function suaraGameOver(){setTimeout(function(){ucapSuara('Jangan emosi, coba lagi gratis')},850)}
 var suaraMissTerakhir=0;
-function suaraMiss(){var kini=Date.now();if(kini-suaraMissTerakhir<1200)return;suaraMissTerakhir=kini;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Goblok kali!')}}catch(e){}}
-function endGame(){if(!panikSudah)suaraPanik();suaraGameOver();try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'ngopi',score:score},'*')}catch(e){} state='over';
+function suaraMiss(jenis){
+  var kini=Date.now();
+  /* SpeechSynthesis terlalu sering dapat membuat Android tersendat.
+     Batasi satu narator per 900 ms dan jangan membatalkan audio yang sedang
+     berjalan agar antrean suara tidak memicu lonjakan kerja. */
+  if(kini-suaraMissTerakhir<900)return;
+  suaraMissTerakhir=kini;
+  var teks=jenis==='leaf'?'Bego lu':'Goblok kali!';
+  try{if('speechSynthesis' in window){ucapSuara(teks)}}catch(e){}
+}
+function endGame(){suaraGameOver();try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'ngopi',score:score},'*')}catch(e){} state='over';
   const nr=score>best; if(nr){ best=score; simpanRekor(best);try{var _h=JSON.parse(localStorage.getItem('reichas_hist_ngopi')||'[]');_h.unshift({s:score,t:Date.now()});localStorage.setItem('reichas_hist_ngopi',JSON.stringify(_h.slice(0,10)))}catch(e){}; }
   /* BUG: skor dulu hanya dikirim saat memecahkan rekor PERANGKAT. Kalau kiriman gagal
      (sinyal putus) atau rekor lokal berasal dari perangkat lain, skor sah tidak pernah
@@ -502,7 +510,7 @@ function loop(now){
          ditangkap. Laju kini dibatasi, dan yang diuji adalah LINTASAN antar-bingkai. */
       if(it.y > cup.y-cup.h/2 && yLama < cup.y+cup.h/2 && Math.abs(it.x-cup.x) < cup.w/2){
         if(it.t.good){ score+=it.t.pts; combo++; addFloat('+'+it.t.pts, it.x, it.y, it.t.isLogo?'#b8860b':'#2f7346'); if(combo>=3)addFloat('\ud83d\udd25x'+combo, it.x, it.y-26, '#e67e22'); if(combo>0&&combo%10===0&&lives<3){ lives++; addFloat('+1 \❤', cup.x, cup.y-44, '#ff6b5d'); } try{if(window.BWKAudio)window.BWKAudio.playPoint();}catch(e){} getar(12); }
-        else { lives--; suaraMiss(); if(lives===1)setTimeout(suaraPanik,650); combo=0; addFloat('-1', it.x, it.y, '#c0392b'); flashRed(); getar(70); try{if(window.BWKAudio)window.BWKAudio.playBad();}catch(e){} if(lives<=0) endGame(); }
+        else { lives--; suaraMiss(it.t.k); combo=0; addFloat('-1', it.x, it.y, '#c0392b'); flashRed(); getar(70); try{if(window.BWKAudio)window.BWKAudio.playBad();}catch(e){} if(lives<=0) endGame(); }
         items.splice(i,1); updateHud(); continue;
       }
       if(it.y>H+30){ // missed

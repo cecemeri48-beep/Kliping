@@ -266,7 +266,13 @@ function startGame(){
   document.getElementById('overScreen').classList.add('hidden');
 }
 function ucapSuara(teks){try{if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(teks);u.lang='id-ID';u.rate=1.04;u.pitch=1.08;u.volume=.9;speechSynthesis.speak(u)}}catch(e){}}
-function suaraPanik(){if(panikPeringatan)return;panikPeringatan=true;try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Santai Losari Ko… Mang Odong')}}catch(e){}}
+function suaraPanik(){
+  /* Narator baru aktif setelah pemain melewati 10 poin, supaya pembukaan
+     tetap ringan dan tidak mengganggu kontrol di perangkat mobile. */
+  if(score<10 || panikPeringatan)return;
+  panikPeringatan=true;
+  try{if('speechSynthesis' in window){speechSynthesis.cancel();ucapSuara('Santai Losari Ko… Mang Odong')}}catch(e){}
+}
 function suaraGameOver(){setTimeout(function(){ucapSuara('Jangan emosi, coba lagi gratis')},850)}
 function endGame(){suaraPanik();suaraGameOver();try{if(window.BWKAudio){window.BWKAudio.unlock();window.BWKAudio.playGameOver();}}catch(e){}try{window.parent.postMessage({type:'pintu-game-score',game:'flyer',score:score},'*')}catch(e){}
   state='over';
