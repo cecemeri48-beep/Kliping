@@ -141,6 +141,7 @@
     <div class="brow"><h3>FLYER</h3><ol class="ranks" id="winFlyer"></ol></div>
     <div class="brow"><h3>NGOPI</h3><ol class="ranks" id="winNgopi"></ol></div>
     <div class="brow"><h3>SUSUN</h3><ol class="ranks" id="winPuzzle"></ol></div>
+    <div class="brow"><h3>TTS JELAJAH ALAM</h3><ol class="ranks" id="winTts"></ol></div>
   </section>
 
   <section class="board">
@@ -148,6 +149,7 @@
     <div class="brow"><h3>FLYER</h3><ol class="ranks" id="rankFlyer"><li class="kosong">Memuat&#8230;</li></ol></div>
     <div class="brow"><h3>NGOPI</h3><ol class="ranks" id="rankNgopi"><li class="kosong">Memuat&#8230;</li></ol></div>
     <div class="brow"><h3>SUSUN</h3><ol class="ranks" id="rankPuzzle"><li class="kosong">Memuat&#8230;</li></ol></div>
+    <div class="brow"><h3>TTS JELAJAH ALAM</h3><ol class="ranks" id="rankTts"><li class="kosong">Memuat&#8230;</li></ol></div>
   </section>
 
   <section class="board">
@@ -214,7 +216,7 @@
     }).join('');
   }
   function loadRank(game,elm){
-    fetch(SUPA+'/rest/v1/rehat_klasemen_aktif?game=eq.'+game+'&select=nama,skor,created_at,level&order=skor.desc,created_at.asc&limit=80',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
+    fetch(SUPA+(game==='tts'?'/rest/v1/rehat_klasemen_tts?':'/rest/v1/rehat_klasemen_aktif?game=eq.'+game+'&')+'select=nama,skor,created_at,level&order=skor.desc,created_at.asc&limit=80',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
     .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
     .then(function(rows){
       var seen={},uniq=[]; /* satu nama = satu baris per tingkat (urutan sudah desc) */
@@ -240,6 +242,7 @@
     loadRank('flyer',document.getElementById('rankFlyer'));
     loadRank('ngopi',document.getElementById('rankNgopi'));
     loadRank('puzzle',document.getElementById('rankPuzzle'));
+    loadRank('tts',document.getElementById('rankTts'));
   }
   function loadFinalWinners(){
     fetch(SUPA+'/rest/v1/rehat_klasemen_final?select=game,peringkat,nama,skor,created_at,level&order=game,peringkat',{headers:{apikey:KEY,Authorization:'Bearer '+KEY}})
@@ -268,7 +271,7 @@
   function renderPemenang(){
     var sec=document.getElementById('pemenang'); if(!sec) return;
     var medali=['\u{1F947}','\u{1F948}','\u{1F949}'];
-    [['flyer','winFlyer'],['ngopi','winNgopi'],['puzzle','winPuzzle']].forEach(function(g){
+    [['flyer','winFlyer'],['ngopi','winNgopi'],['puzzle','winPuzzle'],['tts','winTts']].forEach(function(g){
       var rows=(cacheFinal[g[0]]||[]).slice(0,3);
       var ol=document.getElementById(g[1]); if(!ol) return;
       if(!rows.length){ ol.innerHTML='<li class="kosong">Belum ada skor tercatat.</li>'; return }
