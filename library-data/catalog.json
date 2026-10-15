@@ -47,6 +47,25 @@
       "revision": "9e7dc1273a1c9260"
     },
     {
+      "id": "1QrM16xztdIzh61BEWNonH6-qqVLC7KYb",
+      "name": "Mengenal Olahraga Golf.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "1b087a48d5f4cb41",
+      "modifiedTime": "2026-10-15T14:40:41.200Z",
+      "size": 3816250,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1QrM16xztdIzh61BEWNonH6-qqVLC7KYb-2c0b1e3015edde51.jpg",
+        "width": 600,
+        "height": 431,
+        "type": "image/jpeg",
+        "bytes": 69361
+      },
+      "revision": "2e2b1b03e31245a1"
+    },
+    {
       "id": "1uTuvpfrWjSg4jFEhVIKmNxr7h9FgIXzK",
       "name": "Problematika Sosial Dunia Modern.pdf",
       "mimeType": "application/pdf",
@@ -91,9 +110,6 @@
       "sourceRevision": "cb9b930514e73128",
       "modifiedTime": "2026-10-15T12:33:43.905Z",
       "size": 61274636,
-      "status": "ready",
-      "coverMethod": "pdf-first-pages",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1frGbhzCwU_RlK-foqwrufJ2YmCXZvYbg-39462eb97ebd762c.jpg",
         "width": 600,
@@ -101,6 +117,9 @@
         "type": "image/jpeg",
         "bytes": 65260
       },
+      "status": "ready",
+      "coverMethod": "pdf-first-pages",
+      "attempts": 0,
       "revision": "a958d1ad5fdf845e"
     },
     {
@@ -142,6 +161,6 @@
       "revision": "664f68b252a64cac"
     }
   ],
-  "checkedAt": "2026-10-15T14:19:33Z",
-  "updatedAt": "2026-10-15T14:19:33Z"
+  "checkedAt": "2026-10-15T14:42:26Z",
+  "updatedAt": "2026-10-15T14:42:26Z"
 }
