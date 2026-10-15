@@ -1,0 +1,22 @@
+PERBAIKAN BERANDA DAN PERPUSTAKAAN - SEMUA BERKAS DI ROOT
+
+Pemeriksaan live/repo menunjukkan index.html saat ini berisi Perpustakaan, dan folder perpustakaan tidak ada. Paket ini menghindari nama index.html ganda dan tidak memerlukan unggahan folder.
+
+1. Ekstrak ZIP ini.
+2. Unggah semua berkas hasil ekstrak ke ROOT repositori Kliping dan timpa berkas dengan nama sama.
+3. Pastikan nama index.html tepat, bukan index (1).html atau index (3).html.
+4. Commit dan push, tunggu deployment sukses.
+5. Buka beranda / lalu klik menu Perpustakaan. Jika tampilan tertahan cache, hard refresh.
+
+BERKAS:
+index.html = beranda Kliping asli + satu tambahan menu saja
+perpustakaan.html = halaman Perpustakaan terpisah
+library.css, library.js = aset Perpustakaan
+pdf.mjs, pdf.worker.mjs, PDFJS-LICENSE.txt = pembaca PDF lokal
+sw.js = service worker dengan nama cache baru
+
+vercel.json yang sudah ada memiliki cleanUrls:true, sehingga perpustakaan.html dibuka sebagai /perpustakaan. Tidak perlu mengubah vercel.json.
+
+Berkas salinan index (1).html / index (3).html tidak dipakai untuk beranda. Jangan memakai salah satunya sebagai pengganti tanpa memeriksa isinya.
+
+Integrasi Drive masih menunggu tautan folder/file; koleksi PDF versi ini belum menjadi koleksi Drive bersama.
