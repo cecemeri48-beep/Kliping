@@ -1,0 +1,32 @@
+PERPUSTAKAAN: BACA LANGSUNG
+
+Paket ini TIDAK mengubah index.html beranda.
+
+LANGKAH 1 — ROOT REPO
+Ekstrak ZIP, lalu unggah perpustakaan.html, library.css, library.js, sw.js ke root repositori Kliping. Timpa berkas lama bernama sama.
+
+LANGKAH 2 — FOLDER api
+Berkas server perpustakaan.js diberikan sebagai lampiran TERPISAH.
+Di GitHub buka folder api yang SUDAH ADA, pilih Add file > Upload files, unggah perpustakaan.js, lalu commit. Pastikan path akhirnya api/perpustakaan.js. Bukan perpustakaan.js di root, dan bukan perpustakaan (1).js.
+
+Pada pengecekan situs, /api/perpustakaan masih 404 dan perpustakaan.js justru ada di root. Itulah penyebab respons bukan JSON. Mengunggah JS server ke root tidak menjalankannya sebagai fungsi Vercel.
+
+LANGKAH 3 — DEPLOYMENT
+Tunggu deployment sukses. Buka /perpustakaan lalu pilih Baca. Jika tampilan versi lama masih terlihat, gunakan hard refresh.
+
+TAMPILAN
+- Tanpa label sumber, tautan folder, atau penjelasan Google Drive pada katalog.
+- Kartu buku hanya sampul, judul, dan Baca.
+- Baca membuka pembaca tertanam secara langsung. Tidak memulai unduhan PDF.
+- Pembaca layar penuh di ponsel dan dialog besar di desktop. Jika pembaca gagal, ada tautan Buka pembaca sebagai alternatif.
+- Tidak ada tombol unduh dari aplikasi. Kontrol internal pembaca penyedia mungkin masih tersedia dan tidak dimodifikasi.
+
+DAFTAR BUKU DAN PEMBARUAN
+Daftar awal di library.js adalah snapshot dua PDF yang diverifikasi ada dalam folder sumber saat paket dibuat; tidak ada katalog WeLib. Daftar ini/daftar terakhir tersimpan menjadi fallback saat endpoint gagal. Jika fallback sedang digunakan, tampilan menyatakan pembaruan belum tersambung. Snapshot bukan klaim bahwa daftar selalu terbaru.
+
+Pembaruan otomatis dari folder baru bekerja SESUDAH api/perpustakaan.js benar-benar terpasang. Pemeriksaan saat halaman dibuka, kembali ke tab, setiap 5 menit selama tab terlihat, atau Perbarui ditekan. Bila daftar sumber berhasil dibaca, hasil itu menggantikan snapshot termasuk saat file dihapus atau folder kosong. Tidak perlu push ulang untuk PDF baru setelah endpoint terpasang.
+
+Server hanya membaca metadata folder publik yang ditentukan. File harus tetap dapat dilihat pengunjung; tidak memintas izin, konfirmasi, atau kuota penyedia. Hanya PDF langsung di folder yang didukung. Versi tanpa kredensial memakai halaman publik, bukan API resmi; perubahan format atau pagination (50+ item) memerlukan integrasi resmi dan akan menghasilkan kegagalan pembaruan, bukan daftar lengkap palsu.
+
+PENGUJIAN LOKAL
+Dua PDF terlihat meski endpoint membalas 404 teks. Tidak ada error JSON mentah. Baca masing-masing PDF berhasil membuka preview; tidak ada event unduhan. Pencarian, layout 390/1280 px, penutupan iframe dan penggantian daftar setelah pembaruan berhasil diuji. Paket belum dipasang ke situs live.
