@@ -34,9 +34,6 @@
       "sourceRevision": "a28c097f367108ca",
       "modifiedTime": "2026-10-15T17:34:55.769Z",
       "size": 2601950,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1oVHxWOe78fOnvLSXkWwQF1XizBhMDCTM-25457f3ee4e6a113.jpg",
         "width": 600,
@@ -44,14 +41,17 @@
         "type": "image/jpeg",
         "bytes": 80574
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "f495b72710b32202"
     },
     {
       "id": "1EAsvagspF_VtQaYgo2LVKFIwOok5VuLu",
-      "name": "Ensiklopedia Satwa Liar ANJ - Pendaki (Peduli Keanekaragaman -- Nardiyono",
+      "name": "Ensiklopedia Satwa Liar ANJ  -- Nardiyono",
       "mimeType": "application/pdf",
-      "sourceRevision": "e87c22a6013870a5",
-      "modifiedTime": "2026-10-15T16:04:59.807Z",
+      "sourceRevision": "981bf22822af4ebe",
+      "modifiedTime": "2026-10-15T17:56:09.207Z",
       "size": 18610752,
       "cover": {
         "path": "library-data/covers/1EAsvagspF_VtQaYgo2LVKFIwOok5VuLu-9f71494e20587ada.jpg",
@@ -63,7 +63,7 @@
       "status": "ready",
       "coverMethod": "drive-thumbnail",
       "attempts": 0,
-      "revision": "7dbec5fdd0689d00"
+      "revision": "a262bfa2d50ea868"
     },
     {
       "id": "1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f",
@@ -102,6 +102,25 @@
       "coverMethod": "drive-thumbnail",
       "attempts": 0,
       "revision": "7cd83a547d1e3505"
+    },
+    {
+      "id": "1utMjyob28sBLOcPlbI0niF-KY_xJDXbW",
+      "name": "Kahlil Gibran- Sang Musafir -- Kahlil Gibran -- ( WeLib.org ).pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "f5e85390654e465d",
+      "modifiedTime": "2026-10-15T18:03:31.344Z",
+      "size": 1381812,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1utMjyob28sBLOcPlbI0niF-KY_xJDXbW-56f90bac7ce3b2c9.jpg",
+        "width": 600,
+        "height": 900,
+        "type": "image/jpeg",
+        "bytes": 52355
+      },
+      "revision": "842d35f749436875"
     },
     {
       "id": "1QrM16xztdIzh61BEWNonH6-qqVLC7KYb",
@@ -218,6 +237,6 @@
       "revision": "9ce5bf31cf0159d8"
     }
   ],
-  "checkedAt": "2026-10-15T17:35:41Z",
-  "updatedAt": "2026-10-15T17:35:41Z"
+  "checkedAt": "2026-10-15T18:05:08Z",
+  "updatedAt": "2026-10-15T18:05:08Z"
 }
