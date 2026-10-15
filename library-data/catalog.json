@@ -28,6 +28,25 @@
       "revision": "b139495c8e1b2215"
     },
     {
+      "id": "1oVHxWOe78fOnvLSXkWwQF1XizBhMDCTM",
+      "name": "Ayat - Ayat Api -- Sapardi Djoko Damono .pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "a28c097f367108ca",
+      "modifiedTime": "2026-10-15T17:34:55.769Z",
+      "size": 2601950,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1oVHxWOe78fOnvLSXkWwQF1XizBhMDCTM-25457f3ee4e6a113.jpg",
+        "width": 600,
+        "height": 898,
+        "type": "image/jpeg",
+        "bytes": 80574
+      },
+      "revision": "f495b72710b32202"
+    },
+    {
       "id": "1EAsvagspF_VtQaYgo2LVKFIwOok5VuLu",
       "name": "Ensiklopedia Satwa Liar ANJ - Pendaki (Peduli Keanekaragaman -- Nardiyono",
       "mimeType": "application/pdf",
@@ -72,9 +91,6 @@
       "sourceRevision": "340ff49042f32248",
       "modifiedTime": "2026-10-15T16:13:16.989Z",
       "size": 912702,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1aeyOZY7p2wE0Y4O9Sz8wNgYd8Ocua3S1-d7472bbe4e39a00e.jpg",
         "width": 600,
@@ -82,6 +98,9 @@
         "type": "image/jpeg",
         "bytes": 48354
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "7cd83a547d1e3505"
     },
     {
@@ -199,6 +218,6 @@
       "revision": "9ce5bf31cf0159d8"
     }
   ],
-  "checkedAt": "2026-10-15T16:15:18Z",
-  "updatedAt": "2026-10-15T16:15:18Z"
+  "checkedAt": "2026-10-15T17:35:41Z",
+  "updatedAt": "2026-10-15T17:35:41Z"
 }
