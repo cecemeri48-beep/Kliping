@@ -1,0 +1,10 @@
+PEMULIHAN BERANDA KLIPING REICHAS
+
+1. Timpa index.html dan sw.js di ROOT repositori, bukan di folder perpustakaan.
+2. Jangan pindahkan perpustakaan/index.html ke root.
+3. Commit dan push, lalu tunggu deployment selesai.
+4. Lakukan hard refresh. Jika tampilan lama masih muncul, hapus data situs lalu muat ulang; tindakan ini menghapus PDF/koleksi lokal jika pernah ditambahkan.
+
+Index.html berasal dari ZIP Kliping asli yang diberikan, dengan satu perubahan: tautan Perpustakaan pada menu. Tidak ada perubahan layout, gaya, isi, atau footer beranda. Paket ini tidak mengubah folder perpustakaan.
+
+Integrasi koleksi bersama Google Drive belum dikonfigurasi: menunggu tautan folder dan izin akses file.

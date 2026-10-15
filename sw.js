@@ -1,9 +1,9 @@
-const CACHE='reichas-v110-perpustakaan';
+const CACHE='reichas-v111-pulihkan-beranda';
 /* Hanya aset yang benar-benar dipakai pada tampilan pertama. og-image.jpg
    (156 KB) dan ikon 512 px dibuang dari precache: keduanya tidak pernah
    ditampilkan ke pembaca (hanya untuk pratinjau WhatsApp dan ikon PWA),
    dan tetap dilayani lewat cache jalan-jalan di bawah bila diminta. */
-const CORE=['/perpustakaan/vendor/pdf.mjs','/perpustakaan/vendor/pdf.worker.mjs','/perpustakaan/','/perpustakaan/library.css','/perpustakaan/library.js','/','/index.html','/manifest.webmanifest','/favicon.ico','/favicon.png','/icon-192.png','/logo.png','/mascot.png','/hero-m.webp','/paper.webp'];
+const CORE=['/','/index.html','/manifest.webmanifest','/favicon.ico','/favicon.png','/icon-192.png','/logo.png','/mascot.png','/hero-m.webp','/paper.webp'];
 self.addEventListener('install',function(e){e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(CORE)}).catch(function(){}));self.skipWaiting()});
 self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return k!==CACHE?caches.delete(k):null}))}));self.clients.claim()});
 self.addEventListener('fetch',function(e){
