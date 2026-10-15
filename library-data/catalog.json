@@ -28,6 +28,25 @@
       "revision": "b139495c8e1b2215"
     },
     {
+      "id": "1EAsvagspF_VtQaYgo2LVKFIwOok5VuLu",
+      "name": "Ensiklopedia Satwa Liar ANJ - Pendaki (Peduli Keanekaragaman -- Nardiyono",
+      "mimeType": "application/pdf",
+      "sourceRevision": "e87c22a6013870a5",
+      "modifiedTime": "2026-10-15T16:04:59.807Z",
+      "size": 18610752,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1EAsvagspF_VtQaYgo2LVKFIwOok5VuLu-9f71494e20587ada.jpg",
+        "width": 600,
+        "height": 855,
+        "type": "image/jpeg",
+        "bytes": 88031
+      },
+      "revision": "7dbec5fdd0689d00"
+    },
+    {
       "id": "1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f",
       "name": "Filosofi Teras -- Henry Manampiring -- ( WeLib.org ).pdf",
       "mimeType": "application/pdf",
@@ -53,9 +72,6 @@
       "sourceRevision": "1b087a48d5f4cb41",
       "modifiedTime": "2026-10-15T14:40:41.200Z",
       "size": 3816250,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1QrM16xztdIzh61BEWNonH6-qqVLC7KYb-2c0b1e3015edde51.jpg",
         "width": 600,
@@ -63,6 +79,9 @@
         "type": "image/jpeg",
         "bytes": 69361
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "2e2b1b03e31245a1"
     },
     {
@@ -161,6 +180,6 @@
       "revision": "664f68b252a64cac"
     }
   ],
-  "checkedAt": "2026-10-15T14:42:26Z",
-  "updatedAt": "2026-10-15T14:42:26Z"
+  "checkedAt": "2026-10-15T16:08:17Z",
+  "updatedAt": "2026-10-15T16:08:17Z"
 }
