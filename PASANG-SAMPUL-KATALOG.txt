@@ -1,0 +1,25 @@
+PERBAIKAN SAMPUL KATALOG HOPE119
+
+1. Ekstrak ZIP dan unggah/timpa di ROOT repository:
+- perpustakaan.html
+- library.js
+- sw.js
+- sampul-1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f.jpg
+Jangan ganti nama JPG. Ini sampul Filosofi Teras yang dibuat dari halaman pertama PDF, JPEG 600x850, 88496 byte. Tidak ada index.html: beranda tidak diganti. Tidak perlu unggah ulang PDF besar.
+
+2. Buka lampiran KODE-api-perpustakaan-119.txt, salin seluruh isinya.
+Di GitHub: buka api/perpustakaan.js -> Edit -> ganti SEMUA kode lama -> Commit.
+Jangan membuat perpustakaan (1).js atau mengunggah TXT menjadi file server baru.
+
+3. Tunggu deployment Ready. Buka ulang perpustakaan dan tekan Perbarui. Sampul Filosofi Teras sudah teruji tampil pada katalog. Bagikan sekarang memakai ?v=hope119.
+
+CARA KERJA
+Kartu katalog sekarang memakai endpoint sampul sendiri, bukan URL thumbnail eksternal langsung. Bila thumbnail gagal, server mencoba file JPG cadangan dari root situs; katalog juga dapat langsung memuat JPG itu jika API belum sempat diperbarui. Kegagalan sementara dicoba ulang terbatas setelah sekitar 4, 12, dan 30 detik; tombol Perbarui dapat memulai ulang. Tidak mengunduh PDF 72 MB ke HP hanya untuk menampilkan sampul.
+
+PENTING UNTUK BUKU BERIKUTNYA
+Paket ini sudah menyediakan sampul cadangan khusus Filosofi Teras. Ini BUKAN pembuat sampul otomatis untuk seluruh PDF mendatang. Buku baru tetap memakai thumbnail sumber. Jika sebuah buku tidak pernah menyediakan thumbnail, perlu satu JPG cadangan bernama sampul-ID_FILE.jpg di root (JPEG maksimal 1 MB). Mekanisme server akan memakainya tanpa mengubah kode atau daftar judul.
+
+Fitur Baca, narator, tanda Diskusi, pencarian, dan pembaruan daftar tetap dipertahankan. Metadata berbagi juga menggunakan sampul cadangan jika tersedia. Cache/pengaturan WhatsApp tetap dapat memengaruhi munculnya gambar; uji pengiriman WhatsApp fisik belum dilakukan.
+
+UJI LOKAL
+Keenam sampul tampil, termasuk Filosofi Teras. Metadata Filosofi Teras memakai JPEG 600x850. Simulasi thumbnail gagal lalu pulih berhasil dicoba ulang; fallback gambar langsung dengan API lama juga lulus. Tidak ada overflow horizontal pada lebar 320/390/1280, tidak ada page error. Tampilan terang/gelap dan mobile/desktop diperiksa visual. Endpoint produksi statis belum diunggah oleh agen; server lokal memetakan URL JPG produksi ke berkas yang akan diunggah untuk menguji fallback. Paket belum di-deploy.
