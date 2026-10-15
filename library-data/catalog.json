@@ -34,9 +34,6 @@
       "sourceRevision": "e87c22a6013870a5",
       "modifiedTime": "2026-10-15T16:04:59.807Z",
       "size": 18610752,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1EAsvagspF_VtQaYgo2LVKFIwOok5VuLu-9f71494e20587ada.jpg",
         "width": 600,
@@ -44,14 +41,17 @@
         "type": "image/jpeg",
         "bytes": 88031
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "7dbec5fdd0689d00"
     },
     {
       "id": "1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f",
-      "name": "Filosofi Teras -- Henry Manampiring -- ( WeLib.org ).pdf",
+      "name": "Filosofi Teras -- Henry Manampiring.pdf",
       "mimeType": "application/pdf",
-      "sourceRevision": "8fa2dd4cce40af54",
-      "modifiedTime": "2026-10-15T11:39:49.498Z",
+      "sourceRevision": "dbb81e76c15909f6",
+      "modifiedTime": "2026-10-15T16:13:39.049Z",
       "size": 71746277,
       "cover": {
         "path": "library-data/covers/1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f-5f0a0c1ef60fb8bc.jpg",
@@ -63,7 +63,26 @@
       "status": "ready",
       "coverMethod": "pdf-first-pages",
       "attempts": 0,
-      "revision": "9e7dc1273a1c9260"
+      "revision": "31038bc6d8782ff5"
+    },
+    {
+      "id": "1aeyOZY7p2wE0Y4O9Sz8wNgYd8Ocua3S1",
+      "name": "Hujan Bulan Juni (Indonesian Edition) -- Sapardi Djoko Damono.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "340ff49042f32248",
+      "modifiedTime": "2026-10-15T16:13:16.989Z",
+      "size": 912702,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1aeyOZY7p2wE0Y4O9Sz8wNgYd8Ocua3S1-d7472bbe4e39a00e.jpg",
+        "width": 600,
+        "height": 888,
+        "type": "image/jpeg",
+        "bytes": 48354
+      },
+      "revision": "7cd83a547d1e3505"
     },
     {
       "id": "1QrM16xztdIzh61BEWNonH6-qqVLC7KYb",
@@ -124,10 +143,10 @@
     },
     {
       "id": "1frGbhzCwU_RlK-foqwrufJ2YmCXZvYbg",
-      "name": "Setiap Hari Stoik- 366 Renungan untuk Menjalani Kehidupan -- Ryan Holiday -- ( WeLib.org ).pdf",
+      "name": "Setiap Hari Stoik- 366 Renungan untuk Menjalani Kehidupan -- Ryan Holiday .pdf",
       "mimeType": "application/pdf",
-      "sourceRevision": "cb9b930514e73128",
-      "modifiedTime": "2026-10-15T12:33:43.905Z",
+      "sourceRevision": "c6301a9cd61ee83e",
+      "modifiedTime": "2026-10-15T16:14:15.165Z",
       "size": 61274636,
       "cover": {
         "path": "library-data/covers/1frGbhzCwU_RlK-foqwrufJ2YmCXZvYbg-39462eb97ebd762c.jpg",
@@ -139,14 +158,14 @@
       "status": "ready",
       "coverMethod": "pdf-first-pages",
       "attempts": 0,
-      "revision": "a958d1ad5fdf845e"
+      "revision": "a08045f7bb244d67"
     },
     {
       "id": "1PgGabHAzr0ADeFKUr7ZQyB-mlbyuZ_N1",
-      "name": "Tan Malaka - MADILOG -- Rowland Book Collections -- ( WeLib.org ).pdf",
+      "name": "Tan Malaka - MADILOG -- Rowland Book Collections.pdf",
       "mimeType": "application/pdf",
-      "sourceRevision": "b99175d739dc390e",
-      "modifiedTime": "2026-10-15T09:02:52.359Z",
+      "sourceRevision": "29bca1b8263426e3",
+      "modifiedTime": "2026-10-15T16:14:29.918Z",
       "size": 2184528,
       "cover": {
         "path": "library-data/covers/1PgGabHAzr0ADeFKUr7ZQyB-mlbyuZ_N1-02de1f95d0b4f409.jpg",
@@ -158,14 +177,14 @@
       "status": "ready",
       "coverMethod": "drive-thumbnail",
       "attempts": 0,
-      "revision": "1571922ce0b0b63c"
+      "revision": "55e11667288af168"
     },
     {
       "id": "1GJU6t5A7rWgyNMMVDZbsgn0BoLWn7uMR",
-      "name": "The Art Of War Sun Tzu- Seni Perang -- Sun Tzu, James Clavell (Editor) -- ( WeLib.org ).pdf",
+      "name": "The Art Of War Sun Tzu- Seni Perang -- Sun Tzu, James Clavell (Editor).pdf",
       "mimeType": "application/pdf",
-      "sourceRevision": "79de27c677b9da00",
-      "modifiedTime": "2026-10-15T09:05:57.858Z",
+      "sourceRevision": "137331789f2a2869",
+      "modifiedTime": "2026-10-15T16:14:42.118Z",
       "size": 4087090,
       "cover": {
         "path": "library-data/covers/1GJU6t5A7rWgyNMMVDZbsgn0BoLWn7uMR-66736ca644854734.jpg",
@@ -177,9 +196,9 @@
       "status": "ready",
       "coverMethod": "drive-thumbnail",
       "attempts": 0,
-      "revision": "664f68b252a64cac"
+      "revision": "9ce5bf31cf0159d8"
     }
   ],
-  "checkedAt": "2026-10-15T16:08:17Z",
-  "updatedAt": "2026-10-15T16:08:17Z"
+  "checkedAt": "2026-10-15T16:15:18Z",
+  "updatedAt": "2026-10-15T16:15:18Z"
 }
