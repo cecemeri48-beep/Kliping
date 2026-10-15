@@ -1,0 +1,10 @@
+Aset opsional narator HOPE
+PDF.js / pdfjs-dist 6.4.299, Mozilla Foundation, Apache-2.0.
+https://www.npmjs.com/package/pdfjs-dist/v/6.4.299
+Tesseract.js 6.0.1, Apache-2.0; tesseract.js-core 6.0.0, Apache-2.0.
+https://www.npmjs.com/package/tesseract.js/v/6.0.1
+https://www.npmjs.com/package/tesseract.js-core/v/6.0.0
+Data bahasa Indonesia: tessdata fast, Apache-2.0.
+https://tessdata.projectnaptha.com/4.0.0_fast/ind.traineddata.gz
+Lisensi/notis terkait disertakan pada PDFJS-LICENSE.txt dan OCR-LICENSE.txt serta header distribusi JS.
+Aset ini hanya dimuat setelah pengguna memilih fitur yang memerlukannya.

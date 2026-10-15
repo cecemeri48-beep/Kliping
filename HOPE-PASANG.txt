@@ -1,0 +1,68 @@
+PERPUSTAKAAN HOPE — NARATOR INDONESIA, OCR OPSIONAL, DUA KOLOM
+
+PENTING: DUA BAGIAN PEMASANGAN HARUS SELESAI
+
+1) BERKAS ROOT (dari ZIP ini)
+Unggah/timpa di root repositori Kliping:
+- perpustakaan.html
+- library.css
+- library.js
+- sw.js
+- vercel.json
+- narrator.js
+- hope-pdf.mjs dan hope-pdf.worker.mjs
+- hope-ocr.js, hope-ocr-worker.js, hope-ocr-core.wasm.js
+- ind.traineddata.gz (biarkan tetap .gz, jangan diekstrak)
+- PDFJS-LICENSE.txt, OCR-LICENSE.txt, THIRD-PARTY.txt
+
+Paket tidak berisi index.html. Beranda Kliping TIDAK diganti.
+vercel.json mempertahankan cleanUrls serta route lama /klip, /rss.xml, /feed, /sitemap.xml. Ditambahkan:
+/buku/:id -> /api/perpustakaan?book=:id
+/sampul/:id -> /api/perpustakaan?cover=:id
+Fungsi api/perpustakaan.js juga membundel perpustakaan.html agar metadata per buku dapat dibuat di server.
+
+2) BERKAS SERVER (lampiran perpustakaan.js terpisah)
+Buka FOLDER api di GitHub, lalu timpa perpustakaan.js yang sudah ada.
+Path akhirnya HARUS api/perpustakaan.js, bukan di root. Nama harus tetap perpustakaan.js, bukan perpustakaan (1).js.
+Sebaiknya commit kedua bagian bersama. Tunggu deployment sukses sebelum mencoba Bagikan.
+
+PERUBAHAN
+- Nama halaman, header, footer, judul browser, dan pesan berbagi menjadi Perpustakaan HOPE.
+- Dua kolom di ponsel (320–600 px), tiga di tablet, empat di desktop lebar.
+- Tidak ada framework/font eksternal. Sampul kecil 320 px dengan lazy-load dan decoding async. Pratinjau PDF baru dimuat saat Baca diklik. Modul narator tidak dimuat sampai Dengarkan dipilih.
+- Filter/urutan ditempatkan dalam panel yang dapat dibuka; tombol Bagikan dan Diskusi menjadi ikon pada kartu kecil dengan nama aksesibel, tombol min. 44 px.
+- Baca langsung, tanda Diskusi, filter, mode gelap, tombol Kembali, dan tautan lama #baca tetap didukung. Kunci penyimpanan lama dipertahankan agar tanda diskusi tidak hilang karena pergantian nama.
+- File CSS/JS diberi versi agar cache mobile lama tidak mempertahankan susunan satu kolom.
+
+PRATINJAU WHATSAPP
+Tombol Bagikan baru memakai /buku/ID, bukan sekadar /perpustakaan#baca=ID. Halaman itu memiliki Open Graph judul, deskripsi, dan gambar sampul khusus buku dalam HTML yang langsung tersedia tanpa JavaScript. URL gambar /sampul/ID menyajikan PNG/JPEG/WebP publik dari sampul, bukan halaman HTML/login. Tidak menyimpan isi PDF secara permanen. Untuk narator, endpoint audio meneruskan potongan byte PDF terbatas tanpa melewati izin akses file.
+
+Penerima membuka halaman tersebut dan pembaca langsung terbuka pada buku yang dibagikan. Untuk buku yang belum ada dalam snapshot/cache browser, data buku dari server disisipkan secara aman ke halaman.
+
+Setelah deployment, gunakan Bagikan lagi untuk mengirim LINK BARU. Pesan WhatsApp lama dengan #baca tidak otomatis berubah menjadi kartu buku. Tunggu pratinjau muncul sebelum mengirim bila WhatsApp menampilkannya. Cache dan pengaturan WhatsApp dapat memengaruhi munculnya gambar; kode situs tidak dapat menjamin perilaku setiap versi WhatsApp. Belum ada uji pengiriman pada perangkat WhatsApp fisik oleh agen.
+
+Jika setelah deployment tautan Bagikan masih memakai #baca, periksa bahwa kedua bagian pemasangan sudah selesai dan jalur /buku/ID menghasilkan HTML, bukan 404/JSON. Frontend memeriksa kesiapan jalur melalui HEAD dengan header X-HOPE-Book. Bila pemasangan belum lengkap, tautan baca lama dipakai sebagai fallback agar tidak membagikan link yang rusak.
+
+PENGELOLAAN DAN BATAS TETAP
+Buku tetap berasal hanya dari PDF langsung di folder publik yang sudah ditetapkan. Daftar diperiksa saat halaman dibuka, kembali ke tab, setiap 5 menit selama tab terlihat, serta lewat tombol Perbarui. Metadata server memiliki cache 60 detik untuk mengurangi permintaan berulang. Sampul berbagi memiliki cache 1 jam; perubahan file dengan ID sama dapat membutuhkan waktu untuk mengganti gambar. PDF baru dalam folder yang sama tidak memerlukan push ulang.
+
+Endpoint tanpa kredensial masih membaca halaman folder publik, bukan Drive API resmi. Subfolder, EPUB, dan shortcut belum didukung; pagination/50+ item perlu integrasi resmi. Pratinjau isi mengikuti izin penyedia. Penandaan Diskusi tetap lokal di browser/perangkat, bukan komentar atau daftar bersama antar pengguna.
+
+UJI
+Metadata HTML empat buku dibaca tanpa JavaScript (termasuk UA crawler), keempat gambar sampul publik teruji PNG 1000 px lebar, ID invalid/di luar koleksi ditolak. Ukuran layar 320/360/390/430/600/768/1280 px diuji: jumlah kolom sesuai, tidak ada overflow horizontal, tombol minimal 44 px. Cari/reset/urut/filter, tanda diskusi, deep-link buku, penutupan pembaca kembali ke katalog, tanpa event download, dan fallback saat route belum terpasang lulus uji lokal Chromium. Pengiriman native Share/WhatsApp tidak dilakukan; payload/metadata diuji, bukan pengiriman pesan nyata. Paket belum di-deploy oleh agen.
+
+
+NARATOR INDONESIA (BARU)
+- Baca -> Dengarkan -> Mulai mendengarkan. PDF teks disiapkan saat panel narator dibuka; narasi tidak diputar otomatis.
+- Hanya suara dengan bahasa id/id-ID yang ditampilkan/dipakai. Jika tidak tersedia, narator dinonaktifkan dan memberi petunjuk mengaktifkan Bahasa Indonesia di pengaturan teks-ke-ucapan perangkat. Tidak diam-diam memakai suara Inggris. Kualitas dan karakter suara mengikuti OS/browser, bukan rekaman profesional atau MP3 yang dibuat server. Beberapa suara memakai koneksi internet/layanan online penyedia suara.
+- Jeda/lanjut, stop, kecepatan 0,8x–1,5x, pilih halaman PDF, halaman sebelum/sesudah. Pindah ke halaman berikutnya otomatis setelah halaman selesai, selama ada teks yang terbaca. Halaman kosong/teks terlalu sedikit menghentikan narasi dan memberi pilihan halaman lain atau OCR.
+- Posisi halaman/bagian serta kecepatan tersimpan lokal. Lanjut dari awal potongan kalimat terakhir, bukan detik/karakter terakhir. Menutup pembaca/mengganti buku meninggalkan halaman menghentikan narasi dan membersihkan worker/request.
+- Keep halaman tetap terbuka. Layar terkunci/tab latar belakang dapat menghentikan suara di Android/iOS. Ini pembaca suara browser, BUKAN layanan audiobook background yang dijamin jalan saat layar mati.
+- PDF hasil scan: pilih Aktifkan OCR Indonesia. OCR benar-benar berjalan lokal menggunakan Tesseract, satu halaman pada satu waktu, bukan mengirim scan ke layanan OCR. Hasil bisa salah pada teks kecil, scan buram, tabel, dan tata letak rumit. Halaman diperkecil maksimal kira-kira 1200 x 1800 agar lebih ringan di HP. OCR lebih lambat dan memakai baterai; tidak dinyalakan otomatis.
+- Aset tambahan (PDF.js, OCR dan model Indonesia) disajikan dari situs sendiri dan dimuat sesuai permintaan; tidak dimasukkan ke precache katalog PWA. Tidak perlu API key atau layanan TTS berbayar.
+- Wajib ganti api/perpustakaan.js dengan versi NARATOR yang disertakan terpisah. Ini mengatasi CORS file sumber: akses PDF dibatasi ke buku yang memang ada dalam folder, melalui potongan maksimal 256 KiB per respons. Hindari menaruh berkas API ini di root.
+- Batas narator PDF 80 MB; akses per potongan harus diizinkan penyedia. Password, persetujuan unduh, pembatasan file, atau PDF rusak belum didukung. Tombol Baca biasa tetap tersedia walaupun narator gagal.
+- Tidak ada index.html dalam paket; beranda Kliping tetap. Dua kolom mobile, pratinjau WhatsApp, tanda Diskusi, cari/urut, dan update folder otomatis tetap dipertahankan.
+
+UJI VERSI NARATOR
+Uji lokal Chromium: PDF teks asli, mock suara Indonesia (bukan audio speaker nyata), jeda/lanjut/stop/kecepatan, pilih halaman/posisi tersimpan, tidak ada fallback suara Inggris, tanpa suara tersedia, OCR Indonesia nyata untuk fixture scan, dan OCR halaman pertama PDF koleksi 100 Menu Kopi (71 halaman). API PDF range asli diuji berhasil. Endpoint menolak ID invalid, buku di luar folder, offset salah, respons HTML dan ukuran melebihi batas. Layout 320/390/844-landscape/1280 px tanpa overflow; pemeriksaan visual terang/gelap serta keadaan OCR/suara tidak tersedia sudah dilakukan. Regresi katalog 320–1280 px, Bagikan/OG metadata/sampul per buku, filter/tanda Diskusi, deep link dan Baca lulus. Tidak ada event unduh dari tombol Baca/Dengarkan. Suara OS dan kontinuitas saat layar mati belum diuji pada HP fisik. Paket belum di-deploy oleh agen.
