@@ -31,12 +31,28 @@ async function loadCollection(){
  try{return await collectionPending}finally{collectionPending=null}
 }
 function shellHTML(){for(const p of [path.join(process.cwd(),'perpustakaan.html'),path.join(__dirname,'..','perpustakaan.html')]){if(fs.existsSync(p))return fs.readFileSync(p,'utf8')}throw new Error('Halaman perpustakaan belum dibundel.');}
-function bookHTML(book){const title=bookTitle(book),url=SITE+'/buku/'+book.id,img=SITE+'/sampul/'+book.id,description='Baca '+title+' langsung di Perpustakaan HOPE. Temukan bahan obrolan, bagikan, dan tandai untuk diskusi.';let html=shellHTML();const tags=`<meta property="og:title" content="${htmlEsc(title)} — Perpustakaan HOPE"><meta property="og:description" content="${htmlEsc(description)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Perpustakaan HOPE"><meta property="og:url" content="${htmlEsc(url)}"><meta property="og:image" content="${htmlEsc(img)}"><meta property="og:image:secure_url" content="${htmlEsc(img)}"><meta property="og:image:alt" content="Sampul ${htmlEsc(title)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${htmlEsc(title)}"><meta name="twitter:image" content="${htmlEsc(img)}"><link rel="canonical" href="${htmlEsc(url)}">`;
+function bookHTML(book,image=null){const title=bookTitle(book),url=SITE+'/buku/'+book.id+'?v=hope118',img=SITE+'/sampul/'+book.id+'?v=hope118',description='Baca '+title+' langsung di Perpustakaan HOPE. Temukan bahan obrolan, bagikan, dan tandai untuk diskusi.';let html=shellHTML();const tags=`<meta property="og:title" content="${htmlEsc(title)} — Perpustakaan HOPE"><meta property="og:description" content="${htmlEsc(description)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Perpustakaan HOPE"><meta property="og:url" content="${htmlEsc(url)}"><meta property="og:image" content="${htmlEsc(img)}"><meta property="og:image:secure_url" content="${htmlEsc(img)}"><meta property="og:image:type" content="image/jpeg">${image?.width&&image?.height?`<meta property="og:image:width" content="${image.width}"><meta property="og:image:height" content="${image.height}">`:``}<meta property="og:image:alt" content="Sampul ${htmlEsc(title)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${htmlEsc(title)}"><meta name="twitter:image" content="${htmlEsc(img)}"><link rel="canonical" href="${htmlEsc(url)}">`;
  html=html.replace(/<title>[\s\S]*?<\/title>/i,'<title>'+htmlEsc(title)+' — Perpustakaan HOPE</title>').replace(/<!-- HOPE_OG_START -->[\s\S]*?<!-- HOPE_OG_END -->/,tags);
  html=html.replace('</head>','<script>window.HOPE_SHARED_BOOK='+JSON.stringify(book).replace(/</g,'\\u003c')+';</script></head>');
  return html;
 }
-async function bookCover(id){const cached=coverCache.get(id);if(cached&&Date.now()-cached.time<3600000)return cached;const r=await fetch('https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w1000',{signal:AbortSignal.timeout(12000)});const type=(r.headers.get('content-type')||'').split(';')[0];if(!r.ok||!['image/png','image/jpeg','image/webp'].includes(type))throw new Error('Sampul belum tersedia.');const declared=Number(r.headers.get('content-length'));if(declared>5*1024*1024)throw new Error('Sampul terlalu besar.');const buf=Buffer.from(await r.arrayBuffer());if(buf.length>5*1024*1024)throw new Error('Sampul terlalu besar.');const value={time:Date.now(),type,buffer:buf};if(coverCache.size>=12)coverCache.delete(coverCache.keys().next().value);coverCache.set(id,value);return value;}
+function jpegDimensions(b){
+ if(b.length<4||b[0]!==0xff||b[1]!==0xd8)throw Error('Sampul bukan JPEG.');
+ let p=2;
+ while(p+4<=b.length){if(b[p++]!==0xff)continue;while(p<b.length&&b[p]===0xff)p++;const marker=b[p++];if(marker===0xd9||marker===0xda)break;if(marker===0x01||(marker>=0xd0&&marker<=0xd7))continue;if(p+2>b.length)break;const len=b.readUInt16BE(p);if(len<2||p+len>b.length)break;if([0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb,0xcd,0xce,0xcf].includes(marker)&&len>=7){const height=b.readUInt16BE(p+3),width=b.readUInt16BE(p+5);if(width&&height)return {width,height};break}p+=len}
+ throw Error('Dimensi JPEG belum tersedia.');
+}
+async function fetchCoverJPEG(id,size){
+ const r=await fetch('https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w'+size+'-rj',{signal:AbortSignal.timeout(10000)});
+ if(!r.ok||(r.headers.get('content-type')||'').split(';')[0]!=='image/jpeg'){await r.body?.cancel();throw Error('Sampul JPEG belum tersedia.');}
+ const reader=r.body.getReader(),parts=[];let length=0;
+ try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>2*1024*1024)throw Error('Sampul terlalu besar.');parts.push(Buffer.from(value))}}finally{await reader.cancel().catch(()=>{});reader.releaseLock()}
+ const buffer=Buffer.concat(parts);return {time:Date.now(),type:'image/jpeg',buffer,...jpegDimensions(buffer)};
+}
+async function bookCover(id){const cached=coverCache.get(id);if(cached&&Date.now()-cached.time<3600000)return cached;
+ let image=await fetchCoverJPEG(id,600);if(image.buffer.length>250000)image=await fetchCoverJPEG(id,360);
+ if(coverCache.size>=12)coverCache.delete(coverCache.keys().next().value);coverCache.set(id,image);return image;
+}
 const AUDIO_CHUNK=262144,AUDIO_MAX=80*1024*1024;
 async function audioChunk(id,offset){
  const response=await fetch('https://drive.usercontent.google.com/download?id='+encodeURIComponent(id)+'&export=download',{headers:{Range:'bytes='+offset+'-'+(offset+AUDIO_CHUNK-1)},signal:AbortSignal.timeout(18000)});
@@ -61,9 +77,9 @@ async function handler(req,res){
   if(id){const b=data.books.find(x=>x.id===id);if(!b){res.statusCode=404;res.setHeader('Cache-Control','no-store');res.end('Buku tidak ditemukan dalam koleksi.');return}
    if(audio&&!book&&!cover){const raw=q.offset??params.get('offset')??'0';if(typeof raw!=='string'||!/^\d{1,9}$/.test(raw)||Number(raw)>=AUDIO_MAX){res.statusCode=400;res.end('Offset tidak valid.');return}const offset=Number(raw),chunk=await audioChunk(id,offset);res.setHeader('Content-Type','application/pdf');res.setHeader('Cache-Control','no-store');res.setHeader('X-HOPE-Total',chunk.total);res.setHeader('X-HOPE-Offset',offset);res.setHeader('Content-Length',chunk.buffer.length);res.statusCode=200;res.end(req.method==='HEAD'?undefined:chunk.buffer);return}
    if(cover&&!book){const image=await bookCover(id);res.setHeader('Content-Type',image.type);res.setHeader('Cache-Control','public, max-age=3600, s-maxage=3600');res.setHeader('Content-Length',image.buffer.length);res.statusCode=200;res.end(req.method==='HEAD'?undefined:image.buffer);return}
-   const body=bookHTML(b);res.setHeader('X-HOPE-Book',b.id);res.setHeader('Content-Type','text/html; charset=utf-8');res.setHeader('Cache-Control','public, max-age=0, s-maxage=60');res.statusCode=200;res.end(req.method==='HEAD'?'':body);return;
+   const image=await bookCover(id).catch(()=>null);const body=bookHTML(b,image);res.setHeader('X-HOPE-Book',b.id);res.setHeader('Content-Type','text/html; charset=utf-8');res.setHeader('Cache-Control','public, max-age=0, s-maxage=60');res.statusCode=200;res.end(req.method==='HEAD'?'':body);return;
   }
   res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('Cache-Control','public, max-age=0, s-maxage=60');res.statusCode=200;res.end(req.method==='HEAD'?'':JSON.stringify(data));
  }catch(e){res.statusCode=502;res.setHeader('Cache-Control','no-store');if(isPage||cover||audio){res.setHeader('Content-Type','text/plain; charset=utf-8');res.end('Buku sementara belum dapat dimuat. Silakan coba lagi.')}else{res.setHeader('Content-Type','application/json; charset=utf-8');res.end(JSON.stringify({error:'Koleksi sementara belum dapat diperbarui.'}))}}
 }
-module.exports=handler;module.exports.audioChunk=audioChunk;module.exports.parseFolder=parseFolder;module.exports.bookHTML=bookHTML;
+module.exports=handler;module.exports.jpegDimensions=jpegDimensions;module.exports.bookCover=bookCover;module.exports.audioChunk=audioChunk;module.exports.parseFolder=parseFolder;module.exports.bookHTML=bookHTML;
