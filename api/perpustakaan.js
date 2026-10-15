@@ -31,7 +31,7 @@ async function loadCollection(){
  try{return await collectionPending}finally{collectionPending=null}
 }
 function shellHTML(){for(const p of [path.join(process.cwd(),'perpustakaan.html'),path.join(__dirname,'..','perpustakaan.html')]){if(fs.existsSync(p))return fs.readFileSync(p,'utf8')}throw new Error('Halaman perpustakaan belum dibundel.');}
-function bookHTML(book,image=null){const title=bookTitle(book),url=SITE+'/buku/'+book.id+'?v=hope118',img=SITE+'/sampul/'+book.id+'?v=hope118',description='Baca '+title+' langsung di Perpustakaan HOPE. Temukan bahan obrolan, bagikan, dan tandai untuk diskusi.';let html=shellHTML();const tags=`<meta property="og:title" content="${htmlEsc(title)} — Perpustakaan HOPE"><meta property="og:description" content="${htmlEsc(description)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Perpustakaan HOPE"><meta property="og:url" content="${htmlEsc(url)}"><meta property="og:image" content="${htmlEsc(img)}"><meta property="og:image:secure_url" content="${htmlEsc(img)}"><meta property="og:image:type" content="image/jpeg">${image?.width&&image?.height?`<meta property="og:image:width" content="${image.width}"><meta property="og:image:height" content="${image.height}">`:``}<meta property="og:image:alt" content="Sampul ${htmlEsc(title)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${htmlEsc(title)}"><meta name="twitter:image" content="${htmlEsc(img)}"><link rel="canonical" href="${htmlEsc(url)}">`;
+function bookHTML(book,image=null){const title=bookTitle(book),url=SITE+'/buku/'+book.id+'?v=hope119',img=SITE+'/sampul/'+book.id+'?v=hope119',description='Baca '+title+' langsung di Perpustakaan HOPE. Temukan bahan obrolan, bagikan, dan tandai untuk diskusi.';let html=shellHTML();const tags=`<meta property="og:title" content="${htmlEsc(title)} — Perpustakaan HOPE"><meta property="og:description" content="${htmlEsc(description)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Perpustakaan HOPE"><meta property="og:url" content="${htmlEsc(url)}"><meta property="og:image" content="${htmlEsc(img)}"><meta property="og:image:secure_url" content="${htmlEsc(img)}"><meta property="og:image:type" content="image/jpeg">${image?.width&&image?.height?`<meta property="og:image:width" content="${image.width}"><meta property="og:image:height" content="${image.height}">`:``}<meta property="og:image:alt" content="Sampul ${htmlEsc(title)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${htmlEsc(title)}"><meta name="twitter:image" content="${htmlEsc(img)}"><link rel="canonical" href="${htmlEsc(url)}">`;
  html=html.replace(/<title>[\s\S]*?<\/title>/i,'<title>'+htmlEsc(title)+' — Perpustakaan HOPE</title>').replace(/<!-- HOPE_OG_START -->[\s\S]*?<!-- HOPE_OG_END -->/,tags);
  html=html.replace('</head>','<script>window.HOPE_SHARED_BOOK='+JSON.stringify(book).replace(/</g,'\\u003c')+';</script></head>');
  return html;
@@ -42,15 +42,22 @@ function jpegDimensions(b){
  while(p+4<=b.length){if(b[p++]!==0xff)continue;while(p<b.length&&b[p]===0xff)p++;const marker=b[p++];if(marker===0xd9||marker===0xda)break;if(marker===0x01||(marker>=0xd0&&marker<=0xd7))continue;if(p+2>b.length)break;const len=b.readUInt16BE(p);if(len<2||p+len>b.length)break;if([0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb,0xcd,0xce,0xcf].includes(marker)&&len>=7){const height=b.readUInt16BE(p+3),width=b.readUInt16BE(p+5);if(width&&height)return {width,height};break}p+=len}
  throw Error('Dimensi JPEG belum tersedia.');
 }
-async function fetchCoverJPEG(id,size){
- const r=await fetch('https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w'+size+'-rj',{signal:AbortSignal.timeout(10000)});
+async function fetchCoverJPEG(id,size,timeout=8000){
+ const r=await fetch('https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w'+size+'-rj',{signal:AbortSignal.timeout(timeout)});
  if(!r.ok||(r.headers.get('content-type')||'').split(';')[0]!=='image/jpeg'){await r.body?.cancel();throw Error('Sampul JPEG belum tersedia.');}
  const reader=r.body.getReader(),parts=[];let length=0;
  try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>2*1024*1024)throw Error('Sampul terlalu besar.');parts.push(Buffer.from(value))}}finally{await reader.cancel().catch(()=>{});reader.releaseLock()}
  const buffer=Buffer.concat(parts);return {time:Date.now(),type:'image/jpeg',buffer,...jpegDimensions(buffer)};
 }
+async function staticCover(id){
+ const r=await fetch(SITE+'/sampul-'+encodeURIComponent(id)+'.jpg',{signal:AbortSignal.timeout(4000)});
+ if(!r.ok||(r.headers.get('content-type')||'').split(';')[0]!=='image/jpeg'){await r.body?.cancel();throw Error('Sampul cadangan belum tersedia.');}
+ const reader=r.body.getReader(),parts=[];let length=0;
+ try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>1024*1024)throw Error('Sampul cadangan terlalu besar.');parts.push(Buffer.from(value))}}finally{await reader.cancel().catch(()=>{});reader.releaseLock()}
+ const buffer=Buffer.concat(parts);return {time:Date.now(),type:'image/jpeg',buffer,...jpegDimensions(buffer)};
+}
 async function bookCover(id){const cached=coverCache.get(id);if(cached&&Date.now()-cached.time<3600000)return cached;
- let image=await fetchCoverJPEG(id,600);if(image.buffer.length>250000)image=await fetchCoverJPEG(id,360);
+ let image;try{image=await fetchCoverJPEG(id,600);if(image.buffer.length>250000)image=await fetchCoverJPEG(id,360,4000)}catch(e){image=await staticCover(id)}
  if(coverCache.size>=12)coverCache.delete(coverCache.keys().next().value);coverCache.set(id,image);return image;
 }
 const AUDIO_CHUNK=262144,AUDIO_MAX=80*1024*1024;
