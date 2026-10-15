@@ -1,0 +1,36 @@
+PERPUSTAKAAN — MOBILE, BAGIKAN, DAN DISKUSI
+
+PUSH:
+Ekstrak ZIP dan timpa perpustakaan.html, library.css, library.js, sw.js di ROOT repositori. Commit/push dan tunggu deployment sukses. Paket tidak menyertakan index.html beranda, vercel.json, maupun berkas api: jangan mengganti beranda atau endpoint yang sudah berfungsi. Bila masih tampil versi lama, hard refresh.
+
+PERUBAHAN MOBILE
+- Kartu horizontal ringkas untuk ponsel, sampul di kiri, tombol besar di kanan.
+- Input 16 px untuk menghindari zoom otomatis saat mengetik pada iOS.
+- Pembaca layar penuh, safe-area/notch, mode landscape, dan tombol min. 44 px.
+- Scroll latar terkunci saat membaca dan dipulihkan saat pembaca ditutup.
+- Tombol Kembali setelah membuka buku dari katalog menutup pembaca terlebih dahulu.
+- Mode gelap mengikuti preferensi perangkat; kontras teks utama dan tombol diuji >=4.5:1.
+
+BAGIKAN
+Bagikan tersedia di kartu dan pembaca. Menggunakan menu berbagi perangkat jika tersedia; alternatifnya menyalin tautan. Bila browser menolak clipboard, tampil dialog untuk menyalin manual. Tautan /perpustakaan#baca=ID membuka buku yang dipilih, tanpa mengharuskan download. Uji share sheet menggunakan mock, tidak mengirim pesan sungguhan.
+
+DISKUSI
+Diskusi menandai buku untuk dibahas. Badge, tombol Ditandai, dan filter khusus disediakan. Penandaan tersimpan di localStorage browser perangkat ini, BUKAN papan diskusi bersama atau komentar yang tersinkron ke pengunjung lain. Tanda tetap ada setelah reload; menghapus data situs/mode privat dapat menghilangkannya. Jika penyimpanan diblokir, tanda masih berlaku selama halaman terbuka dengan pesan peringatan.
+
+PERBAIKAN BUG
+- Tidak lagi membutuhkan AbortSignal.timeout yang tidak tersedia pada sebagian browser lama; menggunakan AbortController + timer.
+- Respons 404/non-JSON tidak memunculkan error mentah dan tidak menghapus koleksi terakhir.
+- ID buku duplikat dibuang.
+- Data yang sama tidak merender ulang seluruh kartu setiap polling otomatis, menghemat jaringan dan mencegah hilangnya fokus.
+- Pembaruan daftar tidak memaksa menutup buku yang sedang dibaca.
+- Iframe/timer dilepas saat pembaca ditutup; callback lama tidak menimpa keadaan pembaca baru.
+- Tautan buku dapat dibuka langsung dan tombol Bagikan memiliki alternatif saat share/clipboard tidak tersedia.
+
+PEMBARUAN BUKU
+Endpoint /api/perpustakaan sudah diperiksa memberi 200 JSON pada saat paket dibuat. Endpoint tetap yang sudah terpasang. Tambahkan PDF publik langsung ke folder sumber yang sama. Daftar diperiksa saat halaman dibuka, kembali ke tab, setiap 5 menit selama tab terlihat, dan melalui Perbarui. Tidak ada job background ketika halaman tidak dibuka. PDF baru muncul dengan sampul dan tombol Baca tanpa push ulang setelah endpoint tersambung. Pembuatan thumbnail/pratinjau oleh penyedia dapat memerlukan waktu setelah upload. Jika mengganti isi PDF dengan ID yang sama, muat ulang pembaca untuk melihat versi terbaru; penyedia dapat menyimpan cache.
+
+BATAS TETAP
+Hanya PDF langsung di folder, bukan subfolder/shortcut/EPUB. Akses file harus mengizinkan pembacaan pengunjung. Versi endpoint tanpa kredensial masih membaca halaman publik, bukan Drive API resmi. Jika format berubah atau folder mencapai 50 item/pagination, diperlukan integrasi resmi agar semua file dapat dibaca. Aplikasi mempertahankan daftar terakhir dengan peringatan bila pembaruan gagal. Tanda diskusi tidak dibagikan otomatis; Bagikan membagikan tautan buku saja.
+
+HASIL UJI LOKAL
+Chromium pada lebar 320, 360, 390, 430, 768 dan 1280 px: tidak ada overflow horizontal. Uji pencarian/urut/filter, reset hasil kosong, pembaca portrait/landscape, tombol Kembali, pembersihan scroll-lock/iframe, fallback 404, deduplikasi, simulasi buku baru setelah 5 menit, persistence tanda, filter diskusi, deep-link, payload native share dan clipboard/mock, serta dialog salin manual lulus. Tidak ada page error pada rangkaian uji dan tidak ada event download saat Baca. Tampilan mobile, desktop, gelap, pembaca, kosong, error, penandaan, dan dialog berbagi diperiksa visual. Belum diuji pada perangkat iPhone/Android fisik dan paket belum dipasang ke live oleh agen.
