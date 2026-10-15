@@ -1,0 +1,92 @@
+name: Perpustakaan HOPE - Sinkronisasi
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Buat ulang sampul, termasuk yang sudah siap
+        type: boolean
+        default: false
+  schedule:
+    - cron: '13,43 * * * *'
+  push:
+    paths:
+      - 'automation/**'
+      - '.github/workflows/hope-library-sync.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: hope-library-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TARGET_BRANCH: ${{ github.event.repository.default_branch }}
+    steps:
+      - name: Periksa pengaturan rahasia
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        shell: bash
+        run: |
+          if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ] || [ -z "$VERCEL_DEPLOY_HOOK" ]; then
+            echo 'Tambahkan GOOGLE_SERVICE_ACCOUNT_JSON dan VERCEL_DEPLOY_HOOK di repository Settings > Secrets and variables > Actions.'
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: automation/requirements.txt
+      - name: Periksa percobaan ulang deployment
+        id: retry
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python automation/check_deploy_retry.py
+      - name: Pasang pemroses sampul
+        run: python -m pip install -r automation/requirements.txt
+      - name: Uji pemroses sebelum menulis katalog
+        run: python -m unittest discover -s automation/tests -v
+      - name: Baca Drive dan siapkan sampul
+        id: prepare
+        continue-on-error: true
+        env:
+          FORCE: ${{ inputs.force }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ "$FORCE" = 'true' ]; then
+            python automation/sync_library.py --force
+          else
+            python automation/sync_library.py
+          fi
+      - name: Simpan katalog dan sampul (tanpa PDF atau key)
+        id: publish
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- library-data/catalog.json library-data/covers/
+          if git diff --cached --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m 'Perbarui koleksi dan sampul HOPE'
+          git pull --rebase origin "$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - name: Terbitkan hasil melalui deploy hook
+        if: steps.publish.outputs.changed == 'true' || steps.retry.outputs.deploy_retry == 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: python automation/trigger_deploy.py
+      - name: Tandai kegagalan sinkronisasi
+        if: steps.prepare.outcome == 'failure'
+        run: |
+          echo 'Sinkronisasi gagal. Katalog terakhir dipertahankan; periksa log langkah Baca Drive.'
+          exit 1

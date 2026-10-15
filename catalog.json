@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 2,
+  "folderId": "1FsGEVM_KRcCyu43tEDwQPn1CrNugDKdA",
+  "source": "migration-bootstrap",
+  "sharePreview": true,
+  "checkedAt": "2026-10-15T12:21:24Z",
+  "updatedAt": "2026-10-15T12:21:24Z",
+  "sync": {
+    "status": "setup-required",
+    "cadenceMinutes": 30,
+    "message": "Koleksi awal tersedia. Aktifkan pengaturan otomatisasi di GitHub."
+  },
+  "books": [
+    {
+      "id": "1S1wKu_jfL88DPOyacQE5qUAb4F_LFLqi",
+      "name": "100 Menu Kopi -- RCS.CBS Perpustakaan Digital.pdf",
+      "mimeType": "application/pdf",
+      "revision": "f9d931c5905cf00d",
+      "status": "ready",
+      "attempts": 0,
+      "coverMethod": "migration-bootstrap",
+      "cover": {
+        "path": "library-data/covers/1S1wKu_jfL88DPOyacQE5qUAb4F_LFLqi-f9d931c5905cf00d.jpg",
+        "width": 600,
+        "height": 848,
+        "type": "image/jpeg",
+        "bytes": 112295
+      }
+    },
+    {
+      "id": "1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f",
+      "name": "Filosofi Teras -- Henry Manampiring -- ( WeLib.org ).pdf",
+      "mimeType": "application/pdf",
+      "revision": "058d12f7c6e366bf",
+      "status": "ready",
+      "attempts": 0,
+      "coverMethod": "migration-bootstrap",
+      "cover": {
+        "path": "library-data/covers/1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f-058d12f7c6e366bf.jpg",
+        "width": 600,
+        "height": 850,
+        "type": "image/jpeg",
+        "bytes": 90634
+      }
+    },
+    {
+      "id": "1uTuvpfrWjSg4jFEhVIKmNxr7h9FgIXzK",
+      "name": "Problematika Sosial Dunia Modern.pdf",
+      "mimeType": "application/pdf",
+      "revision": "af48545070f292b8",
+      "status": "ready",
+      "attempts": 0,
+      "coverMethod": "migration-bootstrap",
+      "cover": {
+        "path": "library-data/covers/1uTuvpfrWjSg4jFEhVIKmNxr7h9FgIXzK-af48545070f292b8.jpg",
+        "width": 600,
+        "height": 473,
+        "type": "image/jpeg",
+        "bytes": 92485
+      }
+    },
+    {
+      "id": "13wtZtAAWl9YBFth-dyZaEg6P26pFCpDq",
+      "name": "Sebuah Seni untuk Bersikap Bodo Amat -- Mark Manson -- ( RCS.CBS ).pdf",
+      "mimeType": "application/pdf",
+      "revision": "fa4d8e8af5978183",
+      "status": "ready",
+      "attempts": 0,
+      "coverMethod": "migration-bootstrap",
+      "cover": {
+        "path": "library-data/covers/13wtZtAAWl9YBFth-dyZaEg6P26pFCpDq-fa4d8e8af5978183.jpg",
+        "width": 600,
+        "height": 872,
+        "type": "image/jpeg",
+        "bytes": 65320
+      }
+    },
+    {
+      "id": "1PgGabHAzr0ADeFKUr7ZQyB-mlbyuZ_N1",
+      "name": "Tan Malaka - MADILOG -- Rowland Book Collections -- ( WeLib.org ).pdf",
+      "mimeType": "application/pdf",
+      "revision": "dfc027523064fec1",
+      "status": "ready",
+      "attempts": 0,
+      "coverMethod": "migration-bootstrap",
+      "cover": {
+        "path": "library-data/covers/1PgGabHAzr0ADeFKUr7ZQyB-mlbyuZ_N1-dfc027523064fec1.jpg",
+        "width": 600,
+        "height": 847,
+        "type": "image/jpeg",
+        "bytes": 85098
+      }
+    },
+    {
+      "id": "1GJU6t5A7rWgyNMMVDZbsgn0BoLWn7uMR",
+      "name": "The Art Of War Sun Tzu- Seni Perang -- Sun Tzu, James Clavell (Editor) -- ( WeLib.org ).pdf",
+      "mimeType": "application/pdf",
+      "revision": "7ad305598757b2d4",
+      "status": "ready",
+      "attempts": 0,
+      "coverMethod": "migration-bootstrap",
+      "cover": {
+        "path": "library-data/covers/1GJU6t5A7rWgyNMMVDZbsgn0BoLWn7uMR-7ad305598757b2d4.jpg",
+        "width": 600,
+        "height": 810,
+        "type": "image/jpeg",
+        "bytes": 89781
+      }
+    }
+  ]
+}

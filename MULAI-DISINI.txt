@@ -1,0 +1,17 @@
+PERPUSTAKAAN HOPE — OTOMATISASI SAMPUL DAN KOLEKSI
+
+Ini satu kali pemasangan, bukan pekerjaan per buku. Setelah aktif, kamu cukup mengunggah PDF ke folder sumber yang sama.
+
+1. EKSTRAK ZIP ke folder baru, jangan upload ZIP langsung.
+2. Upload isi paket ke ROOT repository GitHub. Pertahankan struktur folder .github, automation, api, library-data. Jangan menaruh isi folder api ke root atau membuat nama (1).js. Paket tidak memuat index.html.
+3. Isi DUA Repository Secrets di GitHub (jangan kirim ke chat):
+   GOOGLE_SERVICE_ACCOUNT_JSON — key JSON akun layanan Google, scope kode read-only; beri email akun layanan akses Viewer ke folder buku saja. Google Drive API harus aktif.
+   VERCEL_DEPLOY_HOOK — hook production branch main dari Vercel Settings > Git > Deploy Hooks.
+4. GitHub Actions > Perpustakaan HOPE - Sinkronisasi > Run workflow.
+5. Tunggu workflow hijau DAN Vercel Ready, kemudian tekan Perbarui di perpustakaan.
+
+Panduan langkah lengkap: AKTIFKAN-HOPE-OTOMATIS.md di dalam paket.
+
+Jadwal sekitar 30 menit, bukan langsung seketika; ditambah pemrosesan dan deployment. Sampul dibuat di runner dan disimpan sebagai JPEG kecil. PDF koleksi tidak disimpan di GitHub. Antrean/gagal dicoba ulang; PDF berpassword/rusak/terlarang diunduh bisa memerlukan perbaikan file sumber.
+
+Enam buku/sampul awal disertakan agar halaman tidak kosong selama pemasangan. Itu snapshot migrasi: sinkronisasi resmi belum aktif sebelum dua Secrets dan workflow berhasil. Paket sudah diuji lokal, belum dipasang atau diaktifkan pada akunmu oleh agen.

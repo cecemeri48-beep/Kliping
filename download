@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.env
+.env.*
+secrets/
+credentials/
+automation/.local/
+*service-account*.json
+*credentials*.json
+library-data/covers/*.tmp

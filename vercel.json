@@ -28,8 +28,28 @@
   ],
   "functions": {
     "api/perpustakaan.js": {
-      "includeFiles": "perpustakaan.html",
+      "includeFiles": "{perpustakaan.html,library-data/catalog.json}",
       "maxDuration": 30
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/library-data/covers/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/library-data/catalog.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
 }

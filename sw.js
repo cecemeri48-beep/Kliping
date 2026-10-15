@@ -1,4 +1,4 @@
-const CACHE='hope-v119-cover-retry';
+const CACHE='hope-v200-auto-catalog';
 /* Hanya aset yang benar-benar dipakai pada tampilan pertama. og-image.jpg
    (156 KB) dan ikon 512 px dibuang dari precache: keduanya tidak pernah
    ditampilkan ke pembaca (hanya untuk pratinjau WhatsApp dan ikon PWA),
@@ -12,7 +12,7 @@ self.addEventListener('fetch',function(e){
   /* Modul narator hanya saat diminta; jangan menumpuk PDF/OCR besar di cache PWA. */
   if(/\/(?:hope-pdf|hope-ocr|narrator|ind\.traineddata)/.test(new URL(req.url).pathname))return;
   var url=new URL(req.url);
-  if(url.origin!==location.origin||(url.pathname.indexOf('/api/')===0||url.pathname.indexOf('/buku/')===0||url.pathname.indexOf('/sampul/')===0))return;
+  if(url.origin!==location.origin||(url.pathname.indexOf('/api/')===0||url.pathname.indexOf('/buku/')===0||url.pathname.indexOf('/sampul/')===0||url.pathname==='/library-data/catalog.json'))return;
   if(req.mode==='navigate'){
     e.respondWith(fetch(req).then(function(r){var cp=r.clone();caches.open(CACHE).then(function(c){c.put(req,cp)}).catch(function(){});return r}).catch(function(){return caches.match(req).then(function(r){return r||caches.match('/')}).then(function(r){return r||caches.match('/index.html')})}));
     return;
