@@ -1,0 +1,24 @@
+PEMBARUAN PRATINJAU SAMPUL WHATSAPP — HOPE118
+
+1. Ekstrak ZIP, lalu unggah/timpa tiga berkas di ROOT repository:
+   perpustakaan.html, library.js, sw.js.
+   Paket ini tidak berisi index.html dan tidak mengganti beranda Kliping.
+
+2. Buka lampiran KODE-api-perpustakaan.txt di editor teks. Salin SEMUA isinya.
+   Di GitHub, buka api/perpustakaan.js -> Edit. Ganti SEMUA kode lama dengan kode dari TXT, lalu commit.
+   TXT bukan untuk diunggah sebagai fungsi server. Tidak perlu membuat file baru atau file bernama perpustakaan (1).js.
+
+3. Tunggu deployment terakhir berstatus Ready. Muat ulang perpustakaan, lalu tekan Bagikan lagi.
+   Tautan baru mengandung ?v=hope118. Jangan teruskan pesan/link lama.
+   Tunggu kartu pratinjau selesai dimuat sebelum mengirim di WhatsApp.
+
+PERUBAHAN
+- Gambar OG sekarang JPEG (bukan PNG besar), ukuran 600px; diperkecil lagi jika lebih dari 250 KB.
+- Tipe gambar, lebar, tinggi, dan alt tersedia dalam HTML server tanpa JavaScript.
+- URL gambar dan URL Bagikan diberi versi baru agar tidak menggunakan hasil pratinjau lama yang gagal.
+- Metadata HTML menyiapkan/menghangatkan cache sampul agar permintaan gambar berikutnya lebih cepat.
+- Fitur baca, narator/akses PDF bertahap, diskusi, update koleksi, dan tata letak tetap dipertahankan.
+
+UJI
+Kelima buku pada koleksi saat pengujian: JPEG 600px, 78–123 KB, tipe MIME benar, dimensi metadata sesuai, HEAD tanpa body. Tautan baru melalui tombol Bagikan memakai ?v=hope118; endpoint audio PDF tetap lulus uji. Sampul MADILOG turun dari 921174 byte PNG menjadi 95237 byte JPEG dan diperiksa visual.
+Ini uji endpoint/metadata dan payload Bagikan lokal, BUKAN jaminan kartu akan muncul di semua klien WhatsApp. Cache, pengaturan privasi, dan jaringan WhatsApp tetap dapat memengaruhi hasil. Paket belum di-deploy oleh agen.
