@@ -47,6 +47,25 @@
       "revision": "f495b72710b32202"
     },
     {
+      "id": "1D78ZkqrYqCUEFyW6Dy5Qy3MynvXM5tNM",
+      "name": "Ceritera Rakyat Daerah Sulawesi Selatan -- Tim Penyusun -.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "f5b2c04690423b94",
+      "modifiedTime": "2026-10-16T08:15:22.512Z",
+      "size": 2610587,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1D78ZkqrYqCUEFyW6Dy5Qy3MynvXM5tNM-58abe168534b5d53.jpg",
+        "width": 600,
+        "height": 847,
+        "type": "image/jpeg",
+        "bytes": 101748
+      },
+      "revision": "782a4edc4af8ff0a"
+    },
+    {
       "id": "1EAsvagspF_VtQaYgo2LVKFIwOok5VuLu",
       "name": "Ensiklopedia Satwa Liar ANJ  -- Nardiyono",
       "mimeType": "application/pdf",
@@ -91,9 +110,6 @@
       "sourceRevision": "39cb6b4e51824663",
       "modifiedTime": "2026-10-16T08:00:21.587Z",
       "size": 10584690,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/12xYVgKA6pcjBRnsN57wd5XA3QSeqXrcK-44c9a997d71f65d4.jpg",
         "width": 600,
@@ -101,6 +117,9 @@
         "type": "image/jpeg",
         "bytes": 189632
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "e4549aed18a18f8e"
     },
     {
@@ -275,6 +294,6 @@
       "revision": "9ce5bf31cf0159d8"
     }
   ],
-  "checkedAt": "2026-10-16T08:01:47Z",
-  "updatedAt": "2026-10-16T08:01:47Z"
+  "checkedAt": "2026-10-16T08:15:44Z",
+  "updatedAt": "2026-10-16T08:15:44Z"
 }
