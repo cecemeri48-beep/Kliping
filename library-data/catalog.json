@@ -180,6 +180,25 @@
       "revision": "b71452d37be4699c"
     },
     {
+      "id": "1AW6z2D9eZjViTie3OKFtNlrOg_DxdWjU",
+      "name": "Senjata Tradisional Daerah Sulawesi Selatan -- Pananrangi Hamid, Drs.Darwas Rasyid, MS., Dra. Hermin -- .pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "a51266eda47f7cb2",
+      "modifiedTime": "2026-10-16T04:57:42.003Z",
+      "size": 4563909,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1AW6z2D9eZjViTie3OKFtNlrOg_DxdWjU-d7f030122ddfe5f2.jpg",
+        "width": 600,
+        "height": 903,
+        "type": "image/jpeg",
+        "bytes": 50509
+      },
+      "revision": "b36d4fdf695c76f1"
+    },
+    {
       "id": "1frGbhzCwU_RlK-foqwrufJ2YmCXZvYbg",
       "name": "Setiap Hari Stoik- 366 Renungan untuk Menjalani Kehidupan -- Ryan Holiday .pdf",
       "mimeType": "application/pdf",
@@ -237,6 +256,6 @@
       "revision": "9ce5bf31cf0159d8"
     }
   ],
-  "checkedAt": "2026-10-16T00:25:24Z",
-  "updatedAt": "2026-10-16T00:25:24Z"
+  "checkedAt": "2026-10-16T05:04:56Z",
+  "updatedAt": "2026-10-16T05:04:56Z"
 }
