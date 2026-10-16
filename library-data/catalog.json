@@ -85,6 +85,25 @@
       "revision": "31038bc6d8782ff5"
     },
     {
+      "id": "12xYVgKA6pcjBRnsN57wd5XA3QSeqXrcK",
+      "name": "Hiking and Climbing -- Jeremy Evans Martin 710-20-Rupert White Studio Smillie -.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "39cb6b4e51824663",
+      "modifiedTime": "2026-10-16T08:00:21.587Z",
+      "size": 10584690,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/12xYVgKA6pcjBRnsN57wd5XA3QSeqXrcK-44c9a997d71f65d4.jpg",
+        "width": 600,
+        "height": 924,
+        "type": "image/jpeg",
+        "bytes": 189632
+      },
+      "revision": "e4549aed18a18f8e"
+    },
+    {
       "id": "1aeyOZY7p2wE0Y4O9Sz8wNgYd8Ocua3S1",
       "name": "Hujan Bulan Juni (Indonesian Edition) -- Sapardi Djoko Damono.pdf",
       "mimeType": "application/pdf",
@@ -186,9 +205,6 @@
       "sourceRevision": "a51266eda47f7cb2",
       "modifiedTime": "2026-10-16T04:57:42.003Z",
       "size": 4563909,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1AW6z2D9eZjViTie3OKFtNlrOg_DxdWjU-d7f030122ddfe5f2.jpg",
         "width": 600,
@@ -196,6 +212,9 @@
         "type": "image/jpeg",
         "bytes": 50509
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "b36d4fdf695c76f1"
     },
     {
@@ -256,6 +275,6 @@
       "revision": "9ce5bf31cf0159d8"
     }
   ],
-  "checkedAt": "2026-10-16T05:04:56Z",
-  "updatedAt": "2026-10-16T05:04:56Z"
+  "checkedAt": "2026-10-16T08:01:47Z",
+  "updatedAt": "2026-10-16T08:01:47Z"
 }
