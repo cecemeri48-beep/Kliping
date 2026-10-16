@@ -110,9 +110,6 @@
       "sourceRevision": "f5e85390654e465d",
       "modifiedTime": "2026-10-15T18:03:31.344Z",
       "size": 1381812,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1utMjyob28sBLOcPlbI0niF-KY_xJDXbW-56f90bac7ce3b2c9.jpg",
         "width": 600,
@@ -120,6 +117,9 @@
         "type": "image/jpeg",
         "bytes": 52355
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "842d35f749436875"
     },
     {
@@ -237,6 +237,6 @@
       "revision": "9ce5bf31cf0159d8"
     }
   ],
-  "checkedAt": "2026-10-15T18:05:08Z",
-  "updatedAt": "2026-10-15T18:05:08Z"
+  "checkedAt": "2026-10-16T00:25:24Z",
+  "updatedAt": "2026-10-16T00:25:24Z"
 }
