@@ -47,6 +47,25 @@
       "revision": "f495b72710b32202"
     },
     {
+      "id": "1KmXA0J_cFY2RhwSnTiwAjRL3WoxhqOKG",
+      "name": "Buku Keris_Unggul Sudrajat.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "40c59a0142ca4df3",
+      "modifiedTime": "2026-10-17T07:34:34.195Z",
+      "size": 40176622,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1KmXA0J_cFY2RhwSnTiwAjRL3WoxhqOKG-c4a950d89db0ebee.jpg",
+        "width": 600,
+        "height": 388,
+        "type": "image/jpeg",
+        "bytes": 42021
+      },
+      "revision": "f1e54c427748a79e"
+    },
+    {
       "id": "1D78ZkqrYqCUEFyW6Dy5Qy3MynvXM5tNM",
       "name": "Ceritera Rakyat Daerah Sulawesi Selatan -- Tim Penyusun -.pdf",
       "mimeType": "application/pdf",
@@ -64,6 +83,44 @@
       "coverMethod": "drive-thumbnail",
       "attempts": 0,
       "revision": "782a4edc4af8ff0a"
+    },
+    {
+      "id": "1JqzmqP3PymZFdAtIcymeUeaIrDt4Zue_",
+      "name": "Ensiklopedia Kerajaan Islam Di Indonesia-Copy.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "5381d5f879fc3f81",
+      "modifiedTime": "2026-10-17T08:43:08.543Z",
+      "size": 1276957,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1JqzmqP3PymZFdAtIcymeUeaIrDt4Zue_-e36513f37d26a7ef.jpg",
+        "width": 600,
+        "height": 920,
+        "type": "image/jpeg",
+        "bytes": 73276
+      },
+      "revision": "693df75c31cd00a3"
+    },
+    {
+      "id": "1rzM_qQ2SIzJO6J1DpVg6awTk5V-q9iSq",
+      "name": "Ensiklopedia Kerajaan Islam Di Indonesia-Copy.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "32700bcc7807d26c",
+      "modifiedTime": "2026-10-17T07:34:33.301Z",
+      "size": 1276957,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1rzM_qQ2SIzJO6J1DpVg6awTk5V-q9iSq-e36513f37d26a7ef.jpg",
+        "width": 600,
+        "height": 920,
+        "type": "image/jpeg",
+        "bytes": 73276
+      },
+      "revision": "84add7f5f2dcf074"
     },
     {
       "id": "1EAsvagspF_VtQaYgo2LVKFIwOok5VuLu",
@@ -218,6 +275,25 @@
       "revision": "b71452d37be4699c"
     },
     {
+      "id": "1edzo-cnc84oWPOR6fxKHlUURLAiQGXHA",
+      "name": "Sejarah Islam yang Hilang by Alkhateeb, F. (z-lib.org)-Copy.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "03b18ac017ff0d07",
+      "modifiedTime": "2026-10-17T08:43:07.209Z",
+      "size": 1813703,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1edzo-cnc84oWPOR6fxKHlUURLAiQGXHA-1b46fc3d9c9b0b42.jpg",
+        "width": 600,
+        "height": 946,
+        "type": "image/jpeg",
+        "bytes": 112830
+      },
+      "revision": "924b819fd62c77aa"
+    },
+    {
       "id": "1AW6z2D9eZjViTie3OKFtNlrOg_DxdWjU",
       "name": "Senjata Tradisional Daerah Sulawesi Selatan -- Pananrangi Hamid, Drs.Darwas Rasyid, MS., Dra. Hermin -- .pdf",
       "mimeType": "application/pdf",
@@ -292,8 +368,27 @@
       "coverMethod": "drive-thumbnail",
       "attempts": 0,
       "revision": "9ce5bf31cf0159d8"
+    },
+    {
+      "id": "1RwzvF7M7kb7tw7zk3jassVpEJqLRHazL",
+      "name": "yajuj-majuj-Copy.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "21db6688938ecd2c",
+      "modifiedTime": "2026-10-17T08:43:07.685Z",
+      "size": 6255656,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1RwzvF7M7kb7tw7zk3jassVpEJqLRHazL-0bbc36af7828bd13.jpg",
+        "width": 600,
+        "height": 776,
+        "type": "image/jpeg",
+        "bytes": 48892
+      },
+      "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-10-17T00:30:13Z",
-  "updatedAt": "2026-10-17T00:30:13Z"
+  "checkedAt": "2026-10-17T09:23:17Z",
+  "updatedAt": "2026-10-17T09:23:17Z"
 }
