@@ -53,9 +53,6 @@
       "sourceRevision": "40c59a0142ca4df3",
       "modifiedTime": "2026-10-17T07:34:34.195Z",
       "size": 40176622,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1KmXA0J_cFY2RhwSnTiwAjRL3WoxhqOKG-c4a950d89db0ebee.jpg",
         "width": 600,
@@ -63,6 +60,9 @@
         "type": "image/jpeg",
         "bytes": 42021
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "f1e54c427748a79e"
     },
     {
@@ -91,9 +91,6 @@
       "sourceRevision": "5381d5f879fc3f81",
       "modifiedTime": "2026-10-17T08:43:08.543Z",
       "size": 1276957,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1JqzmqP3PymZFdAtIcymeUeaIrDt4Zue_-e36513f37d26a7ef.jpg",
         "width": 600,
@@ -101,6 +98,9 @@
         "type": "image/jpeg",
         "bytes": 73276
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "693df75c31cd00a3"
     },
     {
@@ -110,9 +110,6 @@
       "sourceRevision": "32700bcc7807d26c",
       "modifiedTime": "2026-10-17T07:34:33.301Z",
       "size": 1276957,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1rzM_qQ2SIzJO6J1DpVg6awTk5V-q9iSq-e36513f37d26a7ef.jpg",
         "width": 600,
@@ -120,6 +117,9 @@
         "type": "image/jpeg",
         "bytes": 73276
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "84add7f5f2dcf074"
     },
     {
@@ -281,9 +281,6 @@
       "sourceRevision": "03b18ac017ff0d07",
       "modifiedTime": "2026-10-17T08:43:07.209Z",
       "size": 1813703,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1edzo-cnc84oWPOR6fxKHlUURLAiQGXHA-1b46fc3d9c9b0b42.jpg",
         "width": 600,
@@ -291,6 +288,9 @@
         "type": "image/jpeg",
         "bytes": 112830
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "924b819fd62c77aa"
     },
     {
@@ -376,9 +376,6 @@
       "sourceRevision": "21db6688938ecd2c",
       "modifiedTime": "2026-10-17T08:43:07.685Z",
       "size": 6255656,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1RwzvF7M7kb7tw7zk3jassVpEJqLRHazL-0bbc36af7828bd13.jpg",
         "width": 600,
@@ -386,9 +383,12 @@
         "type": "image/jpeg",
         "bytes": 48892
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-10-17T09:23:17Z",
-  "updatedAt": "2026-10-17T09:23:17Z"
+  "checkedAt": "2026-10-18T01:33:15Z",
+  "updatedAt": "2026-10-18T01:33:15Z"
 }
