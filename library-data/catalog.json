@@ -4,10 +4,8 @@
   "source": "google-drive-api",
   "sharePreview": true,
   "sync": {
-    "status": "error",
-    "cadenceMinutes": 30,
-    "message": "Pembaruan terjadwal gagal. Koleksi terakhir tetap tersedia.",
-    "attemptedAt": "2026-10-19T07:48:39Z"
+    "status": "ok",
+    "cadenceMinutes": 30
   },
   "books": [
     {
@@ -391,6 +389,6 @@
       "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-10-19T01:45:27Z",
-  "updatedAt": "2026-10-19T01:45:27Z"
+  "checkedAt": "2026-10-19T15:37:46Z",
+  "updatedAt": "2026-10-19T15:37:46Z"
 }
