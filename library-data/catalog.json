@@ -104,25 +104,6 @@
       "revision": "693df75c31cd00a3"
     },
     {
-      "id": "1rzM_qQ2SIzJO6J1DpVg6awTk5V-q9iSq",
-      "name": "Ensiklopedia Kerajaan Islam Di Indonesia-Copy.pdf",
-      "mimeType": "application/pdf",
-      "sourceRevision": "32700bcc7807d26c",
-      "modifiedTime": "2026-10-17T07:34:33.301Z",
-      "size": 1276957,
-      "cover": {
-        "path": "library-data/covers/1rzM_qQ2SIzJO6J1DpVg6awTk5V-q9iSq-e36513f37d26a7ef.jpg",
-        "width": 600,
-        "height": 920,
-        "type": "image/jpeg",
-        "bytes": 73276
-      },
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
-      "revision": "84add7f5f2dcf074"
-    },
-    {
       "id": "1EAsvagspF_VtQaYgo2LVKFIwOok5VuLu",
       "name": "Ensiklopedia Satwa Liar ANJ  -- Nardiyono",
       "mimeType": "application/pdf",
@@ -370,6 +351,25 @@
       "revision": "9ce5bf31cf0159d8"
     },
     {
+      "id": "15JY55KEBOtx8SWfWiuIDcQeQhGt53I4_",
+      "name": "The Pscyhology of Money -- Morgan Housel --..pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "deaba6b24415888b",
+      "modifiedTime": "2026-10-19T16:52:37.450Z",
+      "size": 9496460,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/15JY55KEBOtx8SWfWiuIDcQeQhGt53I4_-43d76c711817e25b.jpg",
+        "width": 600,
+        "height": 776,
+        "type": "image/jpeg",
+        "bytes": 78114
+      },
+      "revision": "2c41345c65d76bc8"
+    },
+    {
       "id": "1RwzvF7M7kb7tw7zk3jassVpEJqLRHazL",
       "name": "yajuj-majuj-Copy.pdf",
       "mimeType": "application/pdf",
@@ -389,6 +389,6 @@
       "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-10-19T15:37:46Z",
-  "updatedAt": "2026-10-19T15:37:46Z"
+  "checkedAt": "2026-10-19T20:43:43Z",
+  "updatedAt": "2026-10-19T20:43:43Z"
 }
