@@ -218,6 +218,25 @@
       "revision": "2e2b1b03e31245a1"
     },
     {
+      "id": "1pKrUIwQsR9uHwNqE1-YPVjEbFg1JDoOb",
+      "name": "Orang-orang Di Persimpangan Kiri Jalan -- Soe Hok Gie --.pdf",
+      "mimeType": "application/pdf",
+      "sourceRevision": "cb0678344e003fea",
+      "modifiedTime": "2026-10-20T18:00:56.968Z",
+      "size": 51355358,
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
+      "cover": {
+        "path": "library-data/covers/1pKrUIwQsR9uHwNqE1-YPVjEbFg1JDoOb-b13bce37c9d5eeb7.jpg",
+        "width": 563,
+        "height": 1000,
+        "type": "image/jpeg",
+        "bytes": 117720
+      },
+      "revision": "aac9e8a95cf3696d"
+    },
+    {
       "id": "1uTuvpfrWjSg4jFEhVIKmNxr7h9FgIXzK",
       "name": "Problematika Sosial Dunia Modern.pdf",
       "mimeType": "application/pdf",
@@ -389,6 +408,6 @@
       "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-10-20T05:21:13Z",
-  "updatedAt": "2026-10-20T05:21:13Z"
+  "checkedAt": "2026-10-20T19:37:17Z",
+  "updatedAt": "2026-10-20T19:37:17Z"
 }
