@@ -4,10 +4,8 @@
   "source": "google-drive-api",
   "sharePreview": true,
   "sync": {
-    "status": "error",
-    "cadenceMinutes": 30,
-    "message": "Pembaruan terjadwal gagal. Koleksi terakhir tetap tersedia.",
-    "attemptedAt": "2026-10-20T00:22:14Z"
+    "status": "ok",
+    "cadenceMinutes": 30
   },
   "books": [
     {
@@ -359,9 +357,6 @@
       "sourceRevision": "deaba6b24415888b",
       "modifiedTime": "2026-10-19T16:52:37.450Z",
       "size": 9496460,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/15JY55KEBOtx8SWfWiuIDcQeQhGt53I4_-43d76c711817e25b.jpg",
         "width": 600,
@@ -369,6 +364,9 @@
         "type": "image/jpeg",
         "bytes": 78114
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "2c41345c65d76bc8"
     },
     {
@@ -391,6 +389,6 @@
       "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-10-19T20:43:43Z",
-  "updatedAt": "2026-10-19T20:43:43Z"
+  "checkedAt": "2026-10-20T05:21:13Z",
+  "updatedAt": "2026-10-20T05:21:13Z"
 }
