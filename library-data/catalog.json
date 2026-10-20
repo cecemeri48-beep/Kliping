@@ -4,8 +4,10 @@
   "source": "google-drive-api",
   "sharePreview": true,
   "sync": {
-    "status": "ok",
-    "cadenceMinutes": 30
+    "status": "error",
+    "cadenceMinutes": 30,
+    "message": "Pembaruan terjadwal gagal. Koleksi terakhir tetap tersedia.",
+    "attemptedAt": "2026-10-20T00:22:14Z"
   },
   "books": [
     {
