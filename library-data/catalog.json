@@ -224,9 +224,6 @@
       "sourceRevision": "cb0678344e003fea",
       "modifiedTime": "2026-10-20T18:00:56.968Z",
       "size": 51355358,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1pKrUIwQsR9uHwNqE1-YPVjEbFg1JDoOb-b13bce37c9d5eeb7.jpg",
         "width": 563,
@@ -234,6 +231,9 @@
         "type": "image/jpeg",
         "bytes": 117720
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "aac9e8a95cf3696d"
     },
     {
@@ -408,6 +408,6 @@
       "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-10-20T19:37:17Z",
-  "updatedAt": "2026-10-20T19:37:17Z"
+  "checkedAt": "2026-10-21T01:01:58Z",
+  "updatedAt": "2026-10-21T01:01:58Z"
 }
