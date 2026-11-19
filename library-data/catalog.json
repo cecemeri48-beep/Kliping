@@ -123,25 +123,6 @@
       "revision": "a262bfa2d50ea868"
     },
     {
-      "id": "1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f",
-      "name": "Filosofi Teras -- Henry Manampiring.pdf",
-      "mimeType": "application/pdf",
-      "sourceRevision": "dbb81e76c15909f6",
-      "modifiedTime": "2026-10-15T16:13:39.049Z",
-      "size": 71746277,
-      "cover": {
-        "path": "library-data/covers/1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f-5f0a0c1ef60fb8bc.jpg",
-        "width": 600,
-        "height": 850,
-        "type": "image/jpeg",
-        "bytes": 94904
-      },
-      "status": "ready",
-      "coverMethod": "pdf-first-pages",
-      "attempts": 0,
-      "revision": "31038bc6d8782ff5"
-    },
-    {
       "id": "12xYVgKA6pcjBRnsN57wd5XA3QSeqXrcK",
       "name": "Hiking and Climbing -- Jeremy Evans Martin 710-20-Rupert White Studio Smillie -.pdf",
       "mimeType": "application/pdf",
@@ -408,6 +389,6 @@
       "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-11-19T00:26:50Z",
-  "updatedAt": "2026-11-19T00:26:50Z"
+  "checkedAt": "2026-11-19T17:23:13Z",
+  "updatedAt": "2026-11-19T17:23:13Z"
 }
