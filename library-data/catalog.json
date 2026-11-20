@@ -129,9 +129,6 @@
       "sourceRevision": "dbb81e76c15909f6",
       "modifiedTime": "2026-10-15T16:13:39.049Z",
       "size": 71746277,
-      "status": "ready",
-      "coverMethod": "pdf-first-pages",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1Vyd7CNCLGDJPUQAYIE-T6i2wCgQJvB1f-5f0a0c1ef60fb8bc.jpg",
         "width": 600,
@@ -139,6 +136,9 @@
         "type": "image/jpeg",
         "bytes": 94904
       },
+      "status": "ready",
+      "coverMethod": "pdf-first-pages",
+      "attempts": 0,
       "revision": "31038bc6d8782ff5"
     },
     {
@@ -408,6 +408,6 @@
       "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-11-19T23:52:04Z",
-  "updatedAt": "2026-11-19T23:52:04Z"
+  "checkedAt": "2026-11-20T07:18:07Z",
+  "updatedAt": "2026-11-20T07:18:07Z"
 }
