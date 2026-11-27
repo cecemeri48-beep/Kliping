@@ -243,9 +243,6 @@
       "sourceRevision": "c56304004dfa3a54",
       "modifiedTime": "2026-11-26T18:47:00.121Z",
       "size": 15252881,
-      "status": "ready",
-      "coverMethod": "drive-thumbnail",
-      "attempts": 0,
       "cover": {
         "path": "library-data/covers/1HESTcUIYOgkmZG1JMF69LO68nAFZCSO4-5da7ac20f8c2fc48.jpg",
         "width": 600,
@@ -253,6 +250,9 @@
         "type": "image/jpeg",
         "bytes": 66771
       },
+      "status": "ready",
+      "coverMethod": "drive-thumbnail",
+      "attempts": 0,
       "revision": "2b93b842199f842f"
     },
     {
@@ -427,6 +427,6 @@
       "revision": "80621ee5638af0a8"
     }
   ],
-  "checkedAt": "2026-11-26T23:20:09Z",
-  "updatedAt": "2026-11-26T23:20:09Z"
+  "checkedAt": "2026-11-27T05:23:05Z",
+  "updatedAt": "2026-11-27T05:23:05Z"
 }
